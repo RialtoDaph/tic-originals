@@ -1,0 +1,25 @@
+{
+  "name": "NewsletterSubscriber",
+  "type": "object",
+  "properties": {
+    "email": {
+      "type": "string",
+      "description": "Subscriber email"
+    },
+    "language": {
+      "type": "string",
+      "enum": [
+        "en",
+        "de"
+      ],
+      "default": "en"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    }
+  },
+  "required": [
+    "email"
+  ]
+}

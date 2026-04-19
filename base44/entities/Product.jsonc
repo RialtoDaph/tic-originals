@@ -1,0 +1,86 @@
+{
+  "name": "Product",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Product name"
+    },
+    "slug": {
+      "type": "string",
+      "description": "URL-friendly name"
+    },
+    "description_en": {
+      "type": "string",
+      "description": "English description"
+    },
+    "description_de": {
+      "type": "string",
+      "description": "German description"
+    },
+    "price": {
+      "type": "number",
+      "description": "Price in EUR including VAT"
+    },
+    "vat_rate": {
+      "type": "number",
+      "default": 19,
+      "description": "VAT percentage"
+    },
+    "category": {
+      "type": "string",
+      "description": "Product category"
+    },
+    "colors": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Available colors"
+    },
+    "sizes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Available sizes"
+    },
+    "stock": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "color": {
+            "type": "string"
+          },
+          "size": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "number"
+          }
+        }
+      },
+      "description": "Stock per color/size combination"
+    },
+    "images": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Product image URLs"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    },
+    "low_stock_threshold": {
+      "type": "number",
+      "default": 3
+    }
+  },
+  "required": [
+    "name",
+    "price"
+  ]
+}
