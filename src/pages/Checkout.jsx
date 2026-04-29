@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Check } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 const STEPS = ['shipping', 'method', 'payment', 'review'];
 
@@ -90,8 +91,28 @@ export default function Checkout() {
     <div className="max-w-4xl mx-auto px-4 sm:px-6 py-12">
       <h1 className="font-heading text-4xl font-light text-center mb-12">{t('checkout.title')}</h1>
 
+      {/* Progress bar */}
+      <div className="mb-4">
+        <div className="flex justify-between items-center mb-2">
+          <p className="text-xs tracking-[0.15em] uppercase text-gray-text">
+            {stepLabels[step]}
+          </p>
+          <p className="text-xs text-gray-text">
+            {step + 1} / {STEPS.length}
+          </p>
+        </div>
+        <div className="h-0.5 w-full bg-border">
+          <motion.div
+            className="h-full bg-cyan"
+            initial={false}
+            animate={{ width: `${((step + 1) / STEPS.length) * 100}%` }}
+            transition={{ duration: 0.4, ease: 'easeInOut' }}
+          />
+        </div>
+      </div>
+
       {/* Steps */}
-      <div className="flex items-center justify-center mb-16">
+      <div className="flex items-center justify-center mb-12">
         {STEPS.map((s, i) => (
           <React.Fragment key={s}>
             <div className="flex items-center gap-2">
@@ -102,7 +123,7 @@ export default function Checkout() {
               </div>
               <span className="text-xs tracking-wider uppercase hidden sm:inline">{stepLabels[i]}</span>
             </div>
-            {i < STEPS.length - 1 && <div className={`w-8 sm:w-16 h-px mx-2 ${i < step ? 'bg-cyan' : 'bg-border'}`} />}
+            {i < STEPS.length - 1 && <div className={`w-8 sm:w-16 h-px mx-2 transition-colors ${i < step ? 'bg-cyan' : 'bg-border'}`} />}
           </React.Fragment>
         ))}
       </div>
