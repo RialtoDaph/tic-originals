@@ -33,7 +33,7 @@ export default function Checkout() {
 
   const generateOrderNumber = () => {
     const num = Math.floor(1000 + Math.random() * 9000);
-    return `TIC-2025-${num}`;
+    return `TIC-${new Date().getFullYear()}-${num}`;
   };
 
   const placeOrder = async () => {

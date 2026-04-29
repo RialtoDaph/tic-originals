@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Star, ChevronLeft, ChevronRight, Quote } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
@@ -77,25 +77,25 @@ export default function ReviewsCarousel() {
     resetTimer();
   };
 
-  const next = () => {
+  const next = useCallback(() => {
     setDirection(1);
     setCurrent(c => (c + 1) % total);
-  };
+  }, [total]);
 
-  const prev = () => {
+  const prev = useCallback(() => {
     setDirection(-1);
     setCurrent(c => (c - 1 + total) % total);
-  };
+  }, [total]);
 
-  const resetTimer = () => {
+  const resetTimer = useCallback(() => {
     clearInterval(intervalRef.current);
     intervalRef.current = setInterval(next, 5000);
-  };
+  }, [next]);
 
   useEffect(() => {
     intervalRef.current = setInterval(next, 5000);
     return () => clearInterval(intervalRef.current);
-  }, [total]);
+  }, [next]);
 
   const variants = {
     enter: dir => ({ x: dir > 0 ? 80 : -80, opacity: 0 }),

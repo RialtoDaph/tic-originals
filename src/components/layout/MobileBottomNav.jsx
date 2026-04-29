@@ -11,26 +11,27 @@ export default function MobileBottomNav() {
 
   const isActive = (path) => location.pathname === path;
 
-  const navItems = [
-    { icon: Home, label: lang === 'de' ? 'Start' : 'Home', to: '/' },
-    { icon: Search, label: lang === 'de' ? 'Shop' : 'Shop', to: '/products' },
-    { icon: Info, label: lang === 'de' ? 'Über uns' : 'About', to: '/about' },
-  ];
-
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-40 lg:hidden bg-white border-t border-border">
+    <div className="fixed bottom-0 left-0 right-0 z-30 lg:hidden bg-white border-t border-border safe-area-inset-bottom">
       <div className="flex items-center">
-        {navItems.map(({ icon: Icon, label, to }) => (
-          <Link key={to} to={to}
-            className={`flex-1 flex flex-col items-center py-3 gap-1 transition-colors ${
-              isActive(to) ? 'text-dark' : 'text-gray-text'
-            }`}>
-            <Icon className="w-5 h-5" />
-            <span className="text-[10px] tracking-wider uppercase">{label}</span>
-          </Link>
-        ))}
+        <Link to="/"
+          className={`flex-1 flex flex-col items-center py-3 gap-1 transition-colors ${isActive('/') ? 'text-dark' : 'text-gray-text'}`}>
+          <Home className="w-5 h-5" />
+          <span className="text-[10px] tracking-wider uppercase">{lang === 'de' ? 'Start' : 'Home'}</span>
+        </Link>
 
-        {/* Cart */}
+        <Link to="/products"
+          className={`flex-1 flex flex-col items-center py-3 gap-1 transition-colors ${isActive('/products') ? 'text-dark' : 'text-gray-text'}`}>
+          <Search className="w-5 h-5" />
+          <span className="text-[10px] tracking-wider uppercase">Shop</span>
+        </Link>
+
+        <Link to="/about"
+          className={`flex-1 flex flex-col items-center py-3 gap-1 transition-colors ${isActive('/about') ? 'text-dark' : 'text-gray-text'}`}>
+          <Info className="w-5 h-5" />
+          <span className="text-[10px] tracking-wider uppercase">{lang === 'de' ? 'Über uns' : 'About'}</span>
+        </Link>
+
         <button
           onClick={() => setIsOpen(true)}
           className="flex-1 flex flex-col items-center py-3 gap-1 text-gray-text relative">
@@ -42,9 +43,7 @@ export default function MobileBottomNav() {
               </span>
             )}
           </div>
-          <span className="text-[10px] tracking-wider uppercase">
-            {lang === 'de' ? 'Warenkorb' : 'Cart'}
-          </span>
+          <span className="text-[10px] tracking-wider uppercase">{lang === 'de' ? 'Warenkorb' : 'Cart'}</span>
         </button>
       </div>
     </div>

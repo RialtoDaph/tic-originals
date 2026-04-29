@@ -236,7 +236,7 @@ export default function ProductDetail() {
       {/* Size Guide Modal */}
       {showSizeGuide && <SizeGuideModal onClose={() => setShowSizeGuide(false)} />}
 
-      {/* Sticky Add to Cart Bar */}
+      {/* Sticky Add to Cart Bar — sits above mobile nav on mobile, at bottom on desktop */}
       <AnimatePresence>
         {isSticky && (
           <motion.div
@@ -244,7 +244,7 @@ export default function ProductDetail() {
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
             transition={{ type: 'tween', duration: 0.3 }}
-            className="fixed bottom-0 left-0 right-0 z-40 bg-white border-t shadow-lg px-4 py-3 flex items-center gap-4"
+            className="fixed bottom-[57px] lg:bottom-0 left-0 right-0 z-40 bg-white border-t shadow-lg px-4 py-3 flex items-center gap-4"
           >
             {product.images?.[0] && (
               <img src={product.images[0]} alt={product.name} className="w-12 h-12 object-cover shrink-0 hidden sm:block" />

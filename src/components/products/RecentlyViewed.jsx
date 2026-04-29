@@ -13,7 +13,7 @@ export function trackProductView(product) {
 }
 
 export default function RecentlyViewed({ currentProductId }) {
-  const { lang, t } = useLanguage();
+  const { lang } = useLanguage();
   const [items, setItems] = useState([]);
 
   useEffect(() => {
