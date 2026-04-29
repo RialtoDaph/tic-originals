@@ -4,6 +4,7 @@ import { ShoppingBag, Menu, X, Globe } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import { useCart } from '@/context/CartContext';
 import { motion, AnimatePresence } from 'framer-motion';
+import AnnouncementTicker from '@/components/layout/AnnouncementTicker';
 
 export default function Navbar() {
   const { t, lang, toggleLang } = useLanguage();
@@ -19,11 +20,7 @@ export default function Navbar() {
 
   return (
     <>
-      <div className="bg-dark-deep text-center py-2 px-4">
-        <p className="text-xs tracking-[0.2em] uppercase text-cyan">
-          {t('hero.announcement')}
-        </p>
-      </div>
+      <AnnouncementTicker />
       <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
