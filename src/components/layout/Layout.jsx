@@ -3,6 +3,7 @@ import { Outlet } from 'react-router-dom';
 import Navbar from './Navbar';
 import Footer from './Footer';
 import CartDrawer from '@/components/cart/CartDrawer';
+import NewsletterPopup from '@/components/common/NewsletterPopup';
 import CookieBanner from '@/components/common/CookieBanner';
 
 export default function Layout() {
@@ -14,6 +15,7 @@ export default function Layout() {
       </main>
       <Footer />
       <CartDrawer />
+      <NewsletterPopup />
       <CookieBanner />
     </div>
   );

@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Minus, Plus, ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import StockBadge from '@/components/common/StockBadge';
+import ProductReviews from '@/components/products/ProductReviews';
 import { motion } from 'framer-motion';
 
 export default function ProductDetail() {
@@ -170,6 +171,7 @@ export default function ProductDetail() {
           </Button>
         </motion.div>
       </div>
+      <ProductReviews productId={productId} />
     </div>
   );
 }
