@@ -69,6 +69,23 @@ export default function CartDrawer() {
                 </div>
 
                 <div className="border-t p-6 space-y-3">
+                  {/* Free shipping upsell progress bar */}
+                  {subtotal < 80 && (
+                    <div className="bg-muted p-3 mb-1">
+                      <p className="text-xs text-gray-text mb-2">
+                        {subtotal >= 60
+                          ? `🎉 ${(80 - subtotal).toFixed(2)}€ ${t('cart.freeShippingNote')}`
+                          : `🚚 ${t('cart.freeShippingNote')}`}
+                      </p>
+                      <div className="h-1 bg-border rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-cyan transition-all duration-500 rounded-full"
+                          style={{ width: `${Math.min((subtotal / 80) * 100, 100)}%` }}
+                        />
+                      </div>
+                      <p className="text-[10px] text-right text-gray-text mt-1">€{subtotal.toFixed(2)} / €80</p>
+                    </div>
+                  )}
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-text">{t('cart.subtotal')}</span>
                     <span>€{subtotal.toFixed(2)}</span>
@@ -81,9 +98,6 @@ export default function CartDrawer() {
                     <span>{t('cart.total')}</span>
                     <span>€{total.toFixed(2)}</span>
                   </div>
-                  {subtotal < 80 && (
-                    <p className="text-xs text-gray-text text-center">{t('cart.freeShippingNote')}</p>
-                  )}
                   <Link to="/checkout" onClick={() => setIsOpen(false)}>
                     <Button className="w-full bg-cyan text-dark-deep hover:bg-cyan-dark mt-2 text-xs tracking-[0.15em] uppercase">
                       {t('cart.checkout')}

@@ -5,13 +5,14 @@ import { useQuery } from '@tanstack/react-query';
 import ProductCard from '@/components/products/ProductCard';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Search } from 'lucide-react';
+import { Search, SlidersHorizontal } from 'lucide-react';
 
 export default function Products() {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const [search, setSearch] = useState('');
   const [colorFilter, setColorFilter] = useState('all');
   const [sizeFilter, setSizeFilter] = useState('all');
+  const [sortBy, setSortBy] = useState('default');
 
   const { data: products = [], isLoading } = useQuery({
     queryKey: ['products'],
@@ -19,16 +20,34 @@ export default function Products() {
   });
 
   const filtered = useMemo(() => {
-    return products.filter(p => {
+    let result = products.filter(p => {
       const matchSearch = !search || p.name.toLowerCase().includes(search.toLowerCase());
       const matchColor = colorFilter === 'all' || p.colors?.includes(colorFilter);
       const matchSize = sizeFilter === 'all' || p.sizes?.includes(sizeFilter);
       return matchSearch && matchColor && matchSize;
     });
-  }, [products, search, colorFilter, sizeFilter]);
+    if (sortBy === 'price_asc') result = [...result].sort((a, b) => a.price - b.price);
+    if (sortBy === 'price_desc') result = [...result].sort((a, b) => b.price - a.price);
+    if (sortBy === 'name') result = [...result].sort((a, b) => a.name.localeCompare(b.name));
+    if (sortBy === 'stock') result = [...result].sort((a, b) => {
+      const aStock = a.stock?.reduce((s, x) => s + x.quantity, 0) || 0;
+      const bStock = b.stock?.reduce((s, x) => s + x.quantity, 0) || 0;
+      return bStock - aStock;
+    });
+    return result;
+  }, [products, search, colorFilter, sizeFilter, sortBy]);
 
   const allColors = [...new Set(products.flatMap(p => p.colors || []))];
   const allSizes = [...new Set(products.flatMap(p => p.sizes || []))];
+
+  const sortLabel = lang === 'de' ? 'Sortieren' : 'Sort';
+  const sortOptions = [
+    { value: 'default', label: lang === 'de' ? 'Standard' : 'Default' },
+    { value: 'price_asc', label: lang === 'de' ? 'Preis: Aufsteigend' : 'Price: Low to High' },
+    { value: 'price_desc', label: lang === 'de' ? 'Preis: Absteigend' : 'Price: High to Low' },
+    { value: 'name', label: lang === 'de' ? 'Name A–Z' : 'Name A–Z' },
+    { value: 'stock', label: lang === 'de' ? 'Verfügbarkeit' : 'Availability' },
+  ];
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
@@ -37,8 +56,8 @@ export default function Products() {
         <h1 className="font-heading text-5xl md:text-6xl font-light">{t('products.title')}</h1>
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-4 mb-12">
-        <div className="relative flex-1">
+      <div className="flex flex-col sm:flex-row gap-4 mb-12 flex-wrap">
+        <div className="relative flex-1 min-w-[200px]">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-text" />
           <Input
             placeholder={t('products.search')}
@@ -63,6 +82,15 @@ export default function Products() {
           <SelectContent>
             <SelectItem value="all">{t('products.all')}</SelectItem>
             {allSizes.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+          </SelectContent>
+        </Select>
+        <Select value={sortBy} onValueChange={setSortBy}>
+          <SelectTrigger className="w-48 rounded-none">
+            <SlidersHorizontal className="w-3.5 h-3.5 mr-1" />
+            <SelectValue placeholder={sortLabel} />
+          </SelectTrigger>
+          <SelectContent>
+            {sortOptions.map(o => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}
           </SelectContent>
         </Select>
       </div>
