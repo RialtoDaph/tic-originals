@@ -8,6 +8,7 @@ import ProductCard from '@/components/products/ProductCard';
 import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
 import HeroSlider from '@/components/home/HeroSlider';
+import ReviewsCarousel from '@/components/home/ReviewsCarousel';
 
 export default function Home() {
   const { t } = useLanguage();
@@ -60,6 +61,9 @@ export default function Home() {
           </motion.div>
         </div>
       </section>
+
+      {/* Reviews Carousel */}
+      <ReviewsCarousel />
 
       {/* Shipping Info */}
       <ShippingInfo />
