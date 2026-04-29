@@ -7,6 +7,7 @@ import { useQuery } from '@tanstack/react-query';
 import ProductCard from '@/components/products/ProductCard';
 import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
+import HeroSlider from '@/components/home/HeroSlider';
 
 export default function Home() {
   const { t } = useLanguage();
@@ -17,47 +18,8 @@ export default function Home() {
 
   return (
     <div>
-      {/* Hero */}
-      <section className="relative bg-dark-deep min-h-[90vh] flex items-center justify-center overflow-hidden">
-        {/* Noise texture overlay */}
-        <div className="absolute inset-0 bg-gradient-to-b from-dark-deep via-dark to-dark-deep" />
-        <div className="absolute inset-0 opacity-[0.04]" style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
-          backgroundRepeat: 'repeat',
-          backgroundSize: '256px 256px',
-        }} />
-        {/* Diagonal lines pattern */}
-        <div className="absolute inset-0 opacity-[0.03]" style={{
-          backgroundImage: 'repeating-linear-gradient(45deg, #9EF2FF 0px, #9EF2FF 1px, transparent 1px, transparent 40px)',
-        }} />
-        <div className="relative z-10 text-center px-4">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 1.2, ease: 'easeOut' }}
-          >
-            <h1 className="font-heading text-[7rem] md:text-[12rem] lg:text-[16rem] font-light leading-none text-cyan/10 select-none tracking-widest">
-              TIC
-            </h1>
-          </motion.div>
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5, duration: 0.8 }}
-            className="absolute inset-0 flex flex-col items-center justify-center"
-          >
-            <p className="text-xs tracking-[0.5em] uppercase text-gray-text mb-3">TIC ORIGINALS</p>
-            <h2 className="font-heading text-4xl md:text-6xl lg:text-7xl text-white font-light tracking-[0.05em]">
-              {t('hero.subtitle')}
-            </h2>
-            <Link to="/products" className="mt-10">
-              <Button className="bg-cyan text-dark-deep hover:bg-cyan-dark px-10 py-6 text-xs tracking-[0.2em] uppercase rounded-none">
-                {t('hero.cta')} <ArrowRight className="w-4 h-4 ml-2" />
-              </Button>
-            </Link>
-          </motion.div>
-        </div>
-      </section>
+      {/* Hero Slider */}
+      <HeroSlider />
 
       {/* Products Preview */}
       {products.length > 0 && (
