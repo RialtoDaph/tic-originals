@@ -22,6 +22,7 @@ import Impressum from '@/pages/Impressum';
 import Datenschutz from '@/pages/Datenschutz';
 import AGB from '@/pages/AGB';
 import Dashboard from '@/pages/admin/Dashboard';
+import Account from '@/pages/Account';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -59,6 +60,7 @@ const AuthenticatedApp = () => {
         <Route path="/datenschutz" element={<Datenschutz />} />
         <Route path="/agb" element={<AGB />} />
         <Route path="/admin" element={<Dashboard />} />
+        <Route path="/account" element={<Account />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>

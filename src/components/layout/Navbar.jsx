@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { Menu, X, Globe, User, LogOut } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Menu, X, Globe, User } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import { useCart } from '@/context/CartContext';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -56,14 +56,11 @@ export default function Navbar() {
                 {lang === 'en' ? 'DE' : 'EN'}
               </button>
               {user ? (
-                <div className="flex items-center gap-2">
-                  <span className="hidden sm:block text-xs text-gray-text truncate max-w-[100px]">{user.full_name || user.email}</span>
-                  <button onClick={() => base44.auth.logout()} title="Logout" className="text-gray-text hover:text-dark transition-colors">
-                    <LogOut className="w-4 h-4" />
-                  </button>
-                </div>
+                <Link to="/account" title="My Account" className="text-gray-text hover:text-dark transition-colors">
+                  <User className="w-4 h-4" />
+                </Link>
               ) : (
-                <button onClick={() => base44.auth.redirectToLogin()} title="Login" className="text-gray-text hover:text-dark transition-colors">
+                <button onClick={() => base44.auth.redirectToLogin(window.location.href)} title="Login" className="text-gray-text hover:text-dark transition-colors">
                   <User className="w-4 h-4" />
                 </button>
               )}
