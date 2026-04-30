@@ -18,6 +18,11 @@
       "type": "string",
       "description": "German description"
     },
+    "description": {
+      "type": "string",
+      "maxLength": 1000,
+      "description": "General product description for SEO"
+    },
     "price": {
       "type": "number",
       "description": "Price in EUR including VAT"

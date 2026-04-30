@@ -18,6 +18,11 @@
       "type": "string",
       "description": "Review text"
     },
+    "description": {
+      "type": "string",
+      "maxLength": 1000,
+      "description": "Additional review details or summary"
+    },
     "is_approved": {
       "type": "boolean",
       "default": true

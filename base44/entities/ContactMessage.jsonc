@@ -14,6 +14,11 @@
     "message": {
       "type": "string"
     },
+    "description": {
+      "type": "string",
+      "maxLength": 1000,
+      "description": "Additional context or notes"
+    },
     "is_read": {
       "type": "boolean",
       "default": false

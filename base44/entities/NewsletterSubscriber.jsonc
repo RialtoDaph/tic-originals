@@ -6,6 +6,11 @@
       "type": "string",
       "description": "Subscriber email"
     },
+    "description": {
+      "type": "string",
+      "maxLength": 1000,
+      "description": "Subscriber notes or details"
+    },
     "language": {
       "type": "string",
       "enum": [
