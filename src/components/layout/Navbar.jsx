@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ShoppingBag, Menu, X, Globe, User, LogOut } from 'lucide-react';
+import { Menu, X, Globe, User, LogOut } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import { useCart } from '@/context/CartContext';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -67,14 +67,7 @@ export default function Navbar() {
                   <User className="w-4 h-4" />
                 </button>
               )}
-              <button onClick={() => setIsOpen(true)} className="relative">
-                <ShoppingBag className="w-5 h-5 text-dark" />
-                {itemCount > 0 && (
-                  <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-cyan text-dark-deep text-[10px] font-bold rounded-full flex items-center justify-center">
-                    {itemCount}
-                  </span>
-                )}
-              </button>
+
             </div>
           </div>
         </div>
