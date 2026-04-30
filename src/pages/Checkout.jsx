@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/context/LanguageContext';
 import { useCart } from '@/context/CartContext';
@@ -7,17 +7,23 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Check } from 'lucide-react';
+import { Check, LogIn } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const STEPS = ['shipping', 'method', 'payment', 'review'];
 
 export default function Checkout() {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const { items, subtotal, shippingCost, total, clearCart } = useCart();
   const navigate = useNavigate();
   const [step, setStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [user, setUser] = useState(null);
+  const [authChecked, setAuthChecked] = useState(false);
+
+  useEffect(() => {
+    base44.auth.me().then(u => { setUser(u); setAuthChecked(true); }).catch(() => setAuthChecked(true));
+  }, []);
 
   const [form, setForm] = useState({
     firstName: '', lastName: '', email: '', phone: '',
@@ -79,10 +85,51 @@ export default function Checkout() {
 
   const stepLabels = [t('checkout.shipping'), t('checkout.method'), t('checkout.payment'), t('checkout.review')];
 
+  // Pre-fill email from logged-in user
+  useEffect(() => {
+    if (user?.email && !form.email) {
+      setForm(prev => ({
+        ...prev,
+        email: user.email,
+        firstName: prev.firstName || (user.full_name ? user.full_name.split(' ')[0] : ''),
+        lastName: prev.lastName || (user.full_name ? user.full_name.split(' ').slice(1).join(' ') : ''),
+      }));
+    }
+  }, [user]);
+
   if (items.length === 0) {
     return (
       <div className="max-w-2xl mx-auto px-4 py-24 text-center">
         <p className="text-gray-text">{t('cart.empty')}</p>
+      </div>
+    );
+  }
+
+  // Login gate — only show if auth check done and user not logged in
+  if (authChecked && !user) {
+    return (
+      <div className="max-w-md mx-auto px-4 py-24 text-center">
+        <div className="border p-10 space-y-6">
+          <LogIn className="w-10 h-10 mx-auto text-cyan" />
+          <div>
+            <h2 className="font-heading text-3xl font-light mb-2">
+              {lang === 'de' ? 'Anmelden' : 'Sign In to Continue'}
+            </h2>
+            <p className="text-sm text-gray-text leading-relaxed">
+              {lang === 'de'
+                ? 'Melde dich an, um deine Bestellung abzuschließen.'
+                : 'Please sign in to complete your purchase.'}
+            </p>
+          </div>
+          <Button
+            onClick={() => base44.auth.redirectToLogin(window.location.href)}
+            className="w-full bg-cyan text-dark-deep hover:bg-cyan-dark rounded-none text-xs tracking-[0.2em] uppercase py-5">
+            {lang === 'de' ? 'Jetzt anmelden' : 'Sign In'}
+          </Button>
+          <p className="text-xs text-gray-text">
+            {lang === 'de' ? 'Noch kein Konto? Jetzt registrieren.' : "Don't have an account? Register now."}
+          </p>
+        </div>
       </div>
     );
   }

@@ -1,15 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ShoppingBag, Menu, X, Globe } from 'lucide-react';
+import { ShoppingBag, Menu, X, Globe, User, LogOut } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import { useCart } from '@/context/CartContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import AnnouncementTicker from '@/components/layout/AnnouncementTicker';
+import { base44 } from '@/api/base44Client';
 
 export default function Navbar() {
   const { t, lang, toggleLang } = useLanguage();
   const { itemCount, setIsOpen } = useCart();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    base44.auth.me().then(setUser).catch(() => setUser(null));
+  }, []);
 
   const links = [
     { to: '/products', label: t('nav.shop') },
@@ -49,6 +55,18 @@ export default function Navbar() {
                 <Globe className="w-3.5 h-3.5" />
                 {lang === 'en' ? 'DE' : 'EN'}
               </button>
+              {user ? (
+                <div className="flex items-center gap-2">
+                  <span className="hidden sm:block text-xs text-gray-text truncate max-w-[100px]">{user.full_name || user.email}</span>
+                  <button onClick={() => base44.auth.logout()} title="Logout" className="text-gray-text hover:text-dark transition-colors">
+                    <LogOut className="w-4 h-4" />
+                  </button>
+                </div>
+              ) : (
+                <button onClick={() => base44.auth.redirectToLogin()} title="Login" className="text-gray-text hover:text-dark transition-colors">
+                  <User className="w-4 h-4" />
+                </button>
+              )}
               <button onClick={() => setIsOpen(true)} className="relative">
                 <ShoppingBag className="w-5 h-5 text-dark" />
                 {itemCount > 0 && (
