@@ -25,28 +25,17 @@ import Dashboard from '@/pages/admin/Dashboard';
 import Account from '@/pages/Account';
 
 const AuthenticatedApp = () => {
-  const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
+  const { isLoadingAuth, authError } = useAuth();
 
-  if (isLoadingPublicSettings || isLoadingAuth) {
-    return (
-      <div className="fixed inset-0 flex items-center justify-center bg-white">
-        <div className="text-center">
-          <p className="font-heading text-2xl tracking-[0.2em] text-dark animate-pulse">TIC</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (authError) {
-    if (authError.type === 'user_not_registered') {
-      return <UserNotRegisteredError />;
-    }
-    // auth_required: biarkan user browsing sebagai guest, jangan redirect otomatis
+  // Only block rendering for user_not_registered — all other states allow public browsing
+  if (authError?.type === 'user_not_registered') {
+    return <UserNotRegisteredError />;
   }
 
   return (
     <Routes>
       <Route element={<Layout />}>
+        {/* Public routes — always accessible without login */}
         <Route path="/" element={<Home />} />
         <Route path="/products" element={<Products />} />
         <Route path="/products/:id" element={<ProductDetail />} />
@@ -59,6 +48,7 @@ const AuthenticatedApp = () => {
         <Route path="/impressum" element={<Impressum />} />
         <Route path="/datenschutz" element={<Datenschutz />} />
         <Route path="/agb" element={<AGB />} />
+        {/* Auth-gated routes */}
         <Route path="/admin" element={<Dashboard />} />
         <Route path="/account" element={<Account />} />
       </Route>
