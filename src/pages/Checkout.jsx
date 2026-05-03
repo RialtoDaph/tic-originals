@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/context/LanguageContext';
 import { useCart } from '@/context/CartContext';
 import { base44 } from '@/api/base44Client';
+import { createCheckoutSession } from '@/functions/createCheckoutSession';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -45,10 +46,20 @@ export default function Checkout() {
 
   const placeOrder = async () => {
     setIsSubmitting(true);
+
+    // Check if running in iframe (preview mode)
+    if (window.self !== window.top) {
+      alert('Checkout hanya bisa digunakan dari aplikasi yang sudah dipublikasi. / Checkout only works from the published app.');
+      setIsSubmitting(false);
+      return;
+    }
+
     const orderNumber = generateOrderNumber();
+
+    // Create order first with pending payment status
     const orderData = {
       order_number: orderNumber,
-      status: 'confirmed',
+      status: 'pending',
       items: items.map(item => ({
         product_id: item.productId,
         product_name: item.productName,
@@ -75,11 +86,34 @@ export default function Checkout() {
       },
       shipping_method: form.shippingMethod,
       payment_method: form.paymentMethod,
-      payment_status: 'paid'
+      payment_status: 'pending'
     };
+
     await base44.entities.Order.create(orderData);
-    clearCart();
-    navigate(`/order-confirmation?order=${orderNumber}`);
+
+    if (form.paymentMethod === 'stripe') {
+      const successUrl = `${window.location.origin}/order-confirmation?order=${orderNumber}`;
+      const cancelUrl = `${window.location.origin}/checkout`;
+
+      const res = await createCheckoutSession({
+        items,
+        shipping_cost: shippingCost,
+        customer_email: form.email,
+        customer_name: `${form.firstName} ${form.lastName}`,
+        order_number: orderNumber,
+        success_url: successUrl,
+        cancel_url: cancelUrl,
+      });
+
+      clearCart();
+      window.location.href = res.data.url;
+    } else {
+      // PayPal or other — mark as paid directly for now
+      await base44.entities.Order.update(orderData.id, { payment_status: 'paid', status: 'confirmed' });
+      clearCart();
+      navigate(`/order-confirmation?order=${orderNumber}`);
+    }
+
     setIsSubmitting(false);
   };
 
