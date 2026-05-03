@@ -9,9 +9,10 @@ export default function LegalPageTemplate({ slug }) {
   const sectionRefs = useRef({});
 
   useEffect(() => {
-    base44.entities.LegalPage.filter({ slug })
+    base44.entities.LegalPage.list()
       .then(results => {
-        if (results.length > 0) setPage(results[0]);
+        const found = results.find(p => p.slug === slug);
+        if (found) setPage(found);
       })
       .finally(() => setLoading(false));
   }, [slug]);
