@@ -14,7 +14,7 @@ export default function Home() {
   const { t } = useLanguage();
   const { data: products = [] } = useQuery({
     queryKey: ['products-home'],
-    queryFn: () => base44.entities.Product.filter({ is_active: true }, '-created_date', 4),
+    queryFn: () => base44.entities.Product.list('-created_date', 4).then(all => all.filter(p => p.is_active)),
   });
 
   return (
