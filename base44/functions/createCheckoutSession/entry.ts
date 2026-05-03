@@ -12,7 +12,7 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { items, shipping_cost, customer_email, customer_name, order_number, success_url, cancel_url } = await req.json();
+    const { items, shipping_cost, discount_amount, customer_email, customer_name, order_number, success_url, cancel_url } = await req.json();
 
     if (!items || !items.length) {
       return Response.json({ error: 'No items provided' }, { status: 400 });
@@ -36,6 +36,18 @@ Deno.serve(async (req) => {
           currency: 'eur',
           product_data: { name: 'Versandkosten / Shipping' },
           unit_amount: Math.round(shipping_cost * 100),
+        },
+        quantity: 1,
+      });
+    }
+
+    // Add discount as a negative line item if applicable
+    if (discount_amount > 0) {
+      lineItems.push({
+        price_data: {
+          currency: 'eur',
+          product_data: { name: 'Rabattcode / Discount Code' },
+          unit_amount: -Math.round(discount_amount * 100),
         },
         quantity: 1,
       });

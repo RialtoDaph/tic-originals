@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Check, LogIn } from 'lucide-react';
+import DiscountCodeInput from '@/components/checkout/DiscountCodeInput';
 import { motion } from 'framer-motion';
 
 const STEPS = ['shipping', 'method', 'payment', 'review'];
@@ -21,6 +22,9 @@ export default function Checkout() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [user, setUser] = useState(null);
   const [authChecked, setAuthChecked] = useState(false);
+  const [appliedCode, setAppliedCode] = useState('');
+  const [discountAmount, setDiscountAmount] = useState(0);
+  const [discountCodeRecord, setDiscountCodeRecord] = useState(null);
 
   useEffect(() => {
     base44.auth.me().then(u => { setUser(u); setAuthChecked(true); }).catch(() => setAuthChecked(true));
@@ -57,6 +61,8 @@ export default function Checkout() {
     const orderNumber = generateOrderNumber();
 
     // Create order first with pending payment status
+    const finalTotal = Math.max(0, total - discountAmount);
+
     const orderData = {
       order_number: orderNumber,
       status: 'pending',
@@ -70,8 +76,10 @@ export default function Checkout() {
       })),
       subtotal,
       shipping_cost: shippingCost,
-      total,
-      vat_amount: total - (total / 1.19),
+      discount_amount: discountAmount,
+      applied_discount_code: appliedCode || undefined,
+      total: finalTotal,
+      vat_amount: finalTotal - (finalTotal / 1.19),
       customer_email: form.email,
       customer_name: `${form.firstName} ${form.lastName}`,
       customer_phone: form.phone,
@@ -95,15 +103,25 @@ export default function Checkout() {
       const successUrl = `${window.location.origin}/order-confirmation?order=${orderNumber}`;
       const cancelUrl = `${window.location.origin}/checkout`;
 
+      // Build items for Stripe — apply discount as negative line item if needed
+      const stripeItems = [...items];
       const res = await createCheckoutSession({
-        items,
+        items: stripeItems,
         shipping_cost: shippingCost,
+        discount_amount: discountAmount,
         customer_email: form.email,
         customer_name: `${form.firstName} ${form.lastName}`,
         order_number: orderNumber,
         success_url: successUrl,
         cancel_url: cancelUrl,
       });
+
+      // Increment used_count on the discount code
+      if (discountCodeRecord) {
+        await base44.entities.DiscountCode.update(discountCodeRecord.id, {
+          used_count: (discountCodeRecord.used_count || 0) + 1
+        });
+      }
 
       clearCart();
       window.location.href = res.data.url;
@@ -335,9 +353,9 @@ export default function Checkout() {
         </div>
 
         {/* Order Summary Sidebar */}
-        <div className="bg-muted p-6 h-fit">
-          <h3 className="text-xs tracking-wider uppercase mb-4">{t('cart.title')}</h3>
-          <div className="space-y-3 mb-6">
+        <div className="bg-muted p-6 h-fit space-y-4">
+          <h3 className="text-xs tracking-wider uppercase">{t('cart.title')}</h3>
+          <div className="space-y-3">
             {items.map(item => (
               <div key={item.key} className="flex justify-between text-sm">
                 <span className="text-gray-text">{item.productName} x{item.quantity}</span>
@@ -345,6 +363,26 @@ export default function Checkout() {
               </div>
             ))}
           </div>
+
+          {/* Discount Code Input */}
+          <DiscountCodeInput
+            subtotal={subtotal}
+            customerEmail={form.email}
+            lang={lang}
+            appliedCode={appliedCode}
+            discountAmount={discountAmount}
+            onApply={(code, amount, record) => {
+              setAppliedCode(code);
+              setDiscountAmount(amount);
+              setDiscountCodeRecord(record);
+            }}
+            onRemove={() => {
+              setAppliedCode('');
+              setDiscountAmount(0);
+              setDiscountCodeRecord(null);
+            }}
+          />
+
           <div className="border-t pt-4 space-y-2">
             <div className="flex justify-between text-sm">
               <span className="text-gray-text">{t('cart.subtotal')}</span>
@@ -354,9 +392,15 @@ export default function Checkout() {
               <span className="text-gray-text">{t('cart.shipping')}</span>
               <span>{shippingCost === 0 ? t('cart.free') : `€${shippingCost.toFixed(2)}`}</span>
             </div>
+            {discountAmount > 0 && (
+              <div className="flex justify-between text-sm text-green-700">
+                <span>{lang === 'de' ? 'Rabatt' : 'Discount'} ({appliedCode})</span>
+                <span>−€{discountAmount.toFixed(2)}</span>
+              </div>
+            )}
             <div className="flex justify-between font-medium pt-2 border-t">
               <span>{t('cart.total')}</span>
-              <span>€{total.toFixed(2)}</span>
+              <span>€{Math.max(0, total - discountAmount).toFixed(2)}</span>
             </div>
             <p className="text-xs text-gray-text">{t('products.inclVat')} (19%)</p>
           </div>

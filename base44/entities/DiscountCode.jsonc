@@ -1,0 +1,74 @@
+{
+  "name": "DiscountCode",
+  "type": "object",
+  "properties": {
+    "code": {
+      "type": "string",
+      "description": "Uppercase alphanumeric discount code"
+    },
+    "description": {
+      "type": "string",
+      "description": "Internal description of the code"
+    },
+    "discount_type": {
+      "type": "string",
+      "enum": [
+        "percentage",
+        "fixed"
+      ],
+      "description": "Type of discount"
+    },
+    "discount_value": {
+      "type": "number",
+      "description": "Discount amount (percent 1-100 or EUR fixed)"
+    },
+    "minimum_order_amount": {
+      "type": "number",
+      "default": 0,
+      "description": "Minimum cart total to apply code"
+    },
+    "maximum_discount_amount": {
+      "type": "number",
+      "description": "Cap on discount for percentage codes (EUR)"
+    },
+    "usage_limit": {
+      "type": "number",
+      "description": "Total times code can be used (null = unlimited)"
+    },
+    "usage_limit_per_customer": {
+      "type": "number",
+      "default": 1,
+      "description": "Times one customer can use this code"
+    },
+    "used_count": {
+      "type": "number",
+      "default": 0,
+      "description": "How many times the code has been used"
+    },
+    "is_first_order_only": {
+      "type": "boolean",
+      "default": false,
+      "description": "Only valid for first-time customers"
+    },
+    "valid_from": {
+      "type": "string",
+      "format": "date",
+      "description": "Start date of validity"
+    },
+    "valid_until": {
+      "type": "string",
+      "format": "date",
+      "description": "End date of validity"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether the code is currently active"
+    }
+  },
+  "required": [
+    "code",
+    "discount_type",
+    "discount_value"
+  ]
+}
