@@ -16,7 +16,7 @@ export default function Products() {
 
   const { data: products = [], isLoading } = useQuery({
     queryKey: ['products'],
-    queryFn: () => base44.entities.Product.filter({ is_active: true }),
+    queryFn: () => base44.entities.Product.list().then(all => all.filter(p => p.is_active)),
   });
 
   const filtered = useMemo(() => {
