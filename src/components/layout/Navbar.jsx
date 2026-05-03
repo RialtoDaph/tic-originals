@@ -44,9 +44,11 @@ export default function Navbar() {
             </div>
 
             <Link to="/" className="absolute left-1/2 -translate-x-1/2">
-              <h1 className="font-heading text-xl md:text-2xl font-semibold tracking-[0.15em] text-dark">
-                TIC
-              </h1>
+              <img
+                src="https://media.base44.com/images/public/69e5695817245a39fd1a3317/f282074c4_TIC.png"
+                alt="TIC"
+                className="h-8 md:h-10 w-auto"
+              />
             </Link>
 
             <div className="flex items-center gap-4">
