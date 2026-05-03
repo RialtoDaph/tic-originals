@@ -62,9 +62,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Reviews Carousel */}
-      <ReviewsCarousel />
-
       {/* Shipping Info */}
       <ShippingInfo />
     </div>
