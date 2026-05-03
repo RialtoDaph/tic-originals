@@ -2,6 +2,7 @@ import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
 import { useCart } from '@/context/CartContext';
 import { base44 } from '@/api/base44Client';
+import { getPublicProducts } from '@/functions/getPublicProducts';
 import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Minus, Plus, ArrowLeft, Ruler, ChevronLeft, ChevronRight } from 'lucide-react';
@@ -27,7 +28,7 @@ export default function ProductDetail() {
 
   const { data: products = [] } = useQuery({
     queryKey: ['products'],
-    queryFn: () => base44.entities.Product.list().then(all => all.filter(p => p.is_active)),
+    queryFn: () => getPublicProducts({}).then(res => res.data.products),
   });
 
   const product = products.find(p => p.id === productId);

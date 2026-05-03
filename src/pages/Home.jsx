@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
-import { base44 } from '@/api/base44Client';
+import { getPublicProducts } from '@/functions/getPublicProducts';
 import { useQuery } from '@tanstack/react-query';
 import ProductCard from '@/components/products/ProductCard';
 import { Button } from '@/components/ui/button';
@@ -14,7 +14,7 @@ export default function Home() {
   const { t } = useLanguage();
   const { data: products = [] } = useQuery({
     queryKey: ['products-home'],
-    queryFn: () => base44.entities.Product.list('-created_date', 4).then(all => all.filter(p => p.is_active)),
+    queryFn: () => getPublicProducts({}).then(res => res.data.products.slice(0, 4)),
   });
 
   return (

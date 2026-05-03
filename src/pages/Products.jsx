@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
-import { base44 } from '@/api/base44Client';
+import { getPublicProducts } from '@/functions/getPublicProducts';
 import { useQuery } from '@tanstack/react-query';
 import ProductCard from '@/components/products/ProductCard';
 import { Input } from '@/components/ui/input';
@@ -16,7 +16,7 @@ export default function Products() {
 
   const { data: products = [], isLoading } = useQuery({
     queryKey: ['products'],
-    queryFn: () => base44.entities.Product.list().then(all => all.filter(p => p.is_active)),
+    queryFn: () => getPublicProducts({}).then(res => res.data.products),
   });
 
   const filtered = useMemo(() => {
