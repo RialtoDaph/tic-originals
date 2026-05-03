@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Check, LogIn } from 'lucide-react';
+import { Check, LogIn, Loader2 } from 'lucide-react';
 import DiscountCodeInput from '@/components/checkout/DiscountCodeInput';
 import { motion } from 'framer-motion';
 
@@ -20,6 +20,7 @@ export default function Checkout() {
   const navigate = useNavigate();
   const [step, setStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [checkoutError, setCheckoutError] = useState('');
   const [user, setUser] = useState(null);
   const [authChecked, setAuthChecked] = useState(false);
   const [appliedCode, setAppliedCode] = useState('');
@@ -50,17 +51,16 @@ export default function Checkout() {
 
   const placeOrder = async () => {
     setIsSubmitting(true);
+    setCheckoutError('');
 
     // Check if running in iframe (preview mode)
     if (window.self !== window.top) {
-      alert('Checkout hanya bisa digunakan dari aplikasi yang sudah dipublikasi. / Checkout only works from the published app.');
+      alert('Checkout funktioniert nur in der veröffentlichten App. / Checkout only works from the published app.');
       setIsSubmitting(false);
       return;
     }
 
     const orderNumber = generateOrderNumber();
-
-    // Create order first with pending payment status
     const finalTotal = Math.max(0, total - discountAmount);
 
     const orderData = {
@@ -97,26 +97,44 @@ export default function Checkout() {
       payment_status: 'pending'
     };
 
-    await base44.entities.Order.create(orderData);
+    // Create the order record first
+    const createdOrder = await base44.entities.Order.create(orderData);
 
     if (form.paymentMethod === 'stripe') {
       const successUrl = `${window.location.origin}/order-confirmation?order=${orderNumber}`;
       const cancelUrl = `${window.location.origin}/checkout`;
 
-      // Build items for Stripe — apply discount as negative line item if needed
-      const stripeItems = [...items];
-      const res = await createCheckoutSession({
-        items: stripeItems,
-        shipping_cost: shippingCost,
-        discount_amount: discountAmount,
-        customer_email: form.email,
-        customer_name: `${form.firstName} ${form.lastName}`,
-        order_number: orderNumber,
-        success_url: successUrl,
-        cancel_url: cancelUrl,
-      });
+      let res;
+      try {
+        res = await createCheckoutSession({
+          items,
+          shipping_cost: shippingCost,
+          discount_amount: discountAmount,
+          customer_email: form.email,
+          customer_name: `${form.firstName} ${form.lastName}`,
+          order_number: orderNumber,
+          success_url: successUrl,
+          cancel_url: cancelUrl,
+        });
+      } catch (err) {
+        // Clean up the pending order if Stripe fails
+        if (createdOrder?.id) await base44.entities.Order.delete(createdOrder.id);
+        setCheckoutError(
+          err?.response?.data?.error || err?.message ||
+          'Stripe nicht konfiguriert — bitte STRIPE_SECRET_KEY in den App-Einstellungen hinterlegen.'
+        );
+        setIsSubmitting(false);
+        return;
+      }
 
-      // Increment used_count on the discount code
+      if (!res?.data?.url) {
+        if (createdOrder?.id) await base44.entities.Order.delete(createdOrder.id);
+        setCheckoutError('Stripe hat keine Checkout-URL zurückgegeben. Bitte erneut versuchen.');
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Increment discount code usage
       if (discountCodeRecord) {
         await base44.entities.DiscountCode.update(discountCodeRecord.id, {
           used_count: (discountCodeRecord.used_count || 0) + 1
@@ -126,8 +144,7 @@ export default function Checkout() {
       clearCart();
       window.location.href = res.data.url;
     } else {
-      // PayPal or other — mark as paid directly for now
-      await base44.entities.Order.update(orderData.id, { payment_status: 'paid', status: 'confirmed' });
+      // PayPal or other — navigate to confirmation directly
       clearCart();
       navigate(`/order-confirmation?order=${orderNumber}`);
     }
@@ -331,6 +348,13 @@ export default function Checkout() {
             </div>
           )}
 
+          {/* Checkout Error */}
+          {checkoutError && (
+            <div className="mt-6 p-4 bg-red-50 border border-red-200 text-red-700 text-sm">
+              {checkoutError}
+            </div>
+          )}
+
           {/* Navigation */}
           <div className="flex justify-between mt-8">
             {step > 0 ? (
@@ -346,7 +370,12 @@ export default function Checkout() {
             ) : (
               <Button onClick={placeOrder} disabled={isSubmitting}
                 className="bg-cyan text-dark-deep hover:bg-cyan-dark rounded-none text-xs tracking-wider uppercase px-10">
-                {isSubmitting ? '...' : t('checkout.placeOrder')}
+                {isSubmitting ? (
+                  <span className="flex items-center gap-2">
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    {lang === 'de' ? 'Wird verarbeitet…' : 'Processing…'}
+                  </span>
+                ) : t('checkout.placeOrder')}
               </Button>
             )}
           </div>
