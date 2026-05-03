@@ -51,6 +51,15 @@
     "shipping_cost": {
       "type": "number"
     },
+    "discount_amount": {
+      "type": "number",
+      "default": 0,
+      "description": "EUR amount discounted via code"
+    },
+    "applied_discount_code": {
+      "type": "string",
+      "description": "The discount code that was applied"
+    },
     "total": {
       "type": "number"
     },
