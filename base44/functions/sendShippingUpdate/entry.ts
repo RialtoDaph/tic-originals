@@ -11,7 +11,7 @@ Deno.serve(async (req) => {
     }
 
     const status = order.status;
-    const lang = order.shipping_address?.country?.toLowerCase().includes('deutsch') ? 'de' : 'en';
+    const lang = order.language || (order.shipping_address?.country?.toLowerCase().includes('deutsch') ? 'de' : 'en');
     const isDE = lang === 'de';
 
     const statusInfo = {

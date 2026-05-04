@@ -10,7 +10,12 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Missing order data' }, { status: 400 });
     }
 
-    const lang = order.shipping_address?.country?.toLowerCase().includes('deutsch') ? 'de' : 'en';
+    // Only send confirmation when payment is actually paid (not on initial pending creation)
+    if (order.payment_status !== 'paid') {
+      return Response.json({ skipped: true, reason: 'payment not yet paid' });
+    }
+
+    const lang = order.language || (order.shipping_address?.country?.toLowerCase().includes('deutsch') ? 'de' : 'en');
     const isDE = lang === 'de';
 
     const itemsHtml = (order.items || []).map(item =>

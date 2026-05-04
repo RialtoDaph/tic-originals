@@ -27,6 +27,8 @@ export default function Checkout() {
   const [appliedCode, setAppliedCode] = useState('');
   const [discountAmount, setDiscountAmount] = useState(0);
   const [discountCodeRecord, setDiscountCodeRecord] = useState(null);
+  // discountCodeRecord kept for compatibility — usage is now incremented server-side via stripeWebhook
+  void discountCodeRecord;
 
   useEffect(() => {
     base44.auth.me().then(u => { setUser(u); setAuthChecked(true); }).catch(() => setAuthChecked(true));
@@ -61,6 +63,30 @@ export default function Checkout() {
       return;
     }
 
+    // Validate stock availability before creating order
+    try {
+      const productIds = [...new Set(items.map(i => i.productId))];
+      const products = await Promise.all(productIds.map(id => base44.entities.Product.get(id)));
+      for (const item of items) {
+        const product = products.find(p => p?.id === item.productId);
+        const stockEntry = product?.stock?.find(s => s.color === item.color && s.size === item.size);
+        const available = stockEntry?.quantity ?? 0;
+        if (available < item.quantity) {
+          setCheckoutError(
+            lang === 'de'
+              ? `Nicht genug Lagerbestand für ${item.productName} (${item.color}/${item.size}). Verfügbar: ${available}`
+              : `Not enough stock for ${item.productName} (${item.color}/${item.size}). Available: ${available}`
+          );
+          setIsSubmitting(false);
+          return;
+        }
+      }
+    } catch (err) {
+      setCheckoutError(lang === 'de' ? 'Lagerprüfung fehlgeschlagen' : 'Stock check failed');
+      setIsSubmitting(false);
+      return;
+    }
+
     const orderNumber = generateOrderNumber();
     const finalTotal = Math.max(0, total - discountAmount);
 
@@ -84,6 +110,7 @@ export default function Checkout() {
       customer_email: form.email,
       customer_name: `${form.firstName} ${form.lastName}`,
       customer_phone: form.phone,
+      language: lang,
       shipping_address: {
         first_name: form.firstName,
         last_name: form.lastName,
@@ -135,13 +162,7 @@ export default function Checkout() {
         return;
       }
 
-      // Increment discount code usage
-      if (discountCodeRecord) {
-        await base44.entities.DiscountCode.update(discountCodeRecord.id, {
-          used_count: (discountCodeRecord.used_count || 0) + 1
-        });
-      }
-
+      // Discount usage is incremented server-side via stripeWebhook on successful payment
       clearCart();
       window.location.href = res.data.url;
     } else {
