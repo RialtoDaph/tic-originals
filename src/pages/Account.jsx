@@ -26,8 +26,12 @@ export default function Account() {
   useEffect(() => {
     if (!authChecked) return;
     if (!isAuthenticated) { setLoadingOrders(false); return; }
-    base44.entities.Order.filter({ customer_email: user.email }, '-created_date', 20)
-      .then(setOrders)
+    base44.entities.Order.filter({ customer_email: user.email }, '-created_date', 50)
+      .then(list => {
+        // Hide pending/unpaid orders (e.g., user abandoned Stripe checkout)
+        const visible = (list || []).filter(o => o.payment_status === 'paid' || o.status !== 'pending');
+        setOrders(visible);
+      })
       .catch(() => setOrders([]))
       .finally(() => setLoadingOrders(false));
   }, [authChecked, isAuthenticated, user]);

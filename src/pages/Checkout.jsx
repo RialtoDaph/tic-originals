@@ -268,7 +268,10 @@ export default function Checkout() {
               </div>
               <div>
                 <Label className="text-xs tracking-wider uppercase">{t('checkout.email')}</Label>
-                <Input type="email" value={form.email} onChange={e => updateField('email', e.target.value)} className="rounded-none mt-1" />
+                <Input type="email" value={form.email} disabled className="rounded-none mt-1 bg-muted" />
+                <p className="text-xs text-gray-text mt-1">
+                  {lang === 'de' ? 'Bestellungen werden mit deinem Konto verknüpft.' : 'Orders are linked to your account.'}
+                </p>
               </div>
               <div>
                 <Label className="text-xs tracking-wider uppercase">{t('checkout.phone')}</Label>
