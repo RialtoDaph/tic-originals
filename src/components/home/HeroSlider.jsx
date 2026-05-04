@@ -107,6 +107,13 @@ export default function HeroSlider() {
           {/* Gradient overlay */}
           <div className={`absolute inset-0 bg-gradient-to-r ${slide.accent}`} />
           <div className="absolute inset-0 bg-gradient-to-t from-dark-deep/70 via-transparent to-dark-deep/30" />
+
+          {/* TIC watermark logo */}
+          <div className="absolute inset-0 flex items-center justify-end pr-8 sm:pr-16 lg:pr-24 pointer-events-none select-none">
+            <span className="font-heading text-[20vw] font-light tracking-[0.15em] text-white/[0.04] leading-none">
+              TIC
+            </span>
+          </div>
         </motion.div>
       </AnimatePresence>
 
