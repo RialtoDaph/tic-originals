@@ -45,8 +45,12 @@ export default function Home() {
       )}
 
       {/* Manifesto */}
-      <section className="bg-dark-deep py-32">
-        <div className="max-w-4xl mx-auto px-4 text-center">
+      <section className="bg-dark-deep py-32 relative overflow-hidden">
+        {/* Low opacity TIC watermark */}
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
+          <span className="font-heading text-[20rem] font-bold text-white/[0.03] leading-none tracking-widest">TIC</span>
+        </div>
+        <div className="max-w-4xl mx-auto px-4 text-center relative z-10">
           <motion.div
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
