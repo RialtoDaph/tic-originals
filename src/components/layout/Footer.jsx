@@ -24,7 +24,7 @@ export default function Footer() {
     <footer className="bg-dark-deep text-white relative overflow-hidden">
       {/* Low opacity TIC watermark */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
-        <span className="font-heading text-[20rem] font-bold text-white/[0.03] leading-none tracking-widest">TIC</span>
+        <span className="font-heading text-[8rem] md:text-[20rem] font-bold text-white/[0.03] leading-none tracking-widest">TIC</span>
       </div>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
