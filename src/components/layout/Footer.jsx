@@ -6,6 +6,7 @@ import { base44 } from '@/api/base44Client';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
+import PaymentMethods from '@/components/common/PaymentMethods';
 
 export default function Footer() {
   const { t } = useLanguage();
@@ -73,9 +74,12 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-dark-light mt-12 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-xs text-gray-text">© {new Date().getFullYear()} TIC ORIGINALS. All rights reserved.</p>
-          <p className="text-xs text-gray-text">An der Oberen Au 4, 85072 Eichstätt, Germany</p>
+        <div className="border-t border-dark-light mt-12 pt-8 space-y-4">
+          <PaymentMethods />
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+            <p className="text-xs text-gray-text">© {new Date().getFullYear()} TIC ORIGINALS. All rights reserved.</p>
+            <p className="text-xs text-gray-text">An der Oberen Au 4, 85072 Eichstätt, Germany</p>
+          </div>
         </div>
       </div>
     </footer>

@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Check, LogIn, Loader2 } from 'lucide-react';
 import DiscountCodeInput from '@/components/checkout/DiscountCodeInput';
+import PaymentMethods from '@/components/common/PaymentMethods';
 import { motion } from 'framer-motion';
 
 const STEPS = ['shipping', 'method', 'payment', 'review'];
@@ -310,21 +311,24 @@ export default function Checkout() {
 
           {/* Step 2: Payment */}
           {step === 2 && (
-            <RadioGroup value={form.paymentMethod} onValueChange={v => updateField('paymentMethod', v)} className="space-y-4">
-              <label className={`flex items-center gap-4 p-4 border cursor-pointer transition-colors ${form.paymentMethod === 'stripe' ? 'border-dark' : 'border-border'}`}>
-                <RadioGroupItem value="stripe" />
-                <div>
-                  <p className="text-sm font-medium">{t('checkout.stripe')}</p>
-                  <p className="text-xs text-gray-text">Visa, Mastercard, AMEX</p>
-                </div>
-              </label>
-              <label className={`flex items-center gap-4 p-4 border cursor-pointer transition-colors ${form.paymentMethod === 'paypal' ? 'border-dark' : 'border-border'}`}>
-                <RadioGroupItem value="paypal" />
-                <div>
-                  <p className="text-sm font-medium">{t('checkout.paypal')}</p>
-                </div>
-              </label>
-            </RadioGroup>
+            <div className="space-y-6">
+              <PaymentMethods />
+              <RadioGroup value={form.paymentMethod} onValueChange={v => updateField('paymentMethod', v)} className="space-y-4">
+                <label className={`flex items-center gap-4 p-4 border cursor-pointer transition-colors ${form.paymentMethod === 'stripe' ? 'border-dark' : 'border-border'}`}>
+                  <RadioGroupItem value="stripe" />
+                  <div>
+                    <p className="text-sm font-medium">{t('checkout.stripe')}</p>
+                    <p className="text-xs text-gray-text">Visa, Mastercard, AMEX</p>
+                  </div>
+                </label>
+                <label className={`flex items-center gap-4 p-4 border cursor-pointer transition-colors ${form.paymentMethod === 'paypal' ? 'border-dark' : 'border-border'}`}>
+                  <RadioGroupItem value="paypal" />
+                  <div>
+                    <p className="text-sm font-medium">{t('checkout.paypal')}</p>
+                  </div>
+                </label>
+              </RadioGroup>
+            </div>
           )}
 
           {/* Step 3: Review */}
