@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/context/LanguageContext';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/lib/AuthContext';
@@ -8,18 +7,16 @@ import { createCheckoutSession } from '@/functions/createCheckoutSession';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Check, LogIn, Loader2 } from 'lucide-react';
 import DiscountCodeInput from '@/components/checkout/DiscountCodeInput.jsx';
 import PaymentMethods from '@/components/common/PaymentMethods';
 import { motion } from 'framer-motion';
 
-const STEPS = ['shipping', 'method', 'payment', 'review'];
+const STEPS = ['shipping', 'review'];
 
 export default function Checkout() {
   const { t, lang } = useLanguage();
-  const { items, subtotal, shippingCost, total, clearCart } = useCart();
-  const navigate = useNavigate();
+  const { items, subtotal, shippingCost, total } = useCart();
   const { user, authChecked } = useAuth();
   const [step, setStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -156,12 +153,13 @@ export default function Checkout() {
 
     // Stock decrement, discount usage increment, and confirmation email
     // are all triggered server-side after Stripe confirms payment.
-    clearCart();
+    // Cart is cleared on /order-confirmation when payment succeeds — so if
+    // the user cancels and returns to /checkout, their cart is still intact.
     window.location.href = res.data.url;
     setIsSubmitting(false);
   };
 
-  const stepLabels = [t('checkout.shipping'), t('checkout.method'), t('checkout.payment'), t('checkout.review')];
+  const stepLabels = [t('checkout.shipping'), t('checkout.review')];
 
   // Pre-fill email from logged-in user
   useEffect(() => {
@@ -303,39 +301,8 @@ export default function Checkout() {
             </div>
           )}
 
-          {/* Step 1: Shipping Method */}
+          {/* Step 1: Review + Payment Info */}
           {step === 1 && (
-            <RadioGroup value={form.shippingMethod} onValueChange={v => updateField('shippingMethod', v)} className="space-y-4">
-              <label className={`flex items-center gap-4 p-4 border cursor-pointer transition-colors ${form.shippingMethod === 'standard' ? 'border-dark' : 'border-border'}`}>
-                <RadioGroupItem value="standard" />
-                <div className="flex-1">
-                  <p className="text-sm font-medium">{t('checkout.standard')}</p>
-                  <p className="text-xs text-gray-text">DHL / Hermes</p>
-                </div>
-                <span className="text-sm">{subtotal >= 80 ? t('cart.free') : '€4.95'}</span>
-              </label>
-            </RadioGroup>
-          )}
-
-          {/* Step 2: Payment */}
-          {step === 2 && (
-            <div className="space-y-6">
-              <PaymentMethods />
-              <div className="bg-muted/40 border p-5 text-sm">
-                <p className="font-medium mb-1">
-                  {lang === 'de' ? 'Sichere Zahlung über Stripe' : 'Secure payment via Stripe'}
-                </p>
-                <p className="text-xs text-gray-text leading-relaxed">
-                  {lang === 'de'
-                    ? 'Du wirst zu unserem Zahlungsanbieter weitergeleitet. Dort kannst du mit Kreditkarte (Visa, Mastercard, AMEX) oder PayPal bezahlen.'
-                    : 'You will be redirected to our payment provider where you can pay with card (Visa, Mastercard, AMEX) or PayPal.'}
-                </p>
-              </div>
-            </div>
-          )}
-
-          {/* Step 3: Review */}
-          {step === 3 && (
             <div className="space-y-6">
               <div className="border p-4">
                 <h3 className="text-xs tracking-wider uppercase mb-3 text-gray-text">{t('checkout.shipping')}</h3>
@@ -351,6 +318,17 @@ export default function Checkout() {
                     <span>€{(item.price * item.quantity).toFixed(2)}</span>
                   </div>
                 ))}
+              </div>
+              <PaymentMethods />
+              <div className="bg-muted/40 border p-5 text-sm">
+                <p className="font-medium mb-1">
+                  {lang === 'de' ? 'Sichere Zahlung über Stripe' : 'Secure payment via Stripe'}
+                </p>
+                <p className="text-xs text-gray-text leading-relaxed">
+                  {lang === 'de'
+                    ? 'Du wirst zu unserem Zahlungsanbieter weitergeleitet. Dort kannst du mit Kreditkarte (Visa, Mastercard, AMEX) oder PayPal bezahlen.'
+                    : 'You will be redirected to our payment provider where you can pay with card (Visa, Mastercard, AMEX) or PayPal.'}
+                </p>
               </div>
             </div>
           )}
@@ -369,7 +347,7 @@ export default function Checkout() {
                 {t('checkout.back')}
               </Button>
             ) : <div />}
-            {step < 3 ? (
+            {step < STEPS.length - 1 ? (
               <Button onClick={() => setStep(s => s + 1)} disabled={!canProceed()}
                 className="bg-cyan text-dark-deep hover:bg-cyan-dark rounded-none text-xs tracking-wider uppercase">
                 {t('checkout.next')}

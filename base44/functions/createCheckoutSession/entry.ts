@@ -54,12 +54,13 @@ Deno.serve(async (req) => {
     }
 
     const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card', 'paypal'],
+      // Let Stripe auto-enable card, PayPal, Klarna, etc. based on Dashboard config
       line_items: lineItems,
       mode: 'payment',
       customer_email: customer_email,
-      success_url: success_url,
+      success_url: `${success_url}&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: cancel_url,
+      client_reference_id: order_number,
       metadata: {
         base44_app_id: Deno.env.get('BASE44_APP_ID'),
         order_number: order_number,
