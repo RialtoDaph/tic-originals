@@ -4,12 +4,17 @@
   "properties": {
     "email": {
       "type": "string",
-      "description": "Subscriber email"
+      "description": "E-Mail-Adresse des Abonnenten"
     },
     "description": {
       "type": "string",
-      "maxLength": 1000,
-      "description": "Subscriber notes or details"
+      "description": "Interne Notiz",
+      "maxLength": 1000
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true,
+      "description": "Abonnement aktiv?"
     },
     "language": {
       "type": "string",
@@ -17,14 +22,53 @@
         "en",
         "de"
       ],
-      "default": "en"
+      "default": "de",
+      "description": "Bevorzugte Sprache"
     },
-    "is_active": {
-      "type": "boolean",
-      "default": true
+    "unsubscribe_token": {
+      "type": "string",
+      "description": "Random token used for unsubscribe link verification"
     }
   },
   "required": [
     "email"
-  ]
+  ],
+  "rls": {
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "data.email": "{{user.email}}"
+        }
+      ]
+    }
+  }
 }
