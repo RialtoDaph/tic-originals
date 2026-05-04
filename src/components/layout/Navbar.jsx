@@ -22,6 +22,7 @@ export default function Navbar() {
     { to: '/about', label: t('nav.about') },
     { to: '/contact', label: t('nav.contact') },
     { to: '/faq', label: t('nav.faq') },
+    { to: '/tracking', label: t('order.trackOrder') },
   ];
 
   return (
