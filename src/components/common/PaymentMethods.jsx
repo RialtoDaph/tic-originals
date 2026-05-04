@@ -14,9 +14,9 @@ export default function PaymentMethods() {
   return (
     <div className="flex flex-col gap-3">
       <span className="text-xs tracking-[0.15em] uppercase text-gray-text">Zahlungsarten</span>
-      <div className="flex flex-wrap items-center gap-2">
+      <div className="flex flex-wrap items-center gap-1.5">
         {methods.map((method) => (
-          <div key={method.name} className="h-9 px-3 bg-white rounded border border-border flex items-center justify-center">
+          <div key={method.name} className="h-7 px-2.5 bg-white rounded border border-border flex items-center justify-center">
             {method.name === 'PayPal' ? (
               <div className="flex items-center gap-0.5">
                 <span className="font-bold text-[#003087] text-xs">pay</span>
