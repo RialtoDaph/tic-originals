@@ -4,11 +4,11 @@
   "properties": {
     "code": {
       "type": "string",
-      "description": "Uppercase alphanumeric discount code"
+      "description": "Rabattcode in Gro\u00dfbuchstaben (z.B. SOMMER10)"
     },
     "description": {
       "type": "string",
-      "description": "Internal description of the code"
+      "description": "Interne Notiz f\u00fcr den Admin"
     },
     "discount_type": {
       "type": "string",
@@ -16,59 +16,81 @@
         "percentage",
         "fixed"
       ],
-      "description": "Type of discount"
+      "description": "Rabatttyp: percentage oder fixed EUR"
     },
     "discount_value": {
       "type": "number",
-      "description": "Discount amount (percent 1-100 or EUR fixed)"
-    },
-    "minimum_order_amount": {
-      "type": "number",
-      "default": 0,
-      "description": "Minimum cart total to apply code"
-    },
-    "maximum_discount_amount": {
-      "type": "number",
-      "description": "Cap on discount for percentage codes (EUR)"
-    },
-    "usage_limit": {
-      "type": "number",
-      "description": "Total times code can be used (null = unlimited)"
-    },
-    "usage_limit_per_customer": {
-      "type": "number",
-      "default": 1,
-      "description": "Times one customer can use this code"
-    },
-    "used_count": {
-      "type": "number",
-      "default": 0,
-      "description": "How many times the code has been used"
-    },
-    "is_first_order_only": {
-      "type": "boolean",
-      "default": false,
-      "description": "Only valid for first-time customers"
-    },
-    "valid_from": {
-      "type": "string",
-      "format": "date",
-      "description": "Start date of validity"
-    },
-    "valid_until": {
-      "type": "string",
-      "format": "date",
-      "description": "End date of validity"
+      "description": "Rabattwert \u2014 % oder EUR"
     },
     "is_active": {
       "type": "boolean",
       "default": true,
-      "description": "Whether the code is currently active"
+      "description": "Code aktiv?"
+    },
+    "is_first_order_only": {
+      "type": "boolean",
+      "default": false,
+      "description": "Nur f\u00fcr Erstkunden?"
+    },
+    "maximum_discount_amount": {
+      "type": "number",
+      "description": "Max Rabatt in EUR (nur bei percentage)"
+    },
+    "minimum_order_amount": {
+      "type": "number",
+      "default": 0,
+      "description": "Mindestbestellwert in EUR"
+    },
+    "usage_limit": {
+      "type": "number",
+      "description": "Max Verwendungen gesamt (leer = unbegrenzt)"
+    },
+    "usage_limit_per_customer": {
+      "type": "number",
+      "default": 1,
+      "description": "Max Verwendungen pro Kunde"
+    },
+    "used_count": {
+      "type": "number",
+      "default": 0,
+      "description": "Bereits verwendet (automatisch \u2014 nicht manuell \u00e4ndern)"
+    },
+    "valid_from": {
+      "type": "string",
+      "format": "date",
+      "description": "G\u00fcltig ab (YYYY-MM-DD)"
+    },
+    "valid_until": {
+      "type": "string",
+      "format": "date",
+      "description": "G\u00fcltig bis (YYYY-MM-DD)"
     }
   },
   "required": [
     "code",
     "discount_type",
     "discount_value"
-  ]
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
 }

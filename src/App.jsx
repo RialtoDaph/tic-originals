@@ -22,7 +22,8 @@ import Impressum from '@/pages/Impressum';
 import Datenschutz from '@/pages/Datenschutz';
 import AGB from '@/pages/AGB';
 import Dashboard from '@/pages/admin/Dashboard';
-import Account from '@/pages/Account';
+import Account from '@/pages/Account.jsx';
+import Unsubscribe from '@/pages/Unsubscribe';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, authError } = useAuth();
@@ -48,6 +49,7 @@ const AuthenticatedApp = () => {
         <Route path="/impressum" element={<Impressum />} />
         <Route path="/datenschutz" element={<Datenschutz />} />
         <Route path="/agb" element={<AGB />} />
+        <Route path="/unsubscribe" element={<Unsubscribe />} />
         {/* Auth-gated routes */}
         <Route path="/admin" element={<Dashboard />} />
         <Route path="/account" element={<Account />} />

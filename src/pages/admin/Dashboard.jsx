@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Package, ShoppingCart, AlertTriangle, BarChart2, Lock, Tag } from 'lucide-react';
 import AdminOrders from '@/components/admin/AdminOrders';
-import AdminProducts from '@/components/admin/AdminProducts';
+import AdminProducts from '@/components/admin/AdminProducts.jsx';
 import AdminInventory from '@/components/admin/AdminInventory';
 import AdminOverview from '@/components/admin/AdminOverview';
 import AdminReports from '@/components/admin/AdminReports';

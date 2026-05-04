@@ -152,8 +152,7 @@
     "shipping_method": {
       "type": "string",
       "enum": [
-        "standard",
-        "express"
+        "standard"
       ]
     },
     "shipping_carrier": {

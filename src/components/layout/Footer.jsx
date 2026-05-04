@@ -16,7 +16,9 @@ export default function Footer() {
   const handleSubscribe = async (e) => {
     e.preventDefault();
     if (!email) return;
-    await base44.entities.NewsletterSubscriber.create({ email });
+    // Generate a random token for unsubscribe link verification
+    const token = Math.random().toString(36).slice(2) + Date.now().toString(36);
+    await base44.entities.NewsletterSubscriber.create({ email, unsubscribe_token: token });
     toast({ title: '✓', description: t('footer.newsletter') });
     setEmail('');
   };
@@ -55,6 +57,7 @@ export default function Footer() {
               <Link to="/datenschutz" className="block text-sm text-gray-text hover:text-white transition-colors">{t('footer.privacy')}</Link>
               <Link to="/agb" className="block text-sm text-gray-text hover:text-white transition-colors">{t('footer.terms')}</Link>
               <Link to="/tracking" className="block text-sm text-gray-text hover:text-white transition-colors">{t('order.trackOrder')}</Link>
+              <Link to="/unsubscribe" className="block text-sm text-gray-text hover:text-white transition-colors">{t('footer.unsubscribe') || 'Unsubscribe'}</Link>
             </div>
           </div>
 

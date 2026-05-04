@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Minus, Plus, ArrowLeft, Ruler, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import StockBadge from '@/components/common/StockBadge';
-import ProductReviews from '@/components/products/ProductReviews';
+import ProductReviews from '@/components/products/ProductReviews.jsx';
 import SocialProofBar from '@/components/products/SocialProofBar';
 import SizeGuideModal from '@/components/products/SizeGuideModal';
 import RecentlyViewed, { trackProductView } from '@/components/products/RecentlyViewed';

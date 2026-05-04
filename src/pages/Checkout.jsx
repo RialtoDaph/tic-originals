@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/context/LanguageContext';
 import { useCart } from '@/context/CartContext';
+import { useAuth } from '@/lib/AuthContext';
 import { base44 } from '@/api/base44Client';
 import { createCheckoutSession } from '@/functions/createCheckoutSession';
 import { Button } from '@/components/ui/button';
@@ -9,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Check, LogIn, Loader2 } from 'lucide-react';
-import DiscountCodeInput from '@/components/checkout/DiscountCodeInput';
+import DiscountCodeInput from '@/components/checkout/DiscountCodeInput.jsx';
 import PaymentMethods from '@/components/common/PaymentMethods';
 import { motion } from 'framer-motion';
 
@@ -19,20 +20,12 @@ export default function Checkout() {
   const { t, lang } = useLanguage();
   const { items, subtotal, shippingCost, total, clearCart } = useCart();
   const navigate = useNavigate();
+  const { user, authChecked } = useAuth();
   const [step, setStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [checkoutError, setCheckoutError] = useState('');
-  const [user, setUser] = useState(null);
-  const [authChecked, setAuthChecked] = useState(false);
   const [appliedCode, setAppliedCode] = useState('');
   const [discountAmount, setDiscountAmount] = useState(0);
-  const [discountCodeRecord, setDiscountCodeRecord] = useState(null);
-  // discountCodeRecord kept for compatibility — usage is now incremented server-side via stripeWebhook
-  void discountCodeRecord;
-
-  useEffect(() => {
-    base44.auth.me().then(u => { setUser(u); setAuthChecked(true); }).catch(() => setAuthChecked(true));
-  }, []);
 
   const [form, setForm] = useState({
     firstName: '', lastName: '', email: '', phone: '',
@@ -425,15 +418,13 @@ export default function Checkout() {
             lang={lang}
             appliedCode={appliedCode}
             discountAmount={discountAmount}
-            onApply={(code, amount, record) => {
+            onApply={(code, amount) => {
               setAppliedCode(code);
               setDiscountAmount(amount);
-              setDiscountCodeRecord(record);
             }}
             onRemove={() => {
               setAppliedCode('');
               setDiscountAmount(0);
-              setDiscountCodeRecord(null);
             }}
           />
 
