@@ -53,6 +53,7 @@ export default function Footer() {
               <Link to="/impressum" className="block text-sm text-gray-text hover:text-white transition-colors">{t('footer.impressum')}</Link>
               <Link to="/datenschutz" className="block text-sm text-gray-text hover:text-white transition-colors">{t('footer.privacy')}</Link>
               <Link to="/agb" className="block text-sm text-gray-text hover:text-white transition-colors">{t('footer.terms')}</Link>
+              <Link to="/tracking" className="block text-sm text-gray-text hover:text-white transition-colors">{t('order.trackOrder')}</Link>
             </div>
           </div>
 
@@ -68,11 +69,7 @@ export default function Footer() {
                 TikTok
               </a>
             </div>
-            <div className="mt-8">
-              <Link to="/tracking" className="text-sm text-gray-text hover:text-white transition-colors">
-                {t('order.trackOrder')}
-              </Link>
-            </div>
+
           </div>
         </div>
 
