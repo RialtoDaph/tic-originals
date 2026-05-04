@@ -57,7 +57,6 @@ export default function Footer() {
               <Link to="/datenschutz" className="block text-sm text-gray-text hover:text-white transition-colors">{t('footer.privacy')}</Link>
               <Link to="/agb" className="block text-sm text-gray-text hover:text-white transition-colors">{t('footer.terms')}</Link>
               <Link to="/tracking" className="block text-sm text-gray-text hover:text-white transition-colors">{t('order.trackOrder')}</Link>
-              <Link to="/unsubscribe" className="block text-sm text-gray-text hover:text-white transition-colors">{t('footer.unsubscribe') || 'Unsubscribe'}</Link>
             </div>
           </div>
 

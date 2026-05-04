@@ -30,7 +30,7 @@ export default function Checkout() {
   const [form, setForm] = useState({
     firstName: '', lastName: '', email: '', phone: '',
     street: '', houseNumber: '', postalCode: '', city: '', country: 'Deutschland',
-    shippingMethod: 'standard', paymentMethod: 'stripe'
+    shippingMethod: 'standard', paymentMethod: 'stripe',
   });
 
   const updateField = (field, value) => setForm(prev => ({ ...prev, [field]: value }));
@@ -121,49 +121,43 @@ export default function Checkout() {
     // Create the order record first
     const createdOrder = await base44.entities.Order.create(orderData);
 
-    if (form.paymentMethod === 'stripe') {
-      const successUrl = `${window.location.origin}/order-confirmation?order=${orderNumber}`;
-      const cancelUrl = `${window.location.origin}/checkout`;
+    // All payments (card, PayPal, etc.) go through Stripe Checkout
+    const successUrl = `${window.location.origin}/order-confirmation?order=${orderNumber}`;
+    const cancelUrl = `${window.location.origin}/checkout`;
 
-      let res;
-      try {
-        res = await createCheckoutSession({
-          items,
-          shipping_cost: shippingCost,
-          discount_amount: discountAmount,
-          customer_email: form.email,
-          customer_name: `${form.firstName} ${form.lastName}`,
-          order_number: orderNumber,
-          success_url: successUrl,
-          cancel_url: cancelUrl,
-        });
-      } catch (err) {
-        // Clean up the pending order if Stripe fails
-        if (createdOrder?.id) await base44.entities.Order.delete(createdOrder.id);
-        setCheckoutError(
-          err?.response?.data?.error || err?.message ||
-          'Stripe nicht konfiguriert — bitte STRIPE_SECRET_KEY in den App-Einstellungen hinterlegen.'
-        );
-        setIsSubmitting(false);
-        return;
-      }
-
-      if (!res?.data?.url) {
-        if (createdOrder?.id) await base44.entities.Order.delete(createdOrder.id);
-        setCheckoutError('Stripe hat keine Checkout-URL zurückgegeben. Bitte erneut versuchen.');
-        setIsSubmitting(false);
-        return;
-      }
-
-      // Discount usage is incremented server-side via stripeWebhook on successful payment
-      clearCart();
-      window.location.href = res.data.url;
-    } else {
-      // PayPal or other — navigate to confirmation directly
-      clearCart();
-      navigate(`/order-confirmation?order=${orderNumber}`);
+    let res;
+    try {
+      res = await createCheckoutSession({
+        items,
+        shipping_cost: shippingCost,
+        discount_amount: discountAmount,
+        customer_email: form.email,
+        customer_name: `${form.firstName} ${form.lastName}`,
+        order_number: orderNumber,
+        success_url: successUrl,
+        cancel_url: cancelUrl,
+      });
+    } catch (err) {
+      if (createdOrder?.id) await base44.entities.Order.delete(createdOrder.id);
+      setCheckoutError(
+        err?.response?.data?.error || err?.message ||
+        'Stripe nicht konfiguriert — bitte STRIPE_SECRET_KEY in den App-Einstellungen hinterlegen.'
+      );
+      setIsSubmitting(false);
+      return;
     }
 
+    if (!res?.data?.url) {
+      if (createdOrder?.id) await base44.entities.Order.delete(createdOrder.id);
+      setCheckoutError('Stripe hat keine Checkout-URL zurückgegeben. Bitte erneut versuchen.');
+      setIsSubmitting(false);
+      return;
+    }
+
+    // Stock decrement, discount usage increment, and confirmation email
+    // are all triggered server-side after Stripe confirms payment.
+    clearCart();
+    window.location.href = res.data.url;
     setIsSubmitting(false);
   };
 
@@ -327,21 +321,16 @@ export default function Checkout() {
           {step === 2 && (
             <div className="space-y-6">
               <PaymentMethods />
-              <RadioGroup value={form.paymentMethod} onValueChange={v => updateField('paymentMethod', v)} className="space-y-4">
-                <label className={`flex items-center gap-4 p-4 border cursor-pointer transition-colors ${form.paymentMethod === 'stripe' ? 'border-dark' : 'border-border'}`}>
-                  <RadioGroupItem value="stripe" />
-                  <div>
-                    <p className="text-sm font-medium">{t('checkout.stripe')}</p>
-                    <p className="text-xs text-gray-text">Visa, Mastercard, AMEX</p>
-                  </div>
-                </label>
-                <label className={`flex items-center gap-4 p-4 border cursor-pointer transition-colors ${form.paymentMethod === 'paypal' ? 'border-dark' : 'border-border'}`}>
-                  <RadioGroupItem value="paypal" />
-                  <div>
-                    <p className="text-sm font-medium">{t('checkout.paypal')}</p>
-                  </div>
-                </label>
-              </RadioGroup>
+              <div className="bg-muted/40 border p-5 text-sm">
+                <p className="font-medium mb-1">
+                  {lang === 'de' ? 'Sichere Zahlung über Stripe' : 'Secure payment via Stripe'}
+                </p>
+                <p className="text-xs text-gray-text leading-relaxed">
+                  {lang === 'de'
+                    ? 'Du wirst zu unserem Zahlungsanbieter weitergeleitet. Dort kannst du mit Kreditkarte (Visa, Mastercard, AMEX) oder PayPal bezahlen.'
+                    : 'You will be redirected to our payment provider where you can pay with card (Visa, Mastercard, AMEX) or PayPal.'}
+                </p>
+              </div>
             </div>
           )}
 

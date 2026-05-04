@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
-import { base44 } from '@/api/base44Client';
+import { getOrderByNumber } from '@/functions/getOrderByNumber';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Package, Truck, CheckCircle, Clock, Search } from 'lucide-react';
@@ -19,10 +19,15 @@ export default function OrderTracking() {
     if (!orderNum.trim()) return;
     setLoading(true);
     setNotFound(false);
-    const orders = await base44.entities.Order.filter({ order_number: orderNum.trim() });
-    if (orders.length > 0) {
-      setOrder(orders[0]);
-    } else {
+    try {
+      const res = await getOrderByNumber({ order_number: orderNum.trim() });
+      if (res?.data?.found) {
+        setOrder(res.data.order);
+      } else {
+        setNotFound(true);
+        setOrder(null);
+      }
+    } catch {
       setNotFound(true);
       setOrder(null);
     }
