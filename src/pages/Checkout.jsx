@@ -38,8 +38,10 @@ export default function Checkout() {
   };
 
   const generateOrderNumber = () => {
-    const num = Math.floor(1000 + Math.random() * 9000);
-    return `TIC-${new Date().getFullYear()}-${num}`;
+    // Last 6 digits of timestamp + 3 random digits → very low collision probability
+    const ts = Date.now().toString().slice(-6);
+    const rand = Math.floor(100 + Math.random() * 900);
+    return `TIC-${new Date().getFullYear()}-${ts}${rand}`;
   };
 
   const placeOrder = async () => {

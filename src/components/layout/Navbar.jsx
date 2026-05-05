@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Menu, X, Globe, User } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import { useCart } from '@/context/CartContext';
+import { useAuth } from '@/lib/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import AnnouncementTicker from '@/components/layout/AnnouncementTicker';
 import { base44 } from '@/api/base44Client';
@@ -10,12 +11,8 @@ import { base44 } from '@/api/base44Client';
 export default function Navbar() {
   const { t, lang, toggleLang } = useLanguage();
   const { itemCount, setIsOpen } = useCart();
+  const { user } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [user, setUser] = useState(null);
-
-  useEffect(() => {
-    base44.auth.me().then(setUser).catch(() => setUser(null));
-  }, []);
 
   const links = [
     { to: '/products', label: t('nav.shop') },

@@ -18,13 +18,20 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'No items provided' }, { status: 400 });
     }
 
+    // Apply discount proportionally across product line items
+    // (Stripe rejects negative unit_amount, so we reduce the items' prices)
+    const subtotal = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
+    const discountFactor = (discount_amount > 0 && subtotal > 0)
+      ? Math.max(0, 1 - discount_amount / subtotal)
+      : 1;
+
     const lineItems = items.map(item => ({
       price_data: {
         currency: 'eur',
         product_data: {
           name: `${item.productName} (${item.color} / ${item.size})`,
         },
-        unit_amount: Math.round(item.price * 100),
+        unit_amount: Math.max(0, Math.round(item.price * discountFactor * 100)),
       },
       quantity: item.quantity,
     }));
@@ -36,18 +43,6 @@ Deno.serve(async (req) => {
           currency: 'eur',
           product_data: { name: 'Versandkosten / Shipping' },
           unit_amount: Math.round(shipping_cost * 100),
-        },
-        quantity: 1,
-      });
-    }
-
-    // Add discount as a negative line item if applicable
-    if (discount_amount > 0) {
-      lineItems.push({
-        price_data: {
-          currency: 'eur',
-          product_data: { name: 'Rabattcode / Discount Code' },
-          unit_amount: -Math.round(discount_amount * 100),
         },
         quantity: 1,
       });
@@ -65,6 +60,7 @@ Deno.serve(async (req) => {
         base44_app_id: Deno.env.get('BASE44_APP_ID'),
         order_number: order_number,
         customer_name: customer_name,
+        discount_amount: String(discount_amount || 0),
       },
     });
 
