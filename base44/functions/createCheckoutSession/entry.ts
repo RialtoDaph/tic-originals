@@ -12,20 +12,45 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { items, shipping_cost, discount_amount, customer_email, customer_name, order_number, success_url, cancel_url } = await req.json();
+    const { items, discount_amount, customer_email, customer_name, order_number, success_url, cancel_url } = await req.json();
 
     if (!items || !items.length) {
       return Response.json({ error: 'No items provided' }, { status: 400 });
     }
 
+    // SECURITY: Re-fetch product prices from DB — never trust prices sent from frontend
+    const productIds = [...new Set(items.map(i => i.productId).filter(Boolean))];
+    const products = await Promise.all(
+      productIds.map(id => base44.asServiceRole.entities.Product.get(id).catch(() => null))
+    );
+    const productMap = Object.fromEntries(products.filter(Boolean).map(p => [p.id, p]));
+
+    const verifiedItems = [];
+    for (const item of items) {
+      const product = productMap[item.productId];
+      if (!product || !product.is_active) {
+        return Response.json({ error: `Product unavailable: ${item.productId}` }, { status: 400 });
+      }
+      verifiedItems.push({
+        ...item,
+        price: product.price, // Override with DB price
+        productName: product.name,
+      });
+    }
+
+    // SECURITY: Calculate shipping server-side based on verified subtotal
+    const SHIPPING_COST = 4.95;
+    const FREE_SHIPPING_THRESHOLD = 80;
+    const verifiedSubtotal = verifiedItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
+    const verifiedShippingCost = verifiedSubtotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_COST;
+
     // Apply discount proportionally across product line items
     // (Stripe rejects negative unit_amount, so we reduce the items' prices)
-    const subtotal = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
-    const discountFactor = (discount_amount > 0 && subtotal > 0)
-      ? Math.max(0, 1 - discount_amount / subtotal)
+    const discountFactor = (discount_amount > 0 && verifiedSubtotal > 0)
+      ? Math.max(0, 1 - discount_amount / verifiedSubtotal)
       : 1;
 
-    const lineItems = items.map(item => ({
+    const lineItems = verifiedItems.map(item => ({
       price_data: {
         currency: 'eur',
         product_data: {
@@ -36,13 +61,13 @@ Deno.serve(async (req) => {
       quantity: item.quantity,
     }));
 
-    // Add shipping as a line item if > 0
-    if (shipping_cost > 0) {
+    // Add shipping as a line item if > 0 (server-calculated, not from FE)
+    if (verifiedShippingCost > 0) {
       lineItems.push({
         price_data: {
           currency: 'eur',
           product_data: { name: 'Versandkosten / Shipping' },
-          unit_amount: Math.round(shipping_cost * 100),
+          unit_amount: Math.round(verifiedShippingCost * 100),
         },
         quantity: 1,
       });

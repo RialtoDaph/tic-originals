@@ -127,8 +127,14 @@ export default function Checkout() {
     let res;
     try {
       res = await createCheckoutSession({
-        items,
-        shipping_cost: shippingCost,
+        items: items.map(i => ({
+          productId: i.productId,
+          productName: i.productName,
+          color: i.color,
+          size: i.size,
+          quantity: i.quantity,
+          price: i.price, // Will be overridden server-side from DB
+        })),
         discount_amount: discountAmount,
         customer_email: form.email,
         customer_name: `${form.firstName} ${form.lastName}`,

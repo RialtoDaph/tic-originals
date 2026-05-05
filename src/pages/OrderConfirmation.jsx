@@ -14,10 +14,11 @@ export default function OrderConfirmation() {
   const orderNumber = params.get('order');
   const sessionId = params.get('session_id'); // from Stripe redirect
 
-  // Clear cart on confirmation page load (handles both Stripe and direct flows)
+  // Only clear cart when arriving from a legitimate Stripe redirect
+  // (prevents accidental cart loss if user pastes the URL manually)
   useEffect(() => {
-    clearCart();
-  }, []);
+    if (sessionId) clearCart();
+  }, [sessionId]);
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-24 text-center">
