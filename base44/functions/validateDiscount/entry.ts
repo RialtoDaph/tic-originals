@@ -34,12 +34,31 @@ Deno.serve(async (req) => {
       });
     }
     if (record.is_first_order_only && customer_email) {
-      const prevOrders = await base44.asServiceRole.entities.Order.filter({
+      // Count both paid AND pending orders (pending = checkout in progress)
+      // This prevents using a first-order code twice via concurrent checkouts
+      const allOrders = await base44.asServiceRole.entities.Order.filter({
         customer_email,
-        payment_status: 'paid',
       });
-      if (prevOrders.length > 0) {
+      const blockingOrders = allOrders.filter(
+        o => o.payment_status === 'paid' || o.payment_status === 'pending'
+      );
+      if (blockingOrders.length > 0) {
         return Response.json({ valid: false, error: 'First order only / Code nur für Erstbestellungen' });
+      }
+    }
+
+    // Block re-use of any code that's already pending checkout for this customer
+    if (customer_email) {
+      const pendingWithCode = await base44.asServiceRole.entities.Order.filter({
+        customer_email,
+        applied_discount_code: record.code,
+        payment_status: 'pending',
+      });
+      if (pendingWithCode.length > 0) {
+        return Response.json({
+          valid: false,
+          error: 'Code already in use in another checkout / Code wird bereits in einer anderen Bestellung verwendet',
+        });
       }
     }
 
