@@ -14,7 +14,7 @@ export default function Home() {
   const { t } = useLanguage();
   const { data: products = [] } = useQuery({
     queryKey: ['products-home'],
-    queryFn: () => getPublicProducts({}).then(res => res.data.products.slice(0, 4)),
+    queryFn: () => getPublicProducts({}).then((res) => res.data.products.slice(0, 4))
   });
 
   return (
@@ -23,16 +23,16 @@ export default function Home() {
       <HeroSlider />
 
       {/* Products Preview */}
-      {products.length > 0 && (
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+      {products.length > 0 &&
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
           <div className="text-center mb-16">
             <p className="text-xs tracking-[0.3em] uppercase text-gray-text mb-3">Collection</p>
             <h2 className="font-heading text-4xl md:text-5xl font-light">{t('products.title')}</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-            {products.map(product => (
-              <ProductCard key={product.id} product={product} />
-            ))}
+            {products.map((product) =>
+          <ProductCard key={product.id} product={product} />
+          )}
           </div>
           <div className="text-center mt-16">
             <Link to="/products">
@@ -42,7 +42,7 @@ export default function Home() {
             </Link>
           </div>
         </section>
-      )}
+      }
 
       {/* Manifesto */}
       <section className="bg-dark-deep py-32 relative overflow-hidden">
@@ -55,10 +55,10 @@ export default function Home() {
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
-            transition={{ duration: 1 }}
-          >
+            transition={{ duration: 1 }}>
+            
             <p className="text-xs tracking-[0.3em] uppercase text-cyan mb-8">Manifesto</p>
-            <blockquote className="font-heading text-2xl md:text-3xl lg:text-4xl text-white/90 font-light leading-relaxed italic">
+            <blockquote className="font-heading md:text-3xl lg:text-4xl text-white/90 font-light leading-relaxed italic text-lg">
               "Cause sometimes you just feel tired... But you gotta search within you, try to find that inner strength and just pull that shit out of you. And get that motivation to not give up."
             </blockquote>
             <div className="mt-8 w-12 h-px bg-cyan mx-auto" />
@@ -68,27 +68,27 @@ export default function Home() {
 
       {/* Shipping Info */}
       <ShippingInfo />
-    </div>
-  );
+    </div>);
+
 }
 
 function ShippingInfo() {
   const { lang } = useLanguage();
   const items = [
-    { title: lang === 'de' ? 'Kostenloser Versand' : 'Free Shipping', desc: lang === 'de' ? 'Ab €80 Bestellwert' : 'On orders over €80' },
-    { title: lang === 'de' ? 'Schnelle Lieferung' : 'Fast Delivery', desc: '2-5 ' + (lang === 'de' ? 'Werktage' : 'business days') },
-    { title: lang === 'de' ? '14 Tage Rückgabe' : '14-Day Returns', desc: lang === 'de' ? 'Widerrufsrecht' : 'Right of withdrawal' },
-  ];
+  { title: lang === 'de' ? 'Kostenloser Versand' : 'Free Shipping', desc: lang === 'de' ? 'Ab €80 Bestellwert' : 'On orders over €80' },
+  { title: lang === 'de' ? 'Schnelle Lieferung' : 'Fast Delivery', desc: '2-5 ' + (lang === 'de' ? 'Werktage' : 'business days') },
+  { title: lang === 'de' ? '14 Tage Rückgabe' : '14-Day Returns', desc: lang === 'de' ? 'Widerrufsrecht' : 'Right of withdrawal' }];
+
   return (
     <section className="py-20 border-t">
       <div className="max-w-5xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-12 text-center">
-        {items.map((item, i) => (
-          <div key={i}>
+        {items.map((item, i) =>
+        <div key={i}>
             <h3 className="font-heading text-xl mb-2">{item.title}</h3>
             <p className="text-sm text-gray-text">{item.desc}</p>
           </div>
-        ))}
+        )}
       </div>
-    </section>
-  );
+    </section>);
+
 }
