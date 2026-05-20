@@ -59,7 +59,7 @@ export default function Home() {
             
             <p className="text-xs tracking-[0.3em] uppercase text-cyan mb-8">Manifesto</p>
             <blockquote className="font-heading md:text-3xl lg:text-4xl text-white/90 font-light leading-relaxed italic text-lg">
-              "Cause sometimes you just feel tired... But you gotta search within you, try to find that inner strength and just pull that shit out of you. And get that motivation to not give up."
+              "Cause sometimes you just feel tired. Feel weak, and when you feel weak. You feel like you wanna just give up. But you gotta search within you. Try to find that inner strength and just pull that shit out of you. And get that motivation to not give up. And not be a quitter. No matter how bad you wanna just fall flat on your face and COLLAPSE."
             </blockquote>
             <div className="mt-8 w-12 h-px bg-cyan mx-auto" />
           </motion.div>
