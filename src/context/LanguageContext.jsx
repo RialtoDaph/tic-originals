@@ -11,7 +11,7 @@ const translations = {
     tracking: { title: 'Order Tracking', enterOrder: 'Enter your order number', track: 'Track', status: 'Status', carrier: 'Carrier', trackingNumber: 'Tracking Number', estimatedDelivery: 'Estimated Delivery', notFound: 'Order not found' },
     about: { title: 'About Us', story: 'Our Story' },
     contact: { title: 'Contact Us', name: 'Name', email: 'Email', subject: 'Subject', message: 'Message', send: 'Send Message', sent: 'Message sent successfully!' },
-    footer: { newsletter: 'Subscribe to our newsletter', subscribe: 'Subscribe', legal: 'Legal', impressum: 'Impressum', privacy: 'Privacy Policy', terms: 'Terms & Conditions', followUs: 'Follow Us', emailPlaceholder: 'Your email address' },
+    footer: { newsletter: 'Subscribe to our newsletter', newsletterHeading: 'Newsletter', subscribe: 'Subscribe', legal: 'Legal', impressum: 'Impressum', privacy: 'Privacy Policy', terms: 'Terms & Conditions', followUs: 'Follow Us', service: 'Service', emailPlaceholder: 'Your email address', tagline: 'Till I Collapse — Premium streetwear from Eichstätt, Germany.' },
     common: { germany: 'Germany', close: 'Close', loading: 'Loading...', error: 'An error occurred' },
     status: { pending: 'Pending', confirmed: 'Confirmed', processing: 'Processing', shipped: 'Shipped', delivered: 'Delivered', cancelled: 'Cancelled', returned: 'Returned' }
   },
@@ -25,7 +25,7 @@ const translations = {
     tracking: { title: 'Bestellverfolgung', enterOrder: 'Geben Sie Ihre Bestellnummer ein', track: 'Verfolgen', status: 'Status', carrier: 'Versanddienstleister', trackingNumber: 'Sendungsnummer', estimatedDelivery: 'Voraussichtliche Lieferung', notFound: 'Bestellung nicht gefunden' },
     about: { title: 'Über uns', story: 'Unsere Geschichte' },
     contact: { title: 'Kontakt', name: 'Name', email: 'E-Mail', subject: 'Betreff', message: 'Nachricht', send: 'Nachricht senden', sent: 'Nachricht erfolgreich gesendet!' },
-    footer: { newsletter: 'Abonniere unseren Newsletter', subscribe: 'Abonnieren', legal: 'Rechtliches', impressum: 'Impressum', privacy: 'Datenschutz', terms: 'AGB', followUs: 'Folge uns', emailPlaceholder: 'Deine E-Mail-Adresse' },
+    footer: { newsletter: 'Abonniere unseren Newsletter', newsletterHeading: 'Newsletter', subscribe: 'Abonnieren', legal: 'Rechtliches', impressum: 'Impressum', privacy: 'Datenschutz', terms: 'AGB', followUs: 'Folge uns', service: 'Service', emailPlaceholder: 'Deine E-Mail-Adresse', tagline: 'Till I Collapse — Premium Streetwear aus Eichstätt, Deutschland.' },
     common: { germany: 'Deutschland', close: 'Schließen', loading: 'Laden...', error: 'Ein Fehler ist aufgetreten' },
     status: { pending: 'Ausstehend', confirmed: 'Bestätigt', processing: 'In Bearbeitung', shipped: 'Versendet', delivered: 'Zugestellt', cancelled: 'Storniert', returned: 'Retourniert' }
   }
