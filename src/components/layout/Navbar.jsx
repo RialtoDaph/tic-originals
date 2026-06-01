@@ -43,9 +43,9 @@ export default function Navbar() {
 
             <Link to="/" className="absolute left-1/2 -translate-x-1/2">
               <img
-                src="https://media.base44.com/images/public/69e5695817245a39fd1a3317/f282074c4_TIC.png"
-                alt="TIC"
-                className="h-8 md:h-10 w-auto"
+                src="https://media.base44.com/images/public/69e5695817245a39fd1a3317/5c0b2056b_Untitleddesign.png"
+                alt="Till I Collapse"
+                className="h-10 md:h-14 w-auto"
               />
             </Link>
 
