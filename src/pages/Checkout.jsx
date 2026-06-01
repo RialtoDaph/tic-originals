@@ -117,6 +117,20 @@ export default function Checkout() {
       payment_status: 'pending'
     };
 
+    // Save shipping address to localStorage for next checkout
+    try {
+      localStorage.setItem(`tic_address_${form.email}`, JSON.stringify({
+        firstName: form.firstName,
+        lastName: form.lastName,
+        phone: form.phone,
+        street: form.street,
+        houseNumber: form.houseNumber,
+        postalCode: form.postalCode,
+        city: form.city,
+        country: form.country,
+      }));
+    } catch (e) { /* ignore quota errors */ }
+
     // Create the order record first
     const createdOrder = await base44.entities.Order.create(orderData);
 
@@ -169,16 +183,57 @@ export default function Checkout() {
 
   const stepLabels = [t('checkout.shipping'), t('checkout.review')];
 
-  // Pre-fill email from logged-in user
+  // Pre-fill from logged-in user + last saved address (localStorage → last order fallback)
   useEffect(() => {
-    if (user?.email && !form.email) {
+    if (!user?.email) return;
+
+    const loadSavedData = async () => {
+      // 1. Try localStorage first (fastest)
+      let saved = null;
+      try {
+        const raw = localStorage.getItem(`tic_address_${user.email}`);
+        if (raw) saved = JSON.parse(raw);
+      } catch (e) { /* ignore */ }
+
+      // 2. Fallback: load from user's last order
+      if (!saved) {
+        try {
+          const orders = await base44.entities.Order.filter(
+            { customer_email: user.email },
+            '-created_date',
+            1
+          );
+          if (orders?.[0]?.shipping_address) {
+            const addr = orders[0].shipping_address;
+            saved = {
+              firstName: addr.first_name || '',
+              lastName: addr.last_name || '',
+              phone: orders[0].customer_phone || '',
+              street: addr.street || '',
+              houseNumber: addr.house_number || '',
+              postalCode: addr.postal_code || '',
+              city: addr.city || '',
+              country: addr.country || 'Deutschland',
+            };
+          }
+        } catch (e) { /* ignore */ }
+      }
+
       setForm(prev => ({
         ...prev,
         email: user.email,
-        firstName: prev.firstName || (user.full_name ? user.full_name.split(' ')[0] : ''),
-        lastName: prev.lastName || (user.full_name ? user.full_name.split(' ').slice(1).join(' ') : ''),
+        firstName: prev.firstName || saved?.firstName || (user.full_name ? user.full_name.split(' ')[0] : ''),
+        lastName: prev.lastName || saved?.lastName || (user.full_name ? user.full_name.split(' ').slice(1).join(' ') : ''),
+        phone: prev.phone || saved?.phone || '',
+        street: prev.street || saved?.street || '',
+        houseNumber: prev.houseNumber || saved?.houseNumber || '',
+        postalCode: prev.postalCode || saved?.postalCode || '',
+        city: prev.city || saved?.city || '',
+        country: prev.country || saved?.country || 'Deutschland',
       }));
-    }
+    };
+
+    loadSavedData();
   }, [user]);
 
   if (items.length === 0) {
