@@ -42,23 +42,23 @@ export default function About() {
             viewport={{ once: true }}
           >
             <h2 className="font-heading text-3xl mb-6">
-              {lang === 'de' ? 'Till I Collapse (TIC) — Biografie' : 'Till I Collapse (TIC) — Biography'}
+              {lang === 'de' ? 'Till I Collapse (TIC) Biografie' : 'Till I Collapse (TIC) Biography'}
             </h2>
             <div className="space-y-6 text-gray-text leading-relaxed">
               <p>
                 {lang === 'de'
-                  ? 'Till I Collapse (TIC) steht für mehr als nur Kleidung — es ist eine Haltung. Geboren aus dem Gedanken, niemals aufzugeben, verkörpert TIC den unaufhaltsamen Drang, weiterzumachen, egal wie schwer der Weg ist.'
-                  : 'Till I Collapse (TIC) stands for more than just clothing — it\'s an attitude. Born from the idea of never giving up, TIC embodies the unstoppable drive to keep going, no matter how hard the road.'}
+                  ? 'Till I Collapse (TIC) steht für mehr als nur Kleidung. Es ist eine Haltung. Geboren aus dem Gedanken, niemals aufzugeben, verkörpert TIC den unaufhaltsamen Drang, weiterzumachen, egal wie schwer der Weg ist.'
+                  : 'Till I Collapse (TIC) stands for more than just clothing. It\'s an attitude. Born from the idea of never giving up, TIC embodies the unstoppable drive to keep going, no matter how hard the road.'}
               </p>
               <p>
                 {lang === 'de'
-                  ? 'Wir designen hochwertige Streetwear für Menschen, die ihren eigenen Weg gehen. Jedes Piece ist darauf ausgelegt, Stil, Qualität und Attitude zu vereinen — minimalistisch im Look, aber maximal in der Aussage.'
-                  : 'We design premium streetwear for people who walk their own path. Every piece is built to unite style, quality and attitude — minimalist in look, but maximum in message.'}
+                  ? 'Wir designen hochwertige Streetwear für Menschen, die ihren eigenen Weg gehen. Jedes Piece ist darauf ausgelegt, Stil, Qualität und Attitude zu vereinen. Minimalistisch im Look, aber maximal in der Aussage.'
+                  : 'We design premium streetwear for people who walk their own path. Every piece is built to unite style, quality and attitude. Minimalist in look, but maximum in message.'}
               </p>
               <p>
                 {lang === 'de'
-                  ? 'Entstanden in Deutschland, gedacht für die ganze Welt. TIC ist mehr als eine Brand — es ist ein globales Projekt, das Menschen verbindet, die dieselbe Mentalität teilen.'
-                  : 'Born in Germany, made for the whole world. TIC is more than a brand — it\'s a global project that connects people who share the same mentality.'}
+                  ? 'Entstanden in Deutschland, gedacht für die ganze Welt. TIC ist mehr als eine Brand. Es ist ein globales Projekt, das Menschen verbindet, die dieselbe Mentalität teilen.'
+                  : 'Born in Germany, made for the whole world. TIC is more than a brand. It\'s a global project that connects people who share the same mentality.'}
               </p>
               <p className="font-heading italic text-dark text-xl">
                 {lang === 'de'
