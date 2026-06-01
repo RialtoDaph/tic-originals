@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Menu, X, Globe, User } from 'lucide-react';
+import { Menu, X, Globe, User, Shield } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/lib/AuthContext';
@@ -55,6 +55,11 @@ export default function Navbar() {
                 <Globe className="w-3.5 h-3.5" />
                 {lang === 'en' ? 'DE' : 'EN'}
               </button>
+              {user?.role === 'admin' && (
+                <Link to="/admin" title="Admin Dashboard" className="text-cyan hover:text-cyan-dark transition-colors">
+                  <Shield className="w-4 h-4" />
+                </Link>
+              )}
               {user ? (
                 <Link to="/account" title="My Account" className="text-gray-text hover:text-dark transition-colors">
                   <User className="w-4 h-4" />
