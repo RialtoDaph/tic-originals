@@ -1,21 +1,22 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { base44 } from '@/api/base44Client';
+import { useQuery } from '@tanstack/react-query';
 
 export default function LegalPageTemplate({ slug }) {
-  const [page, setPage] = useState(null);
   const [lang, setLang] = useState('de');
-  const [loading, setLoading] = useState(true);
   const [showWithdrawalForm, setShowWithdrawalForm] = useState(false);
   const sectionRefs = useRef({});
 
-  useEffect(() => {
-    base44.entities.LegalPage.list()
-      .then(results => {
-        const found = results.find(p => p.slug === slug);
-        if (found) setPage(found);
-      })
-      .finally(() => setLoading(false));
-  }, [slug]);
+  // Fetch ONLY this page by slug (not all legal pages) + cache for 5 minutes
+  const { data: page, isLoading: loading } = useQuery({
+    queryKey: ['legal-page', slug],
+    queryFn: async () => {
+      const results = await base44.entities.LegalPage.filter({ slug });
+      return results[0] || null;
+    },
+    staleTime: 5 * 60 * 1000, // 5 minutes cache
+    refetchOnWindowFocus: false,
+  });
 
   const title = page ? (lang === 'de' ? page.title_de : (page.title_en || page.title_de)) : '';
   const subtitle = page ? (lang === 'de' ? page.subtitle_de : (page.subtitle_en || page.subtitle_de)) : '';

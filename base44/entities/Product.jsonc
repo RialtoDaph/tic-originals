@@ -1,91 +1,171 @@
 {
   "name": "Product",
-  "type": "object",
   "properties": {
-    "name": {
-      "type": "string",
-      "description": "Product name"
+    "care_instructions_de": {
+      "description": "Pflegehinweise auf Deutsch",
+      "placeholder": "Bei 30\u00b0C waschen, nicht im Trockner trocknen.",
+      "type": "string"
     },
-    "slug": {
-      "type": "string",
-      "description": "URL-friendly name"
-    },
-    "description_en": {
-      "type": "string",
-      "description": "English description"
-    },
-    "description_de": {
-      "type": "string",
-      "description": "German description"
-    },
-    "description": {
-      "type": "string",
-      "maxLength": 1000,
-      "description": "General product description for SEO"
-    },
-    "price": {
-      "type": "number",
-      "description": "Price in EUR including VAT"
-    },
-    "vat_rate": {
-      "type": "number",
-      "default": 19,
-      "description": "VAT percentage"
+    "care_instructions_en": {
+      "description": "Care instructions in English",
+      "placeholder": "Wash at 30\u00b0C, do not tumble dry.",
+      "type": "string"
     },
     "category": {
-      "type": "string",
-      "description": "Product category"
+      "description": "Produktkategorie",
+      "enum": [
+        "tees",
+        "hoodies",
+        "caps",
+        "accessories",
+        "other"
+      ],
+      "type": "string"
     },
     "colors": {
-      "type": "array",
+      "description": "Verf\u00fcgbare Farben",
       "items": {
         "type": "string"
       },
-      "description": "Available colors"
+      "placeholder": "schwarz",
+      "type": "array"
+    },
+    "description": {
+      "description": "Kurzbeschreibung f\u00fcr SEO (max. 1000 Zeichen)",
+      "maxLength": 1000,
+      "placeholder": "SEO meta description...",
+      "type": "string"
+    },
+    "description_de": {
+      "description": "Produktbeschreibung auf Deutsch",
+      "placeholder": "Kurze, ansprechende Beschreibung auf Deutsch...",
+      "type": "string"
+    },
+    "description_en": {
+      "description": "Product description in English",
+      "placeholder": "Short, compelling description in English...",
+      "type": "string"
+    },
+    "images": {
+      "description": "Produkt-Bild-URLs \u2014 erstes Bild = Hauptbild",
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "is_active": {
+      "default": true,
+      "description": "Produkt im Shop anzeigen?",
+      "type": "boolean"
+    },
+    "low_stock_threshold": {
+      "default": 3,
+      "description": "Ab welcher Menge erscheint Warnung? (Standard: 3)",
+      "type": "number"
+    },
+    "material": {
+      "description": "Material / Zusammensetzung",
+      "placeholder": "100% Baumwolle",
+      "type": "string"
+    },
+    "name": {
+      "description": "Produktname / Product name",
+      "placeholder": "z.B. TIC Tees Schwarz",
+      "type": "string"
+    },
+    "price": {
+      "description": "Verkaufspreis in EUR inkl. 19% MwSt.",
+      "placeholder": "25.00",
+      "type": "number"
     },
     "sizes": {
-      "type": "array",
+      "description": "Verf\u00fcgbare Gr\u00f6\u00dfen",
       "items": {
+        "enum": [
+          "XS",
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "one-size"
+        ],
         "type": "string"
       },
-      "description": "Available sizes"
+      "type": "array"
+    },
+    "slug": {
+      "description": "URL-Slug (z.B. tic-tees-schwarz)",
+      "placeholder": "tic-tees-schwarz",
+      "type": "string"
     },
     "stock": {
-      "type": "array",
+      "description": "Lagerbestand pro Farbe & Gr\u00f6\u00dfe",
       "items": {
-        "type": "object",
         "properties": {
           "color": {
             "type": "string"
           },
-          "size": {
-            "type": "string"
-          },
           "quantity": {
             "type": "number"
+          },
+          "size": {
+            "type": "string"
           }
-        }
+        },
+        "type": "object"
       },
-      "description": "Stock per color/size combination"
+      "type": "array"
     },
-    "images": {
-      "type": "array",
+    "stripe_price_id": {
+      "description": "Stripe Price ID",
+      "placeholder": "price_...",
+      "type": "string"
+    },
+    "tags": {
+      "description": "Tags f\u00fcr Suche & Filter",
       "items": {
         "type": "string"
       },
-      "description": "Product image URLs"
+      "placeholder": "streetwear",
+      "type": "array"
     },
-    "is_active": {
-      "type": "boolean",
-      "default": true
+    "vat_rate": {
+      "default": 19,
+      "description": "MwSt-Satz in %",
+      "type": "number"
     },
-    "low_stock_threshold": {
-      "type": "number",
-      "default": 3
+    "weight_grams": {
+      "description": "Gewicht in Gramm",
+      "placeholder": "200",
+      "type": "number"
     }
   },
   "required": [
     "name",
-    "price"
-  ]
+    "price",
+    "category",
+    "stock"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "data.is_active": true
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  },
+  "type": "object"
 }

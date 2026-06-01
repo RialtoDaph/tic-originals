@@ -1,32 +1,68 @@
 {
   "name": "ContactMessage",
-  "type": "object",
   "properties": {
-    "name": {
+    "description": {
+      "description": "Zus\u00e4tzliche Notizen",
+      "maxLength": 1000,
       "type": "string"
     },
     "email": {
+      "description": "E-Mail des Absenders",
+      "type": "string"
+    },
+    "is_read": {
+      "default": false,
+      "description": "Vom Admin gelesen?",
+      "type": "boolean"
+    },
+    "message": {
+      "description": "Nachrichteninhalt",
+      "type": "string"
+    },
+    "name": {
+      "description": "Name des Absenders",
       "type": "string"
     },
     "subject": {
+      "description": "Betreff",
       "type": "string"
-    },
-    "message": {
-      "type": "string"
-    },
-    "description": {
-      "type": "string",
-      "maxLength": 1000,
-      "description": "Additional context or notes"
-    },
-    "is_read": {
-      "type": "boolean",
-      "default": false
     }
   },
   "required": [
     "name",
     "email",
     "message"
-  ]
+  ],
+  "rls": {
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  },
+  "type": "object"
 }

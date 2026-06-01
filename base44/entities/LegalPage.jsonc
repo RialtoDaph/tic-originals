@@ -1,0 +1,65 @@
+{
+  "name": "LegalPage",
+  "properties": {
+    "content_de": {
+      "description": "Inhalt auf Deutsch (JSON Array)",
+      "type": "string"
+    },
+    "content_en": {
+      "description": "Content in English (JSON array)",
+      "type": "string"
+    },
+    "is_active": {
+      "default": true,
+      "type": "boolean"
+    },
+    "last_updated": {
+      "description": "Datum der letzten Aktualisierung",
+      "type": "string"
+    },
+    "slug": {
+      "description": "URL-Kennung: impressum | datenschutz | agb",
+      "type": "string"
+    },
+    "subtitle_de": {
+      "type": "string"
+    },
+    "subtitle_en": {
+      "type": "string"
+    },
+    "title_de": {
+      "description": "Seitentitel auf Deutsch",
+      "type": "string"
+    },
+    "title_en": {
+      "description": "Page title in English",
+      "type": "string"
+    }
+  },
+  "required": [
+    "slug",
+    "title_de",
+    "content_de"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "data.is_active": true
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  },
+  "type": "object"
+}
