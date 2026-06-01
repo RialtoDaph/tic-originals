@@ -2,6 +2,8 @@ import React, { useState, useRef } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { useLanguage } from '@/context/LanguageContext';
+import { Download } from 'lucide-react';
+import { jsPDF } from 'jspdf';
 
 export default function LegalPageTemplate({ slug }) {
   const { lang: globalLang } = useLanguage();
@@ -34,6 +36,71 @@ export default function LegalPageTemplate({ slug }) {
     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
+  const downloadPDF = () => {
+    const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const margin = 20;
+    const maxWidth = pageWidth - margin * 2;
+    let y = margin;
+
+    // Title
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(20);
+    doc.text(title || slug, margin, y);
+    y += 8;
+
+    if (subtitle) {
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(11);
+      doc.setTextColor(120);
+      doc.text(subtitle, margin, y);
+      y += 6;
+    }
+
+    doc.setTextColor(0);
+    doc.setDrawColor(200);
+    doc.line(margin, y + 2, pageWidth - margin, y + 2);
+    y += 10;
+
+    // Sections
+    sections.forEach((sec) => {
+      if (y > pageHeight - 30) { doc.addPage(); y = margin; }
+
+      if (sec.heading) {
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(11);
+        const headingLines = doc.splitTextToSize(sec.heading, maxWidth);
+        doc.text(headingLines, margin, y);
+        y += headingLines.length * 5 + 2;
+      }
+
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(10);
+      const bodyLines = doc.splitTextToSize(sec.body || '', maxWidth);
+      bodyLines.forEach((line) => {
+        if (y > pageHeight - 20) { doc.addPage(); y = margin; }
+        doc.text(line, margin, y);
+        y += 5;
+      });
+      y += 6;
+    });
+
+    // Footer
+    if (page?.last_updated) {
+      if (y > pageHeight - 20) { doc.addPage(); y = margin; }
+      doc.setFontSize(9);
+      doc.setTextColor(150);
+      doc.text(
+        `${lang === 'de' ? 'Zuletzt aktualisiert:' : 'Last updated:'} ${page.last_updated}`,
+        margin,
+        y + 4
+      );
+    }
+
+    doc.save(`TIC-ORIGINALS-${slug}-${lang}.pdf`);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-muted/30">
@@ -59,20 +126,31 @@ export default function LegalPageTemplate({ slug }) {
                 <p className="text-sm text-gray-text mt-3 font-body">{subtitle}</p>
               )}
             </div>
-            {/* Language Toggle */}
-            <div className="flex gap-1 shrink-0 mt-1">
-              <button
-                onClick={() => setLang('de')}
-                className={`px-3.5 py-1.5 text-[11px] tracking-[0.15em] uppercase font-body border border-cyan transition-colors ${
-                  lang === 'de' ? 'bg-cyan text-dark-deep' : 'bg-transparent text-cyan hover:bg-cyan/10'
-                }`}
-              >DE</button>
-              <button
-                onClick={() => setLang('en')}
-                className={`px-3.5 py-1.5 text-[11px] tracking-[0.15em] uppercase font-body border border-cyan transition-colors ${
-                  lang === 'en' ? 'bg-cyan text-dark-deep' : 'bg-transparent text-cyan hover:bg-cyan/10'
-                }`}
-              >EN</button>
+            {/* Lang Toggle + Download */}
+            <div className="flex flex-col gap-2 shrink-0 mt-1 items-end">
+              <div className="flex gap-1">
+                <button
+                  onClick={() => setLang('de')}
+                  className={`px-3.5 py-1.5 text-[11px] tracking-[0.15em] uppercase font-body border border-cyan transition-colors ${
+                    lang === 'de' ? 'bg-cyan text-dark-deep' : 'bg-transparent text-cyan hover:bg-cyan/10'
+                  }`}
+                >DE</button>
+                <button
+                  onClick={() => setLang('en')}
+                  className={`px-3.5 py-1.5 text-[11px] tracking-[0.15em] uppercase font-body border border-cyan transition-colors ${
+                    lang === 'en' ? 'bg-cyan text-dark-deep' : 'bg-transparent text-cyan hover:bg-cyan/10'
+                  }`}
+                >EN</button>
+              </div>
+              {sections.length > 0 && (
+                <button
+                  onClick={downloadPDF}
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-[10px] tracking-[0.15em] uppercase font-body text-gray-text hover:text-cyan transition-colors"
+                  title="Download PDF"
+                >
+                  <Download className="w-3 h-3" /> PDF
+                </button>
+              )}
             </div>
           </div>
         </div>
