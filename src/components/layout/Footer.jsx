@@ -66,7 +66,7 @@ export default function Footer() {
               <Link to="/impressum" className="block text-sm text-gray-text hover:text-white transition-colors">{t('footer.impressum')}</Link>
               <Link to="/datenschutz" className="block text-sm text-gray-text hover:text-white transition-colors">{t('footer.privacy')}</Link>
               <Link to="/agb" className="block text-sm text-gray-text hover:text-white transition-colors">{t('footer.terms')}</Link>
-              <Link to="/widerruf" className="block text-sm text-gray-text hover:text-white transition-colors">Widerruf</Link>
+              <Link to="/widerruf" className="block text-sm text-gray-text hover:text-white transition-colors">{t('footer.withdrawal')}</Link>
             </div>
             <h4 className="text-xs tracking-[0.2em] uppercase mb-6 mt-8 text-cyan">{t('footer.followUs')}</h4>
             <div className="space-y-3">

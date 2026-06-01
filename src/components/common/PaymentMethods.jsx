@@ -1,6 +1,8 @@
 import React from 'react';
+import { useLanguage } from '@/context/LanguageContext';
 
 export default function PaymentMethods() {
+  const { t } = useLanguage();
   const methods = [
     { name: 'VISA', color: 'text-blue-600' },
     { name: 'Mastercard', color: 'text-red-500' },
@@ -13,7 +15,7 @@ export default function PaymentMethods() {
 
   return (
     <div className="flex flex-col gap-3">
-      <span className="text-xs tracking-[0.15em] uppercase text-gray-text">Zahlungsarten</span>
+      <span className="text-xs tracking-[0.15em] uppercase text-gray-text">{t('footer.payments')}</span>
       <div className="flex flex-wrap items-center gap-1.5">
         {methods.map((method) => (
           <div key={method.name} className="h-7 px-2.5 bg-white rounded border border-border flex items-center justify-center">
