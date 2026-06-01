@@ -1,20 +1,22 @@
 import React, { useState, useRef } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
+import { useLanguage } from '@/context/LanguageContext';
 
 export default function LegalPageTemplate({ slug }) {
-  const [lang, setLang] = useState('de');
+  const { lang: globalLang } = useLanguage();
+  const [lang, setLang] = useState(globalLang || 'de');
   const [showWithdrawalForm, setShowWithdrawalForm] = useState(false);
   const sectionRefs = useRef({});
 
-  // Fetch ONLY this page by slug (not all legal pages) + cache for 5 minutes
+  // Fetch ONLY this page by slug + cache for 5 minutes
   const { data: page, isLoading: loading } = useQuery({
     queryKey: ['legal-page', slug],
     queryFn: async () => {
       const results = await base44.entities.LegalPage.filter({ slug });
       return results[0] || null;
     },
-    staleTime: 5 * 60 * 1000, // 5 minutes cache
+    staleTime: 5 * 60 * 1000,
     refetchOnWindowFocus: false,
   });
 
@@ -34,50 +36,42 @@ export default function LegalPageTemplate({ slug }) {
 
   if (loading) {
     return (
-      <div style={{ background: '#fafaf8', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <p style={{ color: '#999', fontSize: '14px', letterSpacing: '0.1em' }}>Loading…</p>
+      <div className="min-h-screen flex items-center justify-center bg-muted/30">
+        <p className="text-sm tracking-widest text-gray-text">Loading…</p>
       </div>
     );
   }
 
   return (
-    <div style={{ background: '#fafaf8', minHeight: '100vh' }}>
+    <div className="min-h-screen bg-muted/30">
       {/* Header */}
-      <div style={{ background: '#0a0a0a', color: '#fff', padding: '48px 24px 40px' }}>
-        <div style={{ maxWidth: '760px', margin: '0 auto' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-            <div>
-              <p style={{ fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', color: '#9EF2FF', marginBottom: '12px', fontFamily: 'Inter, sans-serif' }}>
+      <div className="bg-dark-deep text-white px-6 pt-12 pb-10">
+        <div className="max-w-[760px] mx-auto">
+          <div className="flex justify-between items-start gap-6">
+            <div className="min-w-0">
+              <p className="text-[11px] tracking-[0.22em] uppercase text-cyan mb-3 font-body">
                 TIC ORIGINALS
               </p>
-              <h1 style={{ fontFamily: 'Georgia, serif', fontSize: 'clamp(28px, 5vw, 48px)', fontWeight: 300, lineHeight: 1.15, margin: 0 }}>
-                {title || slug}
+              <h1 className="font-heading font-light leading-tight text-[clamp(28px,5vw,48px)] m-0">
+                {title || (lang === 'de' ? 'Rechtliches' : 'Legal')}
               </h1>
               {subtitle && (
-                <p style={{ fontSize: '14px', color: '#aaa', marginTop: '10px', fontFamily: 'Inter, sans-serif' }}>{subtitle}</p>
+                <p className="text-sm text-gray-text mt-3 font-body">{subtitle}</p>
               )}
             </div>
             {/* Language Toggle */}
-            <div style={{ display: 'flex', gap: '4px', marginTop: '4px', flexShrink: 0 }}>
+            <div className="flex gap-1 shrink-0 mt-1">
               <button
                 onClick={() => setLang('de')}
-                style={{
-                  padding: '6px 14px', fontSize: '11px', letterSpacing: '0.15em', textTransform: 'uppercase',
-                  background: lang === 'de' ? '#9EF2FF' : 'transparent',
-                  color: lang === 'de' ? '#0a0a0a' : '#9EF2FF',
-                  border: '1px solid #9EF2FF', cursor: 'pointer', fontFamily: 'Inter, sans-serif',
-                  transition: 'all 0.2s'
-                }}
+                className={`px-3.5 py-1.5 text-[11px] tracking-[0.15em] uppercase font-body border border-cyan transition-colors ${
+                  lang === 'de' ? 'bg-cyan text-dark-deep' : 'bg-transparent text-cyan hover:bg-cyan/10'
+                }`}
               >DE</button>
               <button
                 onClick={() => setLang('en')}
-                style={{
-                  padding: '6px 14px', fontSize: '11px', letterSpacing: '0.15em', textTransform: 'uppercase',
-                  background: lang === 'en' ? '#9EF2FF' : 'transparent',
-                  color: lang === 'en' ? '#0a0a0a' : '#9EF2FF',
-                  border: '1px solid #9EF2FF', cursor: 'pointer', fontFamily: 'Inter, sans-serif',
-                  transition: 'all 0.2s'
-                }}
+                className={`px-3.5 py-1.5 text-[11px] tracking-[0.15em] uppercase font-body border border-cyan transition-colors ${
+                  lang === 'en' ? 'bg-cyan text-dark-deep' : 'bg-transparent text-cyan hover:bg-cyan/10'
+                }`}
               >EN</button>
             </div>
           </div>
@@ -86,21 +80,14 @@ export default function LegalPageTemplate({ slug }) {
 
       {/* Section Nav */}
       {sections.length > 0 && (
-        <div style={{ background: '#0a0a0a', borderTop: '1px solid #222' }}>
-          <div style={{ maxWidth: '760px', margin: '0 auto', padding: '0 24px' }}>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0' }}>
+        <div className="bg-dark-deep border-t border-dark-light">
+          <div className="max-w-[760px] mx-auto px-6 overflow-x-auto">
+            <div className="flex gap-0">
               {sections.map((sec, i) => (
                 <button
                   key={sec.id || i}
                   onClick={() => scrollTo(sec.id || `section-${i}`)}
-                  style={{
-                    padding: '12px 16px', fontSize: '11px', letterSpacing: '0.12em',
-                    textTransform: 'uppercase', color: '#666', background: 'transparent',
-                    border: 'none', cursor: 'pointer', fontFamily: 'Inter, sans-serif',
-                    transition: 'color 0.2s', whiteSpace: 'nowrap'
-                  }}
-                  onMouseEnter={e => e.target.style.color = '#9EF2FF'}
-                  onMouseLeave={e => e.target.style.color = '#666'}
+                  className="px-4 py-3 text-[11px] tracking-[0.12em] uppercase text-gray-text hover:text-cyan transition-colors font-body whitespace-nowrap"
                 >
                   {sec.id || `§${i + 1}`}
                 </button>
@@ -111,58 +98,44 @@ export default function LegalPageTemplate({ slug }) {
       )}
 
       {/* Content */}
-      <div style={{ maxWidth: '760px', margin: '0 auto', padding: '48px 24px 80px' }}>
-        {sections.length === 0 && !loading && (
-          <p style={{ color: '#999', fontFamily: 'Inter, sans-serif', fontSize: '14px' }}>
+      <div className="max-w-[760px] mx-auto px-6 py-12 pb-20">
+        {sections.length === 0 && (
+          <p className="text-sm text-gray-text font-body">
             {lang === 'de' ? 'Inhalt wird geladen…' : 'Content coming soon…'}
           </p>
         )}
 
         {sections.map((sec, i) => {
           const sectionId = sec.id || `section-${i}`;
+          const isNote = !!sec.note;
+
           return (
             <div
               key={sectionId}
               ref={el => sectionRefs.current[sectionId] = el}
-              style={{
-                borderTop: i === 0 ? 'none' : '1px solid #e8e6e0',
-                paddingTop: i === 0 ? 0 : '40px',
-                marginTop: i === 0 ? 0 : '40px',
-                background: sec.note ? '#f0ede6' : 'transparent',
-                padding: sec.note ? '24px' : (i === 0 ? '0' : '40px 0 0 0'),
-                marginTop: sec.note ? '40px' : (i === 0 ? 0 : '40px'),
-                borderRadius: sec.note ? '2px' : 0,
-              }}
+              className={`${i > 0 ? 'mt-10 pt-10 border-t border-border' : ''} ${
+                isNote ? 'bg-cyan/10 border border-cyan/30 p-6 rounded-sm' : ''
+              }`}
             >
               {sec.heading && (
-                <p style={{
-                  fontSize: '10px', letterSpacing: '0.2em', textTransform: 'uppercase',
-                  color: '#999', fontFamily: 'Inter, sans-serif', marginBottom: '14px', fontWeight: 500
-                }}>
+                <p className="text-[10px] tracking-[0.2em] uppercase text-gray-text font-body font-medium mb-3.5">
                   {sec.heading}
                 </p>
               )}
-              <div style={{
-                fontFamily: 'Georgia, serif', fontSize: '15px', lineHeight: 1.85,
-                color: '#2a2a2a', whiteSpace: 'pre-line',
-                fontStyle: sec.note ? 'italic' : 'normal'
-              }}>
+              <div
+                className={`font-heading text-[15px] leading-[1.85] text-dark whitespace-pre-line ${
+                  isNote ? 'italic' : ''
+                }`}
+              >
                 {sec.body}
               </div>
 
-              {/* Withdrawal Form Toggle (AGB § Widerrufsrecht) */}
+              {/* Withdrawal Form Toggle */}
               {sec.hasForm && (
-                <div style={{ marginTop: '24px' }}>
+                <div className="mt-6">
                   <button
                     onClick={() => setShowWithdrawalForm(v => !v)}
-                    style={{
-                      padding: '10px 20px', fontSize: '11px', letterSpacing: '0.15em',
-                      textTransform: 'uppercase', background: 'transparent',
-                      color: '#0a0a0a', border: '1px solid #0a0a0a', cursor: 'pointer',
-                      fontFamily: 'Inter, sans-serif', transition: 'all 0.2s'
-                    }}
-                    onMouseEnter={e => { e.target.style.background = '#0a0a0a'; e.target.style.color = '#fff'; }}
-                    onMouseLeave={e => { e.target.style.background = 'transparent'; e.target.style.color = '#0a0a0a'; }}
+                    className="px-5 py-2.5 text-[11px] tracking-[0.15em] uppercase font-body bg-transparent text-dark-deep border border-dark-deep hover:bg-dark-deep hover:text-white transition-colors"
                   >
                     {showWithdrawalForm
                       ? (lang === 'de' ? 'Widerrufsformular ausblenden' : 'Hide Withdrawal Form')
@@ -170,15 +143,11 @@ export default function LegalPageTemplate({ slug }) {
                   </button>
 
                   {showWithdrawalForm && (
-                    <div style={{
-                      marginTop: '20px', border: '1px solid #ccc', padding: '28px',
-                      background: '#fff', fontFamily: 'Georgia, serif', fontSize: '14px',
-                      lineHeight: 1.8, color: '#333'
-                    }}>
-                      <p style={{ fontSize: '10px', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#999', fontFamily: 'Inter, sans-serif', marginBottom: '16px' }}>
+                    <div className="mt-5 border border-border p-7 bg-white font-heading text-sm leading-[1.8] text-dark">
+                      <p className="text-[10px] tracking-[0.2em] uppercase text-gray-text font-body mb-4">
                         {lang === 'de' ? 'Muster-Widerrufsformular' : 'Sample Withdrawal Form'}
                       </p>
-                      <p style={{ fontStyle: 'italic', marginBottom: '16px' }}>
+                      <p className="italic mb-4">
                         {lang === 'de'
                           ? '(Wenn Sie den Vertrag widerrufen wollen, dann füllen Sie bitte dieses Formular aus und senden Sie es zurück.)'
                           : '(If you wish to withdraw from this contract, please fill out this form and return it.)'}
@@ -204,7 +173,7 @@ export default function LegalPageTemplate({ slug }) {
                         ________________________<br /><br />
                         {lang === 'de' ? 'Datum:' : 'Date:'} ________________________
                       </p>
-                      <p style={{ fontSize: '12px', color: '#999', marginTop: '16px', fontStyle: 'italic' }}>
+                      <p className="text-xs text-gray-text mt-4 italic">
                         {lang === 'de' ? '(*) Unzutreffendes streichen.' : '(*) Delete as applicable.'}
                       </p>
                     </div>
@@ -217,8 +186,8 @@ export default function LegalPageTemplate({ slug }) {
 
         {/* Footer note */}
         {page?.last_updated && (
-          <div style={{ marginTop: '60px', paddingTop: '24px', borderTop: '1px solid #e8e6e0' }}>
-            <p style={{ fontSize: '12px', color: '#aaa', fontFamily: 'Inter, sans-serif', letterSpacing: '0.05em' }}>
+          <div className="mt-16 pt-6 border-t border-border">
+            <p className="text-xs text-gray-text font-body tracking-wide">
               {lang === 'de' ? 'Zuletzt aktualisiert:' : 'Last updated:'} {page.last_updated}
             </p>
           </div>
