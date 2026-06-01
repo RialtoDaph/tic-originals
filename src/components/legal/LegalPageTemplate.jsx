@@ -6,8 +6,7 @@ import { Download } from 'lucide-react';
 import { jsPDF } from 'jspdf';
 
 export default function LegalPageTemplate({ slug }) {
-  const { lang: globalLang } = useLanguage();
-  const [lang, setLang] = useState(globalLang || 'de');
+  const { lang } = useLanguage();
   const [showWithdrawalForm, setShowWithdrawalForm] = useState(false);
   const sectionRefs = useRef({});
 
@@ -126,32 +125,16 @@ export default function LegalPageTemplate({ slug }) {
                 <p className="text-sm text-gray-text mt-3 font-body">{subtitle}</p>
               )}
             </div>
-            {/* Lang Toggle + Download */}
-            <div className="flex flex-col gap-2 shrink-0 mt-1 items-end">
-              <div className="flex gap-1">
-                <button
-                  onClick={() => setLang('de')}
-                  className={`px-3.5 py-1.5 text-[11px] tracking-[0.15em] uppercase font-body border border-cyan transition-colors ${
-                    lang === 'de' ? 'bg-cyan text-dark-deep' : 'bg-transparent text-cyan hover:bg-cyan/10'
-                  }`}
-                >DE</button>
-                <button
-                  onClick={() => setLang('en')}
-                  className={`px-3.5 py-1.5 text-[11px] tracking-[0.15em] uppercase font-body border border-cyan transition-colors ${
-                    lang === 'en' ? 'bg-cyan text-dark-deep' : 'bg-transparent text-cyan hover:bg-cyan/10'
-                  }`}
-                >EN</button>
-              </div>
-              {sections.length > 0 && (
-                <button
-                  onClick={downloadPDF}
-                  className="flex items-center gap-1.5 px-3 py-1.5 text-[10px] tracking-[0.15em] uppercase font-body text-gray-text hover:text-cyan transition-colors"
-                  title="Download PDF"
-                >
-                  <Download className="w-3 h-3" /> PDF
-                </button>
-              )}
-            </div>
+            {/* Download PDF */}
+            {sections.length > 0 && (
+              <button
+                onClick={downloadPDF}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-[10px] tracking-[0.15em] uppercase font-body text-gray-text hover:text-cyan transition-colors shrink-0 mt-1"
+                title="Download PDF"
+              >
+                <Download className="w-3 h-3" /> PDF
+              </button>
+            )}
           </div>
         </div>
       </div>
