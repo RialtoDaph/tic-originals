@@ -45,7 +45,7 @@ export default function Navbar() {
               <img
                 src="https://media.base44.com/images/public/69e5695817245a39fd1a3317/5c0b2056b_Untitleddesign.png"
                 alt="Till I Collapse"
-                className="h-10 md:h-14 w-auto"
+                className="h-16 md:h-24 w-auto"
               />
             </Link>
 
