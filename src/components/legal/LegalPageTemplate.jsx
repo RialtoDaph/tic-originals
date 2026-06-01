@@ -10,24 +10,35 @@ export default function LegalPageTemplate({ slug }) {
   const [showWithdrawalForm, setShowWithdrawalForm] = useState(false);
   const sectionRefs = useRef({});
 
-  // Fetch ONLY this page by slug + cache for 5 minutes
+  // Fetch ONLY this page by slug
   const { data: page, isLoading: loading } = useQuery({
     queryKey: ['legal-page', slug],
     queryFn: async () => {
       const results = await base44.entities.LegalPage.filter({ slug });
+      console.log(`[LegalPage] slug=${slug} results=${results.length}`, results);
       return results[0] || null;
     },
-    staleTime: 5 * 60 * 1000,
+    staleTime: 30 * 1000,
     refetchOnWindowFocus: false,
   });
 
   const title = page ? (lang === 'de' ? page.title_de : (page.title_en || page.title_de)) : '';
   const subtitle = page ? (lang === 'de' ? page.subtitle_de : (page.subtitle_en || page.subtitle_de)) : '';
-  const rawContent = page ? (lang === 'de' ? page.content_de : (page.content_en || page.content_de)) : null;
+  // Prefer requested lang, fallback to the other lang if empty
+  const rawContent = page
+    ? (lang === 'de'
+        ? (page.content_de || page.content_en)
+        : (page.content_en || page.content_de))
+    : null;
 
   let sections = [];
   if (rawContent) {
-    try { sections = JSON.parse(rawContent); } catch { sections = []; }
+    try {
+      const parsed = JSON.parse(rawContent);
+      if (Array.isArray(parsed)) sections = parsed;
+    } catch (e) {
+      console.error(`[LegalPage] parse error slug=${slug}`, e);
+    }
   }
 
   const scrollTo = (id) => {
