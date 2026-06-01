@@ -42,23 +42,38 @@ export default function About() {
             viewport={{ once: true }}
           >
             <h2 className="font-heading text-3xl mb-6">
-              {lang === 'de' ? 'Die Geschichte' : 'The Story'}
+              {lang === 'de' ? 'Till I Collapse (TIC) — Biografie' : 'Till I Collapse (TIC) — Biography'}
             </h2>
             <div className="space-y-6 text-gray-text leading-relaxed">
               <p>
                 {lang === 'de'
-                  ? 'TIC ORIGINALS — Till I Collapse — wurde mit einer einfachen, aber kraftvollen Idee geboren: Kleidung zu schaffen, die den unerschütterlichen Geist in jedem von uns verkörpert. Von Eichstätt, Deutschland aus, gestalten wir Premium-Streetwear, die die Grenze zwischen Luxus und Straßenkultur verwischt.'
-                  : 'TIC ORIGINALS — Till I Collapse — was born from a simple yet powerful idea: to create clothing that embodies the unyielding spirit in all of us. From Eichstätt, Germany, we craft premium streetwear that blurs the line between luxury and street culture.'}
+                  ? 'Till I Collapse (TIC) steht für mehr als nur Kleidung — es ist eine Haltung. Geboren aus dem Gedanken, niemals aufzugeben, verkörpert TIC den unaufhaltsamen Drang, weiterzumachen, egal wie schwer der Weg ist.'
+                  : 'Till I Collapse (TIC) stands for more than just clothing — it\'s an attitude. Born from the idea of never giving up, TIC embodies the unstoppable drive to keep going, no matter how hard the road.'}
               </p>
               <p>
                 {lang === 'de'
-                  ? 'Jedes Stück ist eine Erinnerung daran, dass Stärke nicht nur in den Muskeln liegt, sondern im Willen, nicht aufzugeben. Wir glauben, dass wahre Stärke von innen kommt — und unsere Kleidung ist ein Symbol dieser inneren Kraft.'
-                  : 'Each piece is a reminder that strength isn\'t just in muscle — it\'s in the will to never give up. We believe true strength comes from within, and our clothing is a symbol of that inner power.'}
+                  ? 'Wir designen hochwertige Streetwear für Menschen, die ihren eigenen Weg gehen. Jedes Piece ist darauf ausgelegt, Stil, Qualität und Attitude zu vereinen — minimalistisch im Look, aber maximal in der Aussage.'
+                  : 'We design premium streetwear for people who walk their own path. Every piece is built to unite style, quality and attitude — minimalist in look, but maximum in message.'}
               </p>
               <p>
                 {lang === 'de'
-                  ? 'Mit erstklassigen Materialien und minimalistischem Design schaffen wir zeitlose Stücke, die so widerstandsfähig sind wie der Geist, den sie repräsentieren.'
-                  : 'With premium materials and minimalist design, we create timeless pieces that are as resilient as the spirit they represent.'}
+                  ? 'Entstanden in Deutschland, gedacht für die ganze Welt. TIC ist mehr als eine Brand — es ist ein globales Projekt, das Menschen verbindet, die dieselbe Mentalität teilen.'
+                  : 'Born in Germany, made for the whole world. TIC is more than a brand — it\'s a global project that connects people who share the same mentality.'}
+              </p>
+              <p className="font-heading italic text-dark text-xl">
+                {lang === 'de'
+                  ? '1 World. Eine Vision, die keine Grenzen kennt.'
+                  : '1 World. A vision that knows no borders.'}
+              </p>
+              <p>
+                {lang === 'de'
+                  ? 'Till I Collapse richtet sich an alle, die mehr wollen. Mehr als Durchschnitt. Mehr als Trends. Mehr als Stillstand.'
+                  : 'Till I Collapse is for everyone who wants more. More than average. More than trends. More than standstill.'}
+              </p>
+              <p className="font-heading text-dark text-2xl tracking-wide">
+                {lang === 'de'
+                  ? 'No limits. No excuses. Till I Collapse.'
+                  : 'No limits. No excuses. Till I Collapse.'}
               </p>
             </div>
           </motion.div>
