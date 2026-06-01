@@ -27,12 +27,20 @@ export default function Navbar() {
       <AnnouncementTicker />
       <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <button className="lg:hidden" onClick={() => setMobileOpen(!mobileOpen)}>
+          <div className="flex items-center justify-between h-24 md:h-32 gap-4">
+            <button className="lg:hidden shrink-0" onClick={() => setMobileOpen(!mobileOpen)}>
               {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
 
-            <div className="hidden lg:flex items-center gap-8">
+            <Link to="/" className="shrink-0">
+              <img
+                src="https://media.base44.com/images/public/69e5695817245a39fd1a3317/5c0b2056b_Untitleddesign.png"
+                alt="Till I Collapse"
+                className="h-32 md:h-48 w-auto"
+              />
+            </Link>
+
+            <div className="hidden lg:flex items-center gap-8 flex-1 justify-end">
               {links.map(link => (
                 <Link key={link.to} to={link.to}
                   className="text-xs tracking-[0.15em] uppercase text-gray-text hover:text-dark transition-colors">
@@ -41,15 +49,7 @@ export default function Navbar() {
               ))}
             </div>
 
-            <Link to="/" className="absolute left-1/2 -translate-x-1/2">
-              <img
-                src="https://media.base44.com/images/public/69e5695817245a39fd1a3317/5c0b2056b_Untitleddesign.png"
-                alt="Till I Collapse"
-                className="h-24 md:h-36 w-auto"
-              />
-            </Link>
-
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4 shrink-0">
               <button onClick={toggleLang}
                 className="flex items-center gap-1 text-xs tracking-wider uppercase text-gray-text hover:text-dark transition-colors">
                 <Globe className="w-3.5 h-3.5" />
