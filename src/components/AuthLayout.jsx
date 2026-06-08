@@ -5,8 +5,12 @@ export default function AuthLayout({ title, subtitle, footer, children }) {
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-10">
-          <div className="inline-flex items-center justify-center px-5 h-14 rounded-2xl bg-dark-deep mb-4">
-            <span className="font-heading text-2xl tracking-[0.2em] text-cyan font-light">TIC</span>
+          <div className="inline-flex items-center justify-center mb-4">
+            <img
+              src="https://media.base44.com/images/public/69e5695817245a39fd1a3317/8cdf64fb7_TIC.png"
+              alt="TIC ORIGINALS"
+              className="h-20 w-auto"
+            />
           </div>
           <h1 className="text-3xl font-bold tracking-tight text-foreground">{title}</h1>
           {subtitle && <p className="text-muted-foreground mt-2">{subtitle}</p>}
