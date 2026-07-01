@@ -19,10 +19,16 @@ export default function ProductCard({ product }) {
         className="group"
       >
         <div className="aspect-[4/5] bg-muted overflow-hidden mb-5 relative">
-          <Link to={`/products/${product.id}`}>
+          <Link to={`/products/${product.id}`} className="block w-full h-full">
             {product.images?.[0] ? (
-              <img src={product.images[0]} alt={product.name}
-                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-[1200ms] ease-out" />
+              <>
+                <img src={product.images[0]} alt={product.name}
+                  className={`w-full h-full object-cover absolute inset-0 transition-all duration-700 ease-out ${product.images?.[1] ? 'group-hover:opacity-0' : 'group-hover:scale-110'}`} />
+                {product.images?.[1] && (
+                  <img src={product.images[1]} alt={product.name}
+                    className="w-full h-full object-cover absolute inset-0 opacity-0 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700 ease-out" />
+                )}
+              </>
             ) : (
               <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-dark to-dark-deep">
                 <span className="font-display text-6xl text-cyan/30 tracking-[0.2em]">TIC</span>

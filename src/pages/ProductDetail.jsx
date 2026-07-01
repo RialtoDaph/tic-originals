@@ -133,14 +133,17 @@ export default function ProductDetail() {
         </motion.div>
 
         {/* Details */}
-        <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }}>
-          <p className="text-xs tracking-[0.3em] uppercase text-gray-text mb-2">TIC ORIGINALS</p>
-          <h1 className="font-heading text-4xl md:text-5xl font-light mb-4">{product.name}</h1>
-          <p className="text-2xl mb-2">
-            €{product.price?.toFixed(2)}
-            <span className="text-sm text-gray-text ml-2">{t('products.inclVat')}</span>
-          </p>
-          <p className="text-gray-text text-sm leading-relaxed mb-6">
+        <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }} className="lg:sticky lg:top-28 lg:self-start">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-6 h-px bg-cyan" />
+            <p className="text-[10px] tracking-[0.4em] uppercase text-cyan">TIC Originals</p>
+          </div>
+          <h1 className="font-display text-4xl md:text-5xl lg:text-6xl uppercase leading-[0.9] mb-6">{product.name}</h1>
+          <div className="flex items-baseline gap-3 mb-6">
+            <p className="font-display text-3xl md:text-4xl">€{product.price?.toFixed(2)}</p>
+            <span className="text-[10px] tracking-[0.25em] uppercase text-gray-text">{t('products.inclVat')}</span>
+          </div>
+          <p className="text-gray-text text-sm leading-relaxed mb-8 max-w-md">
             {lang === 'de' ? product.description_de : product.description_en}
           </p>
 
@@ -150,14 +153,17 @@ export default function ProductDetail() {
           </div>
 
           {/* Color Selector */}
-          <div className="mb-6">
-            <p className="text-xs tracking-[0.15em] uppercase mb-3">{t('products.color')}</p>
-            <div className="flex flex-wrap gap-3">
+          <div className="mb-8">
+            <div className="flex items-baseline justify-between mb-4">
+              <p className="text-[10px] tracking-[0.3em] uppercase text-gray-text">— {t('products.color')}</p>
+              {selectedColor && <p className="text-[10px] tracking-[0.2em] uppercase">{selectedColor}</p>}
+            </div>
+            <div className="flex flex-wrap gap-2">
               {product.colors?.map(color => (
                 <button key={color}
                   onClick={() => setSelectedColor(color)}
-                  className={`px-4 py-2 text-xs tracking-wider uppercase border transition-all ${
-                    selectedColor === color ? 'border-dark bg-dark text-white' : 'border-border hover:border-dark'
+                  className={`px-5 py-3 text-[10px] tracking-[0.25em] uppercase transition-all ${
+                    selectedColor === color ? 'bg-dark-deep text-white' : 'border border-border hover:border-dark-deep'
                   }`}>
                   {color}
                 </button>
@@ -166,27 +172,28 @@ export default function ProductDetail() {
           </div>
 
           {/* Size Selector with guide */}
-          <div className="mb-6">
-            <div className="flex items-center justify-between mb-3">
-              <p className="text-xs tracking-[0.15em] uppercase">{t('products.size')}</p>
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-4">
+              <p className="text-[10px] tracking-[0.3em] uppercase text-gray-text">— {t('products.size')}</p>
               <button onClick={() => setShowSizeGuide(true)}
-                className="flex items-center gap-1 text-xs text-gray-text hover:text-dark transition-colors">
+                className="flex items-center gap-1.5 text-[10px] tracking-[0.2em] uppercase text-gray-text hover:text-cyan transition-colors">
                 <Ruler className="w-3 h-3" />
                 {lang === 'de' ? 'Größentabelle' : 'Size Guide'}
               </button>
             </div>
-            <div className="flex flex-wrap gap-3">
+            <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
               {product.sizes?.map(size => {
                 const stock = product.stock?.find(s => s.color === selectedColor && s.size === size);
                 const qty = stock?.quantity ?? 0;
+                const disabled = qty <= 0;
                 return (
                   <button key={size}
-                    onClick={() => qty > 0 && setSelectedSize(size)}
-                    disabled={qty <= 0}
-                    className={`w-12 h-12 text-xs tracking-wider uppercase border transition-all ${
-                      selectedSize === size ? 'border-dark bg-dark text-white'
-                        : qty <= 0 ? 'border-border text-gray-text/40 cursor-not-allowed line-through'
-                        : 'border-border hover:border-dark'
+                    onClick={() => !disabled && setSelectedSize(size)}
+                    disabled={disabled}
+                    className={`h-14 font-display text-lg tracking-wider uppercase transition-all ${
+                      selectedSize === size ? 'bg-dark-deep text-white'
+                        : disabled ? 'border border-border text-gray-text/40 cursor-not-allowed line-through'
+                        : 'border border-border hover:border-dark-deep hover:bg-dark-deep hover:text-white'
                     }`}>
                     {size}
                   </button>
@@ -216,12 +223,12 @@ export default function ProductDetail() {
             </div>
           </div>
 
-          {/* CTA — observed for sticky */}
+          {/* CTA - observed for sticky */}
           <div ref={ctaRef}>
             <Button
               onClick={handleAddToCart}
               disabled={!selectedColor || !selectedSize || stockForSelection <= 0}
-              className="w-full bg-cyan text-dark-deep hover:bg-cyan-dark py-6 text-xs tracking-[0.2em] uppercase rounded-none disabled:opacity-40"
+              className="w-full bg-dark-deep text-white hover:bg-cyan hover:text-dark-deep py-7 text-[11px] tracking-[0.3em] uppercase rounded-none disabled:opacity-40 transition-colors"
             >
               {stockForSelection <= 0 && selectedColor && selectedSize ? t('products.soldOut') : t('products.addToCart')}
             </Button>

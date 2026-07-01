@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Instagram, Music2 } from 'lucide-react';
+import { Instagram, Music2, ArrowRight } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import { subscribeNewsletter } from '@/functions/subscribeNewsletter';
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
 import PaymentMethods from '@/components/common/PaymentMethods';
+import Marquee from '@/components/common/Marquee';
 
 export default function Footer() {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const { toast } = useToast();
   const [email, setEmail] = useState('');
 
@@ -22,69 +22,111 @@ export default function Footer() {
   };
 
   return (
-    <footer className="bg-dark-deep text-white relative overflow-hidden">
-      {/* Low opacity TIC watermark */}
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
-        <span className="font-heading text-[8rem] md:text-[20rem] font-bold text-white/[0.03] leading-none tracking-widest">TIC</span>
+    <footer className="grain-overlay bg-dark-deep text-white relative overflow-hidden">
+      {/* Marquee top */}
+      <div className="border-y border-dark-light py-5">
+        <Marquee items={['TILL I COLLAPSE', 'NO LIMITS', 'NO EXCUSES', '1 WORLD', 'BORN IN GERMANY']} />
       </div>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 relative z-10">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
-          <div className="md:col-span-2">
-            <h3 className="font-heading text-3xl font-light tracking-[0.1em] mb-4">TIC ORIGINALS</h3>
-            <p className="text-gray-text text-sm leading-relaxed max-w-md mb-8">
-              {t('footer.tagline')}
-            </p>
-            <h4 className="text-xs tracking-[0.2em] uppercase mb-4 text-cyan">{t('footer.newsletterHeading')}</h4>
-            <form onSubmit={handleSubscribe} className="flex gap-2 max-w-sm">
+
+      {/* Newsletter block */}
+      <div className="border-b border-dark-light">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20 grid grid-cols-12 gap-6 md:gap-10">
+          <div className="col-span-12 md:col-span-5">
+            <p className="text-[10px] tracking-[0.4em] uppercase text-cyan mb-4">— {t('footer.newsletterHeading')}</p>
+            <h3 className="font-display text-4xl md:text-6xl uppercase leading-[0.9] text-white">
+              {lang === 'de' ? 'Sei der Erste.' : 'Be the first.'}<br />
+              <span className="text-outline text-white">{lang === 'de' ? 'Drop 002.' : 'Drop 002.'}</span>
+            </h3>
+          </div>
+          <form onSubmit={handleSubscribe} className="col-span-12 md:col-span-7 flex items-end">
+            <div className="flex-1 flex items-end border-b border-white/30 gap-3">
               <Input
                 type="email"
                 placeholder={t('footer.emailPlaceholder')}
                 value={email}
                 onChange={e => setEmail(e.target.value)}
-                className="bg-dark border-dark-light text-white placeholder:text-gray-text"
+                className="bg-transparent border-0 text-white placeholder:text-white/40 text-base md:text-lg h-14 px-0 focus-visible:ring-0 rounded-none"
               />
-              <Button type="submit" className="bg-cyan text-dark-deep hover:bg-cyan-dark shrink-0 text-xs tracking-wider uppercase">
-                {t('footer.subscribe')}
-              </Button>
-            </form>
-          </div>
+              <button type="submit" className="pb-4 text-[10px] tracking-[0.3em] uppercase text-cyan flex items-center gap-2 hover:gap-4 transition-all shrink-0">
+                {t('footer.subscribe')} <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
 
+      {/* Links */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 md:py-16 relative z-10">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-10">
           <div>
-            <h4 className="text-xs tracking-[0.2em] uppercase mb-6 text-cyan">{t('footer.service')}</h4>
+            <h4 className="text-[10px] tracking-[0.3em] uppercase mb-6 text-cyan">— Shop</h4>
             <div className="space-y-3">
-              <Link to="/tracking" className="block text-sm text-gray-text hover:text-white transition-colors">{t('order.trackOrder')}</Link>
-              <Link to="/contact" className="block text-sm text-gray-text hover:text-white transition-colors">{t('nav.contact')}</Link>
-              <Link to="/faq" className="block text-sm text-gray-text hover:text-white transition-colors">{t('nav.faq')}</Link>
+              <Link to="/products" className="block text-sm text-white/70 hover:text-cyan transition-colors">{t('nav.shop')}</Link>
+              <Link to="/tracking" className="block text-sm text-white/70 hover:text-cyan transition-colors">{t('order.trackOrder')}</Link>
+              <Link to="/account" className="block text-sm text-white/70 hover:text-cyan transition-colors">
+                {lang === 'de' ? 'Mein Konto' : 'My Account'}
+              </Link>
             </div>
           </div>
 
           <div>
-            <h4 className="text-xs tracking-[0.2em] uppercase mb-6 text-cyan">{t('footer.legal')}</h4>
+            <h4 className="text-[10px] tracking-[0.3em] uppercase mb-6 text-cyan">— {t('footer.service')}</h4>
             <div className="space-y-3">
-              <Link to="/impressum" className="block text-sm text-gray-text hover:text-white transition-colors">{t('footer.impressum')}</Link>
-              <Link to="/datenschutz" className="block text-sm text-gray-text hover:text-white transition-colors">{t('footer.privacy')}</Link>
-              <Link to="/agb" className="block text-sm text-gray-text hover:text-white transition-colors">{t('footer.terms')}</Link>
-              <Link to="/widerruf" className="block text-sm text-gray-text hover:text-white transition-colors">{t('footer.withdrawal')}</Link>
+              <Link to="/contact" className="block text-sm text-white/70 hover:text-cyan transition-colors">{t('nav.contact')}</Link>
+              <Link to="/faq" className="block text-sm text-white/70 hover:text-cyan transition-colors">{t('nav.faq')}</Link>
+              <Link to="/about" className="block text-sm text-white/70 hover:text-cyan transition-colors">{t('nav.about')}</Link>
             </div>
-            <h4 className="text-xs tracking-[0.2em] uppercase mb-6 mt-8 text-cyan">{t('footer.followUs')}</h4>
+          </div>
+
+          <div>
+            <h4 className="text-[10px] tracking-[0.3em] uppercase mb-6 text-cyan">— {t('footer.legal')}</h4>
+            <div className="space-y-3">
+              <Link to="/impressum" className="block text-sm text-white/70 hover:text-cyan transition-colors">{t('footer.impressum')}</Link>
+              <Link to="/datenschutz" className="block text-sm text-white/70 hover:text-cyan transition-colors">{t('footer.privacy')}</Link>
+              <Link to="/agb" className="block text-sm text-white/70 hover:text-cyan transition-colors">{t('footer.terms')}</Link>
+              <Link to="/widerruf" className="block text-sm text-white/70 hover:text-cyan transition-colors">{t('footer.withdrawal')}</Link>
+            </div>
+          </div>
+
+          <div>
+            <h4 className="text-[10px] tracking-[0.3em] uppercase mb-6 text-cyan">— {t('footer.followUs')}</h4>
             <div className="space-y-3">
               <a href="https://instagram.com/tillicollapseoriginals" target="_blank" rel="noopener noreferrer"
-                className="flex items-center gap-2 text-sm text-gray-text hover:text-white transition-colors">
+                className="flex items-center gap-2 text-sm text-white/70 hover:text-cyan transition-colors">
                 <Instagram className="w-4 h-4" /> Instagram
               </a>
               <a href="https://tiktok.com/@ticoriginals" target="_blank" rel="noopener noreferrer"
-                className="flex items-center gap-2 text-sm text-gray-text hover:text-white transition-colors">
+                className="flex items-center gap-2 text-sm text-white/70 hover:text-cyan transition-colors">
                 <Music2 className="w-4 h-4" /> TikTok
               </a>
             </div>
+            <div className="mt-8 text-xs text-white/40 leading-relaxed">
+              An der Oberen Au 4<br />
+              85072 Eichstätt<br />
+              Germany
+            </div>
           </div>
         </div>
+      </div>
 
-        <div className="border-t border-dark-light mt-12 pt-8 space-y-4">
+      {/* Oversized brand statement */}
+      <div className="border-t border-dark-light overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+          <h2 className="font-display text-[20vw] md:text-[15vw] lg:text-[200px] leading-[0.85] uppercase text-white/[0.08] select-none pointer-events-none whitespace-nowrap">
+            TILL I COLLAPSE
+          </h2>
+        </div>
+      </div>
+
+      {/* Bottom bar */}
+      <div className="border-t border-dark-light">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-4">
           <PaymentMethods />
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-xs text-gray-text">© {new Date().getFullYear()} TIC ORIGINALS. All rights reserved.</p>
-            <p className="text-xs text-gray-text">An der Oberen Au 4, 85072 Eichstätt, Germany</p>
+          <div className="flex flex-col md:flex-row justify-between items-center gap-2 pt-2">
+            <p className="text-[10px] tracking-[0.2em] uppercase text-white/40">
+              © {new Date().getFullYear()} TIC Originals. {lang === 'de' ? 'Alle Rechte vorbehalten.' : 'All rights reserved.'}
+            </p>
+            <p className="text-[10px] tracking-[0.2em] uppercase text-white/40">EST. 2024 — 1 WORLD.</p>
           </div>
         </div>
       </div>
