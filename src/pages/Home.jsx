@@ -92,12 +92,12 @@ function ShippingInfo() {
   { title: lang === 'de' ? '14 Tage Rückgabe' : '14-Day Returns', desc: lang === 'de' ? 'Widerrufsrecht' : 'Right of withdrawal' }];
 
   return (
-    <section className="py-12 md:py-20 border-t">
-      <div className="max-w-5xl mx-auto px-5 sm:px-6 grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-12 text-center">
+    <section className="py-8 md:py-20 border-t">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 grid grid-cols-3 gap-3 md:gap-12 text-center">
         {items.map((item, i) =>
-        <div key={i} className="py-2">
-            <h3 className="font-heading text-xl mb-2">{item.title}</h3>
-            <p className="text-sm text-gray-text">{item.desc}</p>
+        <div key={i}>
+            <h3 className="font-heading text-sm md:text-xl mb-1 md:mb-2 leading-tight">{item.title}</h3>
+            <p className="text-[11px] md:text-sm text-gray-text leading-snug">{item.desc}</p>
           </div>
         )}
       </div>
