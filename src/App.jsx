@@ -47,7 +47,18 @@ const AuthenticatedApp = () => {
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/unsubscribe" element={<Unsubscribe />} />
 
-      {/* All app routes — gated by auth */}
+      {/* Public routes — no auth required (legal pages, about, contact, faq) */}
+      <Route element={<Layout />}>
+        <Route path="/about" element={<About />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/faq" element={<FAQ />} />
+        <Route path="/impressum" element={<Impressum />} />
+        <Route path="/datenschutz" element={<Datenschutz />} />
+        <Route path="/agb" element={<AGB />} />
+        <Route path="/widerruf" element={<Widerruf />} />
+      </Route>
+
+      {/* Gated app routes — auth required */}
       <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
         <Route element={<Layout />}>
           <Route path="/" element={<Home />} />
@@ -56,13 +67,6 @@ const AuthenticatedApp = () => {
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/order-confirmation" element={<OrderConfirmation />} />
           <Route path="/tracking" element={<OrderTracking />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/faq" element={<FAQ />} />
-          <Route path="/impressum" element={<Impressum />} />
-          <Route path="/datenschutz" element={<Datenschutz />} />
-          <Route path="/agb" element={<AGB />} />
-          <Route path="/widerruf" element={<Widerruf />} />
           <Route path="/admin" element={<Dashboard />} />
           <Route path="/account" element={<Account />} />
         </Route>
