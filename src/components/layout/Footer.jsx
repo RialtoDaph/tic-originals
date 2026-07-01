@@ -111,8 +111,8 @@ export default function Footer() {
 
       {/* Oversized brand statement */}
       <div className="border-t border-dark-light overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-          <h2 className="font-display text-[20vw] md:text-[15vw] lg:text-[200px] leading-[0.85] uppercase text-white/[0.08] select-none pointer-events-none whitespace-nowrap">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-10">
+          <h2 className="font-display text-[14vw] md:text-[15vw] lg:text-[200px] leading-[0.85] uppercase text-white/[0.08] select-none pointer-events-none text-center md:text-left md:whitespace-nowrap">
             TILL I COLLAPSE
           </h2>
         </div>
