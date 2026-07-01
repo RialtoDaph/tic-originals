@@ -32,7 +32,7 @@ export default function TicButton({
     lg: 'px-10 py-5 text-xs',
   };
 
-  const base = `inline-flex items-center justify-center gap-2 tracking-[0.25em] uppercase font-body font-medium transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed group ${variants[variant]} ${sizes[size]} ${className}`;
+  const base = `inline-flex items-center justify-center gap-2 tracking-[0.2em] uppercase font-body font-medium rounded-full transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:transform-none group ${variants[variant]} ${sizes[size]} ${className}`;
 
   const content = (
     <>
