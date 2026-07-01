@@ -33,7 +33,7 @@ export default function Home() {
       <section className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 py-14 md:py-24">
           <div className="flex items-end justify-between mb-10 md:mb-16 gap-4 flex-wrap">
             <div>
-              <p className="text-[10px] tracking-[0.4em] uppercase text-gray-text mb-3 md:mb-4">— Collection 001</p>
+              <p className="text-[10px] tracking-[0.4em] uppercase text-gray-text mb-3 md:mb-4">Collection 001</p>
               <h2 className="font-display text-4xl sm:text-5xl md:text-7xl lg:text-8xl uppercase leading-[0.9]">{t('products.title')}</h2>
             </div>
             <Link to="/products" className="text-[10px] md:text-xs tracking-[0.25em] uppercase flex items-center gap-2 hover:gap-4 transition-all border-b border-dark pb-1">

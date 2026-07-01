@@ -32,7 +32,7 @@ export default function Footer() {
       <div className="border-b border-dark-light">
         <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 py-12 md:py-20 grid grid-cols-12 gap-6 md:gap-10">
           <div className="col-span-12 md:col-span-5">
-            <p className="text-[10px] tracking-[0.4em] uppercase text-cyan mb-3 md:mb-4">— {t('footer.newsletterHeading')}</p>
+            <p className="text-[10px] tracking-[0.4em] uppercase text-cyan mb-3 md:mb-4">{t('footer.newsletterHeading')}</p>
             <h3 className="font-display text-3xl sm:text-4xl md:text-6xl uppercase leading-[0.9] text-white">
               {lang === 'de' ? 'Sei der Erste.' : 'Be the first.'}<br />
               <span className="text-outline text-white">{lang === 'de' ? 'Drop 002.' : 'Drop 002.'}</span>
@@ -59,7 +59,7 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 py-10 md:py-16 relative z-10">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-10">
           <div>
-            <h4 className="text-[10px] tracking-[0.3em] uppercase mb-6 text-cyan">— Shop</h4>
+            <h4 className="text-[10px] tracking-[0.3em] uppercase mb-6 text-cyan">Shop</h4>
             <div className="space-y-3">
               <Link to="/products" className="block text-sm text-white/70 hover:text-cyan transition-colors">{t('nav.shop')}</Link>
               <Link to="/tracking" className="block text-sm text-white/70 hover:text-cyan transition-colors">{t('order.trackOrder')}</Link>
@@ -70,7 +70,7 @@ export default function Footer() {
           </div>
 
           <div>
-            <h4 className="text-[10px] tracking-[0.3em] uppercase mb-6 text-cyan">— {t('footer.service')}</h4>
+            <h4 className="text-[10px] tracking-[0.3em] uppercase mb-6 text-cyan">{t('footer.service')}</h4>
             <div className="space-y-3">
               <Link to="/contact" className="block text-sm text-white/70 hover:text-cyan transition-colors">{t('nav.contact')}</Link>
               <Link to="/faq" className="block text-sm text-white/70 hover:text-cyan transition-colors">{t('nav.faq')}</Link>
@@ -79,7 +79,7 @@ export default function Footer() {
           </div>
 
           <div>
-            <h4 className="text-[10px] tracking-[0.3em] uppercase mb-6 text-cyan">— {t('footer.legal')}</h4>
+            <h4 className="text-[10px] tracking-[0.3em] uppercase mb-6 text-cyan">{t('footer.legal')}</h4>
             <div className="space-y-3">
               <Link to="/impressum" className="block text-sm text-white/70 hover:text-cyan transition-colors">{t('footer.impressum')}</Link>
               <Link to="/datenschutz" className="block text-sm text-white/70 hover:text-cyan transition-colors">{t('footer.privacy')}</Link>
@@ -89,7 +89,7 @@ export default function Footer() {
           </div>
 
           <div>
-            <h4 className="text-[10px] tracking-[0.3em] uppercase mb-6 text-cyan">— {t('footer.followUs')}</h4>
+            <h4 className="text-[10px] tracking-[0.3em] uppercase mb-6 text-cyan">{t('footer.followUs')}</h4>
             <div className="space-y-3">
               <a href="https://instagram.com/tillicollapseoriginals" target="_blank" rel="noopener noreferrer"
                 className="flex items-center gap-2 text-sm text-white/70 hover:text-cyan transition-colors">
@@ -126,7 +126,7 @@ export default function Footer() {
             <p className="text-[10px] tracking-[0.2em] uppercase text-white/40">
               © {new Date().getFullYear()} TIC Originals. {lang === 'de' ? 'Alle Rechte vorbehalten.' : 'All rights reserved.'}
             </p>
-            <p className="text-[10px] tracking-[0.2em] uppercase text-white/40">EST. 2024 — 1 WORLD.</p>
+            <p className="text-[10px] tracking-[0.2em] uppercase text-white/40">EST. 2024 · 1 WORLD.</p>
           </div>
         </div>
       </div>

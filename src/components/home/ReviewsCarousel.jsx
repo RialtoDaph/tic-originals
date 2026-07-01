@@ -18,7 +18,7 @@ const FALLBACK_REVIEWS = [
     id: 'f2',
     author_name: 'Sophie L.',
     rating: 5,
-    comment: 'Das Material ist unglaublich. Genau was ich gesucht habe — limitiert und besonders.',
+    comment: 'Das Material ist unglaublich. Genau was ich gesucht habe, limitiert und besonders.',
     photo: 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=120&q=80&fit=crop&crop=face',
   },
   {

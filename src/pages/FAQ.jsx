@@ -97,7 +97,7 @@ export default function FAQ() {
         </div>
 
         <div className="mt-14 md:mt-20 text-center">
-          <p className="text-[10px] tracking-[0.4em] uppercase text-gray-text mb-3">— {lang === 'de' ? 'Noch Fragen?' : 'Still curious?'}</p>
+          <p className="text-[10px] tracking-[0.4em] uppercase text-gray-text mb-3">{lang === 'de' ? 'Noch Fragen?' : 'Still curious?'}</p>
           <h3 className="font-display text-3xl md:text-4xl uppercase mb-6">
             {lang === 'de' ? 'Schreib uns.' : 'Reach out.'}
           </h3>

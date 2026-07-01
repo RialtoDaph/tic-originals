@@ -48,7 +48,7 @@ export default function Contact() {
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-10 md:gap-16">
           {/* Form */}
           <form onSubmit={handleSubmit} className="lg:col-span-3 space-y-6">
-            <p className="text-[10px] tracking-[0.4em] uppercase text-gray-text">— {lang === 'de' ? 'Nachricht senden' : 'Send Message'}</p>
+            <p className="text-[10px] tracking-[0.4em] uppercase text-gray-text">{lang === 'de' ? 'Nachricht senden' : 'Send Message'}</p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <div>
@@ -105,7 +105,7 @@ export default function Contact() {
           {/* Info sidebar */}
           <div className="lg:col-span-2 space-y-8 lg:pl-8 lg:border-l lg:border-border">
             <div>
-              <p className="text-[10px] tracking-[0.4em] uppercase text-gray-text mb-3">— HQ</p>
+              <p className="text-[10px] tracking-[0.4em] uppercase text-gray-text mb-3">HQ</p>
               <p className="font-display text-3xl md:text-4xl uppercase leading-tight">TIC Originals</p>
               <p className="text-xs tracking-[0.2em] uppercase text-cyan mt-2">EST. 2024 · Germany</p>
             </div>

@@ -86,14 +86,14 @@ export default function Account() {
               <User className="w-6 h-6 text-dark" />
             </div>
             <div>
-              <p className="font-medium">{user?.full_name || '—'}</p>
+              <p className="font-medium">{user?.full_name || '-'}</p>
               <p className="text-sm text-gray-text">{user?.email}</p>
             </div>
           </div>
           <div className="border p-6 space-y-4">
             <div>
               <p className="text-xs tracking-wider uppercase text-gray-text mb-1">{c.name}</p>
-              <p className="text-sm">{user?.full_name || '—'}</p>
+              <p className="text-sm">{user?.full_name || '-'}</p>
             </div>
             <div>
               <p className="text-xs tracking-wider uppercase text-gray-text mb-1">{c.email}</p>
@@ -133,7 +133,7 @@ export default function Account() {
                   <div className="space-y-1">
                     {order.items?.map((item, i) => (
                       <p key={i} className="text-xs text-gray-text">
-                        {item.product_name} — {item.color}/{item.size} x{item.quantity}
+                        {item.product_name} · {item.color}/{item.size} x{item.quantity}
                       </p>
                     ))}
                   </div>

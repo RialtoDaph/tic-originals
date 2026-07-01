@@ -160,7 +160,7 @@ export default function Checkout() {
       if (createdOrder?.id) await base44.entities.Order.delete(createdOrder.id);
       setCheckoutError(
         err?.response?.data?.error || err?.message ||
-        'Stripe nicht konfiguriert — bitte STRIPE_SECRET_KEY in den App-Einstellungen hinterlegen.'
+        'Stripe nicht konfiguriert. Bitte STRIPE_SECRET_KEY in den App-Einstellungen hinterlegen.'
       );
       setIsSubmitting(false);
       return;
@@ -278,7 +278,7 @@ export default function Checkout() {
       <div className="mb-10 md:mb-14">
         <div className="flex items-center gap-3 mb-4">
           <div className="w-8 h-px bg-cyan" />
-          <p className="text-[10px] tracking-[0.4em] uppercase text-cyan">— Checkout</p>
+          <p className="text-[10px] tracking-[0.4em] uppercase text-cyan">Checkout</p>
         </div>
         <h1 className="font-display uppercase leading-[0.9] text-5xl md:text-7xl">{t('checkout.title')}</h1>
       </div>

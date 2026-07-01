@@ -155,7 +155,7 @@ export default function ProductDetail() {
           {/* Color Selector */}
           <div className="mb-8">
             <div className="flex items-baseline justify-between mb-4">
-              <p className="text-[10px] tracking-[0.3em] uppercase text-gray-text">— {t('products.color')}</p>
+              <p className="text-[10px] tracking-[0.3em] uppercase text-gray-text">{t('products.color')}</p>
               {selectedColor && <p className="text-[10px] tracking-[0.2em] uppercase">{selectedColor}</p>}
             </div>
             <div className="flex flex-wrap gap-2">
@@ -174,7 +174,7 @@ export default function ProductDetail() {
           {/* Size Selector with guide */}
           <div className="mb-8">
             <div className="flex items-center justify-between mb-4">
-              <p className="text-[10px] tracking-[0.3em] uppercase text-gray-text">— {t('products.size')}</p>
+              <p className="text-[10px] tracking-[0.3em] uppercase text-gray-text">{t('products.size')}</p>
               <button onClick={() => setShowSizeGuide(true)}
                 className="flex items-center gap-1.5 text-[10px] tracking-[0.2em] uppercase text-gray-text hover:text-cyan transition-colors">
                 <Ruler className="w-3 h-3" />

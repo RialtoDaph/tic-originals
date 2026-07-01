@@ -33,7 +33,7 @@ export default function CartDrawer() {
             {/* Header */}
             <div className="flex items-center justify-between px-5 sm:px-6 py-5 border-b border-border">
               <div>
-                <p className="text-[10px] tracking-[0.35em] uppercase text-gray-text">— {t('cart.title')}</p>
+                <p className="text-[10px] tracking-[0.35em] uppercase text-gray-text">{t('cart.title')}</p>
                 <p className="font-display text-2xl uppercase mt-0.5">{items.length} {lang === 'de' ? 'Artikel' : 'Items'}</p>
               </div>
               <button

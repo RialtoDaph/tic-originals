@@ -4,17 +4,17 @@ import { useLanguage } from '@/context/LanguageContext';
 const messages = {
   en: [
     '🚚 Free Shipping on orders over €80',
-    '🎁 Buy 3 Tees — Get a Boxer Set FREE',
+    '🎁 Buy 3 Tees, Get a Boxer Set FREE',
     '⚡ Limited drops. Limited stock.',
-    '💪 Till I Collapse — Never give up.',
-    '📦 Fast delivery 2–5 business days',
+    '💪 Till I Collapse. Never give up.',
+    '📦 Fast delivery 2 to 5 business days',
   ],
   de: [
     '🚚 Kostenloser Versand ab €80',
-    '🎁 3 Tees kaufen — Boxer Set GRATIS',
+    '🎁 3 Tees kaufen, Boxer Set GRATIS',
     '⚡ Limitierte Drops. Limitierter Bestand.',
-    '💪 Till I Collapse — Gib niemals auf.',
-    '📦 Schnelle Lieferung 2–5 Werktage',
+    '💪 Till I Collapse. Gib niemals auf.',
+    '📦 Schnelle Lieferung 2 bis 5 Werktage',
   ],
 };
 

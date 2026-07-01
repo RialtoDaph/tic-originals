@@ -40,7 +40,7 @@ export default function OrderTracking() {
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
             <div className="flex items-center gap-3 mb-5">
               <div className="w-8 h-px bg-cyan" />
-              <p className="text-[10px] tracking-[0.4em] uppercase text-cyan">— {t('tracking.title')}</p>
+              <p className="text-[10px] tracking-[0.4em] uppercase text-cyan">{t('tracking.title')}</p>
             </div>
             <h1 className="font-display uppercase leading-[0.85] text-6xl md:text-8xl lg:text-9xl">
               {lang === 'de' ? 'Wo ist' : 'Where is'}<br />
@@ -53,7 +53,7 @@ export default function OrderTracking() {
       <div className="max-w-3xl mx-auto px-5 sm:px-6 py-12 md:py-20">
         {/* Search */}
         <div className="mb-14">
-          <p className="text-[10px] tracking-[0.4em] uppercase text-gray-text mb-3">— {t('tracking.enterOrder')}</p>
+          <p className="text-[10px] tracking-[0.4em] uppercase text-gray-text mb-3">{t('tracking.enterOrder')}</p>
           <div className="flex items-end gap-3 border-b border-dark">
             <Input
               placeholder="TIC-2026-XXXXXX"
@@ -88,7 +88,7 @@ export default function OrderTracking() {
               <div className="bg-dark-deep text-white p-6 md:p-8 grain-overlay">
                 <div className="flex items-start justify-between gap-4 flex-wrap">
                   <div>
-                    <p className="text-[10px] tracking-[0.35em] uppercase text-cyan mb-2">— {t('order.orderNumber')}</p>
+                    <p className="text-[10px] tracking-[0.35em] uppercase text-cyan mb-2">{t('order.orderNumber')}</p>
                     <p className="font-display text-2xl md:text-3xl tracking-wider">{order.order_number}</p>
                   </div>
                   <span className="bg-cyan text-dark-deep px-4 py-2 text-[10px] tracking-[0.3em] uppercase">
@@ -105,7 +105,7 @@ export default function OrderTracking() {
 
               {/* Timeline */}
               <div>
-                <p className="text-[10px] tracking-[0.4em] uppercase text-gray-text mb-6">— {lang === 'de' ? 'Fortschritt' : 'Progress'}</p>
+                <p className="text-[10px] tracking-[0.4em] uppercase text-gray-text mb-6">{lang === 'de' ? 'Fortschritt' : 'Progress'}</p>
                 <div>
                   {statusFlow.map((status, i) => {
                     const Icon = statusIcons[status];
@@ -138,7 +138,7 @@ export default function OrderTracking() {
 
               {/* Items */}
               <div className="border-t border-border pt-8">
-                <p className="text-[10px] tracking-[0.4em] uppercase text-gray-text mb-5">— Items</p>
+                <p className="text-[10px] tracking-[0.4em] uppercase text-gray-text mb-5">Items</p>
                 <div className="space-y-3">
                   {order.items?.map((item, i) => (
                     <div key={i} className="flex justify-between items-baseline gap-4 py-2">

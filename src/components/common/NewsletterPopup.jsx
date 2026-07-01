@@ -141,7 +141,7 @@ export default function NewsletterPopup() {
                     <div className="w-14 h-14 rounded-full bg-cyan flex items-center justify-center mx-auto mb-6">
                       <Tag className="w-6 h-6 text-dark-deep" />
                     </div>
-                    <p className="text-[10px] tracking-[0.4em] uppercase text-cyan mb-3">— Your code</p>
+                    <p className="text-[10px] tracking-[0.4em] uppercase text-cyan mb-3">Your code</p>
                     <p className="font-display text-6xl md:text-7xl text-white mb-5 tracking-wider">TIC10</p>
                     <p className="text-sm text-white/70 leading-relaxed max-w-xs mx-auto">{c.thanks}</p>
                     <Button onClick={dismiss} className="mt-8 bg-cyan text-dark-deep hover:bg-white text-[11px] tracking-[0.3em] uppercase px-10 py-5">
