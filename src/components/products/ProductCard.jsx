@@ -18,15 +18,15 @@ export default function ProductCard({ product }) {
         animate={{ opacity: 1, y: 0 }}
         className="group"
       >
-        <div className="aspect-[4/5] bg-muted overflow-hidden mb-5 relative">
+        <div className="aspect-[3/4] bg-muted overflow-hidden mb-4 md:mb-5 relative">
           <Link to={`/products/${product.id}`} className="block w-full h-full">
             {product.images?.[0] ? (
               <>
                 <img src={product.images[0]} alt={product.name}
-                  className={`w-full h-full object-cover absolute inset-0 transition-all duration-700 ease-out ${product.images?.[1] ? 'group-hover:opacity-0' : 'group-hover:scale-110'}`} />
+                  className={`w-full h-full object-cover absolute inset-0 transition-all duration-[900ms] ease-out ${product.images?.[1] ? 'group-hover:opacity-0' : 'group-hover:scale-[1.04]'}`} />
                 {product.images?.[1] && (
                   <img src={product.images[1]} alt={product.name}
-                    className="w-full h-full object-cover absolute inset-0 opacity-0 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700 ease-out" />
+                    className="w-full h-full object-cover absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-[900ms] ease-out" />
                 )}
               </>
             ) : (
@@ -35,27 +35,23 @@ export default function ProductCard({ product }) {
               </div>
             )}
           </Link>
-          <div className="absolute inset-0 bg-dark-deep/0 group-hover:bg-dark-deep/10 transition-colors duration-500 pointer-events-none" />
-          <div className="absolute top-3 right-3">
+          <div className="absolute top-3 left-3">
             <StockBadge quantity={totalStock} />
           </div>
-          {/* Quick View Button */}
+          {/* Quick View Button — minimal, top-right icon only */}
           <button
             onClick={() => setShowQuickView(true)}
-            className="absolute bottom-4 left-4 right-4 flex items-center justify-center gap-2 bg-dark-deep hover:bg-cyan hover:text-dark-deep text-white text-[10px] tracking-[0.25em] uppercase px-4 py-3 opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-500 whitespace-nowrap">
-            <Eye className="w-3.5 h-3.5" />
-            {lang === 'de' ? 'Schnellansicht' : 'Quick View'}
+            aria-label={lang === 'de' ? 'Schnellansicht' : 'Quick View'}
+            className="hidden md:flex absolute top-3 right-3 w-9 h-9 items-center justify-center bg-white/90 hover:bg-cyan text-dark backdrop-blur-sm rounded-full opacity-0 group-hover:opacity-100 transition-all duration-500">
+            <Eye className="w-4 h-4" />
           </button>
         </div>
         <Link to={`/products/${product.id}`} className="block">
-          <div className="flex items-start justify-between gap-4">
-            <h3 className="font-display text-xl md:text-2xl tracking-wider uppercase leading-tight">{product.name}</h3>
-            <p className="text-sm font-medium tracking-wide shrink-0">€{product.price?.toFixed(2)}</p>
+          <div className="flex items-baseline justify-between gap-4">
+            <h3 className="font-heading text-lg md:text-xl leading-tight tracking-tight truncate">{product.name}</h3>
+            <p className="text-sm tracking-wide shrink-0 tabular-nums">€{product.price?.toFixed(2)}</p>
           </div>
-          <p className="text-xs text-gray-text mt-2 tracking-wide">
-            {lang === 'de' ? product.description_de : product.description_en}
-          </p>
-          <p className="text-[10px] text-gray-text/70 mt-1 tracking-[0.15em] uppercase">{t('products.inclVat')}</p>
+          <p className="text-[11px] text-gray-text mt-1.5 tracking-[0.15em] uppercase">{t('products.inclVat')}</p>
         </Link>
       </motion.div>
 
