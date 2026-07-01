@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Instagram, Music2 } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
-import { base44 } from '@/api/base44Client';
+import { subscribeNewsletter } from '@/functions/subscribeNewsletter';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
@@ -16,9 +16,7 @@ export default function Footer() {
   const handleSubscribe = async (e) => {
     e.preventDefault();
     if (!email) return;
-    // Generate a random token for unsubscribe link verification
-    const token = Math.random().toString(36).slice(2) + Date.now().toString(36);
-    await base44.entities.NewsletterSubscriber.create({ email, unsubscribe_token: token });
+    await subscribeNewsletter({ email });
     toast({ title: '✓', description: t('footer.newsletter') });
     setEmail('');
   };

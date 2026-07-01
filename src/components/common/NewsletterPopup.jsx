@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { base44 } from '@/api/base44Client';
+import { subscribeNewsletter } from '@/functions/subscribeNewsletter';
 import { useLanguage } from '@/context/LanguageContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Mail, Tag } from 'lucide-react';
@@ -31,7 +31,7 @@ export default function NewsletterPopup() {
     e.preventDefault();
     if (!email) return;
     setLoading(true);
-    await base44.entities.NewsletterSubscriber.create({ email, language: lang });
+    await subscribeNewsletter({ email, language: lang });
     setLoading(false);
     setSubmitted(true);
     localStorage.setItem(STORAGE_KEY, '1');

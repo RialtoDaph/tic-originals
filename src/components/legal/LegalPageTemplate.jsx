@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { base44 } from '@/api/base44Client';
+import { getLegalPage } from '@/functions/getLegalPage';
 import { useQuery } from '@tanstack/react-query';
 import { useLanguage } from '@/context/LanguageContext';
 import { Download } from 'lucide-react';
@@ -14,9 +14,8 @@ export default function LegalPageTemplate({ slug }) {
   const { data: page, isLoading: loading } = useQuery({
     queryKey: ['legal-page', slug],
     queryFn: async () => {
-      const results = await base44.entities.LegalPage.filter({ slug });
-      console.log(`[LegalPage] slug=${slug} results=${results.length}`, results);
-      return results[0] || null;
+      const res = await getLegalPage({ slug });
+      return res.data.page || null;
     },
     staleTime: 30 * 1000,
     refetchOnWindowFocus: false,

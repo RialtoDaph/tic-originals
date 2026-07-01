@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
-import { base44 } from '@/api/base44Client';
+import { submitContactMessage } from '@/functions/submitContactMessage';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -17,7 +17,7 @@ export default function Contact() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSending(true);
-    await base44.entities.ContactMessage.create(form);
+    await submitContactMessage(form);
     toast({ title: '✓', description: t('contact.sent') });
     setForm({ name: '', email: '', subject: '', message: '' });
     setSending(false);
