@@ -111,7 +111,7 @@ export default function HeroSlider() {
       </AnimatePresence>
 
       {/* Content */}
-      <div className="relative z-10 h-full min-h-[92vh] flex flex-col justify-end pb-20 px-8 sm:px-16 lg:px-24">
+      <div className="relative z-10 h-full min-h-[92vh] flex flex-col justify-end pb-28 sm:pb-20 px-6 sm:px-16 lg:px-24">
         <AnimatePresence mode="wait">
           <motion.div
             key={`content-${slide.id}`}
@@ -146,7 +146,7 @@ export default function HeroSlider() {
         </AnimatePresence>
 
         {/* Controls */}
-        <div className="absolute bottom-10 right-8 sm:right-16 lg:right-24 flex items-center gap-4">
+        <div className="absolute bottom-6 sm:bottom-10 left-6 right-6 sm:left-auto sm:right-16 lg:right-24 flex items-center justify-between sm:justify-end gap-4">
           {/* Dots */}
           <div className="flex gap-2 mr-2">
             {slides.map((_, i) => (
