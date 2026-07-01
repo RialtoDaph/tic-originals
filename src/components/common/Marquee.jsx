@@ -6,9 +6,9 @@ export default function Marquee({ items = ['TILL I COLLAPSE', 'NO LIMITS', 'NO E
     <div className={`overflow-hidden whitespace-nowrap ${className}`}>
       <div className="inline-flex animate-marquee">
         {loop.map((t, i) => (
-          <span key={i} className="font-display text-4xl md:text-6xl tracking-wider mx-8 flex items-center gap-8">
+          <span key={i} className="font-display text-2xl sm:text-4xl md:text-6xl tracking-wider mx-5 sm:mx-8 flex items-center gap-5 sm:gap-8">
             {t}
-            <span className="text-cyan text-3xl">✦</span>
+            <span className="text-cyan text-xl sm:text-3xl">✦</span>
           </span>
         ))}
       </div>

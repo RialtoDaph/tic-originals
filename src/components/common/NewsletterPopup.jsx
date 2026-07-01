@@ -82,59 +82,53 @@ export default function NewsletterPopup() {
             transition={{ type: 'spring', damping: 28, stiffness: 300 }}
             className="fixed inset-0 z-[100] flex items-center justify-center px-4 pointer-events-none"
           >
-            <div className="relative bg-dark-deep w-full max-w-md pointer-events-auto overflow-hidden">
-              {/* Diagonal lines bg decoration */}
-              <div className="absolute inset-0 opacity-[0.04]"
-                style={{ backgroundImage: 'repeating-linear-gradient(45deg,#9EF2FF 0px,#9EF2FF 1px,transparent 1px,transparent 36px)' }}
-              />
-
+            <div className="relative bg-dark-deep w-full max-w-md pointer-events-auto overflow-hidden grain-overlay">
               {/* Close */}
-              <button onClick={dismiss} className="absolute top-4 right-4 text-white/40 hover:text-white transition-colors z-10">
+              <button onClick={dismiss} className="absolute top-4 right-4 w-10 h-10 flex items-center justify-center text-white/50 hover:text-white transition-colors z-10">
                 <X className="w-5 h-5" />
               </button>
 
-              <div className="relative p-8 sm:p-10">
+              <div className="relative p-6 sm:p-10">
                 {!submitted ? (
                   <>
                     {/* Eyebrow */}
-                    <div className="flex items-center gap-2 mb-6">
-                      <Tag className="w-3.5 h-3.5 text-cyan" />
-                      <p className="text-xs tracking-[0.3em] uppercase text-cyan">{c.eyebrow}</p>
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="w-6 h-px bg-cyan" />
+                      <p className="text-[10px] tracking-[0.4em] uppercase text-cyan">{c.eyebrow}</p>
                     </div>
 
-                    {/* Big discount badge */}
-                    <div className="mb-6">
-                      <p className="font-heading text-7xl font-light text-white leading-none">10%</p>
-                      <p className="font-heading text-2xl font-light text-white/70 -mt-1">{lang === 'de' ? 'RABATT' : 'OFF'}</p>
-                    </div>
+                    {/* Big display headline */}
+                    <h2 className="font-display uppercase leading-[0.85] text-6xl sm:text-7xl text-white mb-2">
+                      <span className="text-cyan">10%</span><br />
+                      {lang === 'de' ? 'RABATT' : 'OFF'}
+                    </h2>
 
-                    <h2 className="font-heading text-xl text-white font-light mb-2">{c.headline}</h2>
-                    <p className="text-sm text-white/50 leading-relaxed mb-8">{c.sub}</p>
+                    <p className="text-sm text-white/60 leading-relaxed mb-8 mt-6">{c.sub}</p>
 
                     <form onSubmit={handleSubmit} className="space-y-3">
                       <div className="relative">
-                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
+                        <Mail className="absolute left-0 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40 pointer-events-none" />
                         <Input
                           type="email"
                           required
                           value={email}
                           onChange={e => setEmail(e.target.value)}
                           placeholder={c.placeholder}
-                          className="pl-10 bg-white/10 border-white/20 text-white placeholder:text-white/30 rounded-none focus-visible:ring-cyan"
+                          className="pl-7 h-12 bg-transparent border-0 border-b border-white/30 text-white placeholder:text-white/30 rounded-none focus-visible:ring-0 focus-visible:border-cyan"
                         />
                       </div>
                       <Button
                         type="submit"
                         disabled={loading}
-                        className="w-full bg-cyan text-dark-deep hover:bg-cyan-dark rounded-none text-xs tracking-[0.2em] uppercase py-5"
+                        className="w-full bg-cyan text-dark-deep hover:bg-white rounded-none text-[11px] tracking-[0.3em] uppercase py-5 mt-4"
                       >
                         {loading ? '...' : c.cta}
                       </Button>
                     </form>
 
-                    <p className="text-center text-xs text-white/30 mt-4 tracking-wider">{c.code}</p>
+                    <p className="text-center text-[10px] text-white/40 mt-5 tracking-[0.3em] uppercase">{c.code}</p>
 
-                    <button onClick={dismiss} className="block mx-auto mt-4 text-xs text-white/30 hover:text-white/60 transition-colors tracking-wider">
+                    <button onClick={dismiss} className="block mx-auto mt-4 text-[10px] text-white/30 hover:text-white/60 transition-colors tracking-[0.3em] uppercase">
                       {c.later}
                     </button>
                   </>
@@ -142,14 +136,15 @@ export default function NewsletterPopup() {
                   <motion.div
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    className="py-8 text-center"
+                    className="py-6 text-center"
                   >
-                    <div className="w-14 h-14 rounded-full bg-cyan/20 flex items-center justify-center mx-auto mb-6">
-                      <Tag className="w-7 h-7 text-cyan" />
+                    <div className="w-14 h-14 rounded-full bg-cyan flex items-center justify-center mx-auto mb-6">
+                      <Tag className="w-6 h-6 text-dark-deep" />
                     </div>
-                    <p className="font-heading text-5xl text-cyan mb-4">TIC10</p>
-                    <p className="text-sm text-white/70 leading-relaxed">{c.thanks}</p>
-                    <Button onClick={dismiss} className="mt-8 bg-cyan text-dark-deep hover:bg-cyan-dark rounded-none text-xs tracking-[0.2em] uppercase px-10">
+                    <p className="text-[10px] tracking-[0.4em] uppercase text-cyan mb-3">— Your code</p>
+                    <p className="font-display text-6xl md:text-7xl text-white mb-5 tracking-wider">TIC10</p>
+                    <p className="text-sm text-white/70 leading-relaxed max-w-xs mx-auto">{c.thanks}</p>
+                    <Button onClick={dismiss} className="mt-8 bg-cyan text-dark-deep hover:bg-white rounded-none text-[11px] tracking-[0.3em] uppercase px-10 py-5">
                       {lang === 'de' ? 'Jetzt shoppen' : 'Shop Now'}
                     </Button>
                   </motion.div>

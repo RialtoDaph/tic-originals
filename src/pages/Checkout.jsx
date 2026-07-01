@@ -274,42 +274,37 @@ export default function Checkout() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 py-12">
-      <h1 className="font-heading text-4xl font-light text-center mb-12">{t('checkout.title')}</h1>
-
-      {/* Progress bar */}
-      <div className="mb-4">
-        <div className="flex justify-between items-center mb-2">
-          <p className="text-xs tracking-[0.15em] uppercase text-gray-text">
-            {stepLabels[step]}
-          </p>
-          <p className="text-xs text-gray-text">
-            {step + 1} / {STEPS.length}
-          </p>
+    <div className="max-w-5xl mx-auto px-5 sm:px-6 py-10 md:py-16">
+      <div className="mb-10 md:mb-14">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-8 h-px bg-cyan" />
+          <p className="text-[10px] tracking-[0.4em] uppercase text-cyan">— Checkout</p>
         </div>
-        <div className="h-0.5 w-full bg-border">
-          <motion.div
-            className="h-full bg-cyan"
-            initial={false}
-            animate={{ width: `${((step + 1) / STEPS.length) * 100}%` }}
-            transition={{ duration: 0.4, ease: 'easeInOut' }}
-          />
-        </div>
+        <h1 className="font-display uppercase leading-[0.9] text-5xl md:text-7xl">{t('checkout.title')}</h1>
       </div>
 
-      {/* Steps */}
-      <div className="flex items-center justify-center mb-12">
+      {/* Stepper */}
+      <div className="mb-10 md:mb-14 flex items-center gap-3 md:gap-6">
         {STEPS.map((s, i) => (
           <React.Fragment key={s}>
-            <div className="flex items-center gap-2">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium transition-colors ${
-                i <= step ? 'bg-cyan text-dark-deep' : 'bg-muted text-gray-text'
+            <div className="flex items-center gap-3 flex-1">
+              <div className={`w-10 h-10 flex items-center justify-center text-xs font-display transition-all ${
+                i <= step ? 'bg-dark-deep text-white' : 'border border-border text-gray-text'
               }`}>
-                {i < step ? <Check className="w-4 h-4" /> : i + 1}
+                {i < step ? <Check className="w-4 h-4" /> : `0${i + 1}`}
               </div>
-              <span className="text-xs tracking-wider uppercase hidden sm:inline">{stepLabels[i]}</span>
+              <span className={`text-[10px] tracking-[0.25em] uppercase ${i <= step ? 'text-dark-deep' : 'text-gray-text'}`}>{stepLabels[i]}</span>
             </div>
-            {i < STEPS.length - 1 && <div className={`w-8 sm:w-16 h-px mx-2 transition-colors ${i < step ? 'bg-cyan' : 'bg-border'}`} />}
+            {i < STEPS.length - 1 && (
+              <div className="flex-1 h-px bg-border relative">
+                <motion.div
+                  className="absolute inset-0 bg-dark-deep origin-left"
+                  initial={false}
+                  animate={{ scaleX: i < step ? 1 : 0 }}
+                  transition={{ duration: 0.4 }}
+                />
+              </div>
+            )}
           </React.Fragment>
         ))}
       </div>

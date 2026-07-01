@@ -43,7 +43,7 @@ export default function Navbar() {
               <img
                 src="https://media.base44.com/images/public/69e5695817245a39fd1a3317/5c0b2056b_Untitleddesign.png"
                 alt="Till I Collapse"
-                className={`w-auto transition-all duration-500 ${scrolled ? 'h-20 md:h-28' : 'h-32 md:h-48'}`}
+                className={`w-auto transition-all duration-500 ${scrolled ? 'h-12 md:h-20' : 'h-16 md:h-32 lg:h-40'}`}
               />
             </Link>
 

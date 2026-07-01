@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Plus, Minus } from 'lucide-react';
 
 const faqData = {
   en: [
@@ -28,26 +29,86 @@ const faqData = {
 export default function FAQ() {
   const { lang } = useLanguage();
   const items = faqData[lang] || faqData.en;
+  const [open, setOpen] = useState(null);
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-16">
-      <div className="text-center mb-16">
-        <p className="text-xs tracking-[0.3em] uppercase text-gray-text mb-3">TIC ORIGINALS</p>
-        <h1 className="font-heading text-5xl font-light">FAQ</h1>
-      </div>
+    <div>
+      {/* Hero */}
+      <section className="grain-overlay bg-dark-deep text-white">
+        <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 pt-16 pb-14 md:pt-24 md:pb-20">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
+            <div className="flex items-center gap-3 mb-5">
+              <div className="w-8 h-px bg-cyan" />
+              <p className="text-[10px] tracking-[0.4em] uppercase text-cyan">04 / Help Desk</p>
+            </div>
+            <h1 className="font-display uppercase leading-[0.85] text-[20vw] md:text-[14vw] lg:text-[180px]">
+              F.A.<span className="text-cyan">Q.</span>
+            </h1>
+            <p className="mt-6 max-w-md text-sm md:text-base text-white/60">
+              {lang === 'de'
+                ? 'Antworten auf die häufigsten Fragen. Nicht dabei? Schreib uns.'
+                : 'Answers to what everyone asks. Not here? Ask us.'}
+            </p>
+          </motion.div>
+        </div>
+      </section>
 
-      <Accordion type="single" collapsible className="space-y-2">
-        {items.map((item, i) => (
-          <AccordionItem key={i} value={`faq-${i}`} className="border px-6">
-            <AccordionTrigger className="text-sm text-left hover:no-underline">
-              {item.q}
-            </AccordionTrigger>
-            <AccordionContent className="text-sm text-gray-text leading-relaxed">
-              {item.a}
-            </AccordionContent>
-          </AccordionItem>
-        ))}
-      </Accordion>
+      <div className="max-w-3xl mx-auto px-5 sm:px-6 py-12 md:py-20">
+        <div className="border-t border-dark">
+          {items.map((item, i) => {
+            const isOpen = open === i;
+            return (
+              <div key={i} className="border-b border-border">
+                <button
+                  onClick={() => setOpen(isOpen ? null : i)}
+                  className="w-full flex items-start justify-between gap-4 py-6 md:py-7 text-left group"
+                >
+                  <div className="flex items-start gap-4 md:gap-6 flex-1 min-w-0">
+                    <span className="font-display text-xl md:text-2xl text-cyan shrink-0 leading-none pt-1">
+                      {String(i + 1).padStart(2, '0')}
+                    </span>
+                    <span className="font-display text-lg md:text-2xl uppercase leading-tight group-hover:text-cyan transition-colors">
+                      {item.q}
+                    </span>
+                  </div>
+                  <div className={`w-10 h-10 border border-border flex items-center justify-center shrink-0 transition-all ${isOpen ? 'bg-dark-deep text-white border-dark-deep' : ''}`}>
+                    {isOpen ? <Minus className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
+                  </div>
+                </button>
+
+                <AnimatePresence initial={false}>
+                  {isOpen && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className="overflow-hidden"
+                    >
+                      <p className="pb-6 md:pb-8 md:pl-14 text-sm md:text-base text-gray-text leading-relaxed">
+                        {item.a}
+                      </p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            );
+          })}
+        </div>
+
+        <div className="mt-14 md:mt-20 text-center">
+          <p className="text-[10px] tracking-[0.4em] uppercase text-gray-text mb-3">— {lang === 'de' ? 'Noch Fragen?' : 'Still curious?'}</p>
+          <h3 className="font-display text-3xl md:text-4xl uppercase mb-6">
+            {lang === 'de' ? 'Schreib uns.' : 'Reach out.'}
+          </h3>
+          <a
+            href="/contact"
+            className="inline-flex items-center gap-2 bg-dark-deep text-white px-8 py-4 text-[11px] tracking-[0.3em] uppercase hover:bg-cyan hover:text-dark-deep transition-colors"
+          >
+            {lang === 'de' ? 'Kontakt' : 'Contact'}
+          </a>
+        </div>
+      </div>
     </div>
   );
 }
