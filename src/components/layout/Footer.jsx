@@ -30,10 +30,10 @@ export default function Footer() {
 
       {/* Newsletter block */}
       <div className="border-b border-dark-light">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20 grid grid-cols-12 gap-6 md:gap-10">
+        <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 py-12 md:py-20 grid grid-cols-12 gap-6 md:gap-10">
           <div className="col-span-12 md:col-span-5">
-            <p className="text-[10px] tracking-[0.4em] uppercase text-cyan mb-4">— {t('footer.newsletterHeading')}</p>
-            <h3 className="font-display text-4xl md:text-6xl uppercase leading-[0.9] text-white">
+            <p className="text-[10px] tracking-[0.4em] uppercase text-cyan mb-3 md:mb-4">— {t('footer.newsletterHeading')}</p>
+            <h3 className="font-display text-3xl sm:text-4xl md:text-6xl uppercase leading-[0.9] text-white">
               {lang === 'de' ? 'Sei der Erste.' : 'Be the first.'}<br />
               <span className="text-outline text-white">{lang === 'de' ? 'Drop 002.' : 'Drop 002.'}</span>
             </h3>
@@ -56,8 +56,8 @@ export default function Footer() {
       </div>
 
       {/* Links */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 md:py-16 relative z-10">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-10">
+      <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 py-10 md:py-16 relative z-10">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-10">
           <div>
             <h4 className="text-[10px] tracking-[0.3em] uppercase mb-6 text-cyan">— Shop</h4>
             <div className="space-y-3">

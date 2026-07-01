@@ -71,9 +71,9 @@ export default function ProductDetail() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-28 lg:pb-8">
+    <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 py-6 md:py-8 pb-28 lg:pb-8">
       {/* Breadcrumb */}
-      <nav className="flex items-center gap-2 text-xs text-gray-text mb-8">
+      <nav className="flex items-center gap-2 text-[10px] md:text-xs text-gray-text mb-5 md:mb-8 overflow-hidden">
         <Link to="/" className="hover:text-dark transition-colors">Home</Link>
         <span>/</span>
         <Link to="/products" className="hover:text-dark transition-colors">{t('nav.shop')}</Link>
@@ -81,7 +81,7 @@ export default function ProductDetail() {
         <span className="text-dark">{product.name}</span>
       </nav>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16">
         {/* Images with zoom on hover */}
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
           <div className="aspect-square bg-muted overflow-hidden relative group">

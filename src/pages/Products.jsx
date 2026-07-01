@@ -56,7 +56,7 @@ export default function Products() {
     <div>
       {/* Editorial hero */}
       <section className="grain-overlay bg-dark-deep text-white relative overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16 md:pt-28 md:pb-20">
+        <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 pt-12 pb-12 md:pt-28 md:pb-20">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
             <div className="flex items-center gap-4 mb-6">
               <div className="w-8 h-px bg-cyan" />
@@ -75,9 +75,9 @@ export default function Products() {
         </div>
       </section>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
+      <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 py-8 md:py-16">
         {/* Filters */}
-        <div className="flex flex-col gap-4 mb-10 md:mb-14 pb-6 border-b border-border">
+        <div className="flex flex-col gap-4 mb-8 md:mb-14 pb-5 md:pb-6 border-b border-border">
           <div className="relative max-w-md">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-text" />
             <Input
@@ -165,7 +165,7 @@ export default function Products() {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 md:gap-10">
             {filtered.map(product => (
               <ProductCard key={product.id} product={product} />
             ))}

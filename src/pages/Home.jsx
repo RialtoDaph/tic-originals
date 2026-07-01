@@ -30,17 +30,17 @@ export default function Home() {
 
       {/* Products Preview */}
       {products.length > 0 &&
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
-          <div className="flex items-end justify-between mb-16 gap-6 flex-wrap">
+      <section className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 py-14 md:py-24">
+          <div className="flex items-end justify-between mb-10 md:mb-16 gap-4 flex-wrap">
             <div>
-              <p className="text-[10px] tracking-[0.4em] uppercase text-gray-text mb-4">— Collection 001</p>
-              <h2 className="font-display text-5xl md:text-7xl lg:text-8xl uppercase leading-[0.9]">{t('products.title')}</h2>
+              <p className="text-[10px] tracking-[0.4em] uppercase text-gray-text mb-3 md:mb-4">— Collection 001</p>
+              <h2 className="font-display text-4xl sm:text-5xl md:text-7xl lg:text-8xl uppercase leading-[0.9]">{t('products.title')}</h2>
             </div>
-            <Link to="/products" className="text-xs tracking-[0.25em] uppercase flex items-center gap-2 hover:gap-4 transition-all border-b border-dark pb-1">
+            <Link to="/products" className="text-[10px] md:text-xs tracking-[0.25em] uppercase flex items-center gap-2 hover:gap-4 transition-all border-b border-dark pb-1">
               {t('nav.shop')} <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 md:gap-8">
             {products.map((product) =>
           <ProductCard key={product.id} product={product} />
           )}
@@ -49,12 +49,12 @@ export default function Home() {
       }
 
       {/* Manifesto */}
-      <section className="grain-overlay bg-dark-deep py-32 md:py-40 relative overflow-hidden">
+      <section className="grain-overlay bg-dark-deep py-16 md:py-32 lg:py-40 relative overflow-hidden">
         {/* Low opacity TIC watermark */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
           <span className="font-display text-[10rem] md:text-[24rem] font-bold text-white/[0.04] leading-none tracking-widest">TIC</span>
         </div>
-        <div className="max-w-5xl mx-auto px-4 relative z-10">
+        <div className="max-w-5xl mx-auto px-5 sm:px-6 relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -92,10 +92,10 @@ function ShippingInfo() {
   { title: lang === 'de' ? '14 Tage Rückgabe' : '14-Day Returns', desc: lang === 'de' ? 'Widerrufsrecht' : 'Right of withdrawal' }];
 
   return (
-    <section className="py-20 border-t">
-      <div className="max-w-5xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-12 text-center">
+    <section className="py-12 md:py-20 border-t">
+      <div className="max-w-5xl mx-auto px-5 sm:px-6 grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-12 text-center">
         {items.map((item, i) =>
-        <div key={i}>
+        <div key={i} className="py-2">
             <h3 className="font-heading text-xl mb-2">{item.title}</h3>
             <p className="text-sm text-gray-text">{item.desc}</p>
           </div>
