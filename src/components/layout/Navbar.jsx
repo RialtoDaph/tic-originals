@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Menu, X, Globe, User, Shield } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
@@ -13,6 +13,13 @@ export default function Navbar() {
   const { itemCount, setIsOpen } = useCart();
   const { user } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 40);
+    window.addEventListener('scroll', onScroll);
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   const links = [
     { to: '/products', label: t('nav.shop') },
@@ -25,9 +32,9 @@ export default function Navbar() {
   return (
     <>
       <AnnouncementTicker />
-      <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-border">
+      <nav className={`sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b transition-all duration-500 ${scrolled ? 'border-border shadow-sm' : 'border-transparent'}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16 md:h-20 gap-4">
+          <div className={`flex items-center justify-between gap-4 transition-all duration-500 ${scrolled ? 'h-14 md:h-16' : 'h-16 md:h-20'}`}>
             <button className="lg:hidden shrink-0" onClick={() => setMobileOpen(!mobileOpen)}>
               {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
@@ -36,7 +43,7 @@ export default function Navbar() {
               <img
                 src="https://media.base44.com/images/public/69e5695817245a39fd1a3317/5c0b2056b_Untitleddesign.png"
                 alt="Till I Collapse"
-                className="h-32 md:h-48 w-auto"
+                className={`w-auto transition-all duration-500 ${scrolled ? 'h-20 md:h-28' : 'h-32 md:h-48'}`}
               />
             </Link>
 

@@ -7,6 +7,7 @@ import NewsletterPopup from '@/components/common/NewsletterPopup';
 import CookieBanner from '@/components/common/CookieBanner';
 import MobileBottomNav from './MobileBottomNav';
 import ScrollToTop from './ScrollToTop';
+import PageTransition from './PageTransition';
 
 export default function Layout() {
   return (
@@ -14,7 +15,9 @@ export default function Layout() {
       <ScrollToTop />
       <Navbar />
       <main className="flex-1 pb-16 lg:pb-0">
-        <Outlet />
+        <PageTransition>
+          <Outlet />
+        </PageTransition>
       </main>
       <Footer />
       <CartDrawer />

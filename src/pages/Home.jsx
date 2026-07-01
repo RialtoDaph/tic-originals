@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
 import HeroSlider from '@/components/home/HeroSlider';
 import ReviewsCarousel from '@/components/home/ReviewsCarousel';
+import Marquee from '@/components/common/Marquee';
 
 export default function Home() {
   const { t } = useLanguage();
@@ -22,46 +23,52 @@ export default function Home() {
       {/* Hero Slider */}
       <HeroSlider />
 
+      {/* Marquee ticker */}
+      <div className="bg-dark-deep text-white py-4 border-y border-dark-light overflow-hidden">
+        <Marquee />
+      </div>
+
       {/* Products Preview */}
       {products.length > 0 &&
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
-          <div className="text-center mb-16">
-            <p className="text-xs tracking-[0.3em] uppercase text-gray-text mb-3">Collection</p>
-            <h2 className="font-heading text-4xl md:text-5xl font-light">{t('products.title')}</h2>
+          <div className="flex items-end justify-between mb-16 gap-6 flex-wrap">
+            <div>
+              <p className="text-[10px] tracking-[0.4em] uppercase text-gray-text mb-4">— Collection 001</p>
+              <h2 className="font-display text-5xl md:text-7xl lg:text-8xl uppercase leading-[0.9]">{t('products.title')}</h2>
+            </div>
+            <Link to="/products" className="text-xs tracking-[0.25em] uppercase flex items-center gap-2 hover:gap-4 transition-all border-b border-dark pb-1">
+              {t('nav.shop')} <ArrowRight className="w-4 h-4" />
+            </Link>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {products.map((product) =>
           <ProductCard key={product.id} product={product} />
           )}
-          </div>
-          <div className="text-center mt-16">
-            <Link to="/products">
-              <Button variant="outline" className="px-10 py-6 text-xs tracking-[0.2em] uppercase rounded-none border-dark">
-                {t('nav.shop')} <ArrowRight className="w-4 h-4 ml-2" />
-              </Button>
-            </Link>
           </div>
         </section>
       }
 
       {/* Manifesto */}
-      <section className="bg-dark-deep py-32 relative overflow-hidden">
+      <section className="grain-overlay bg-dark-deep py-32 md:py-40 relative overflow-hidden">
         {/* Low opacity TIC watermark */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
-          <span className="font-heading text-[8rem] md:text-[20rem] font-bold text-white/[0.03] leading-none tracking-widest">TIC</span>
+          <span className="font-display text-[10rem] md:text-[24rem] font-bold text-white/[0.04] leading-none tracking-widest">TIC</span>
         </div>
-        <div className="max-w-4xl mx-auto px-4 text-center relative z-10">
+        <div className="max-w-5xl mx-auto px-4 relative z-10">
           <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 1 }}>
-            
-            <p className="text-xs tracking-[0.3em] uppercase text-cyan mb-8">Manifesto</p>
-            <blockquote className="font-heading md:text-3xl lg:text-4xl text-white/90 font-light leading-relaxed italic text-lg">
+
+            <div className="flex items-center gap-4 mb-10">
+              <div className="w-8 h-px bg-cyan" />
+              <p className="text-[10px] tracking-[0.4em] uppercase text-cyan">Manifesto</p>
+            </div>
+            <blockquote className="font-heading text-2xl md:text-4xl lg:text-5xl text-white/95 font-light leading-[1.3] italic">
               "Cause sometimes you just feel tired. Feel weak, and when you feel weak. You feel like you wanna just give up. But you gotta search within you. Try to find that inner strength and just pull that shit out of you. And get that motivation to not give up. And not be a quitter. No matter how bad you wanna just fall flat on your face and COLLAPSE."
             </blockquote>
-            <div className="mt-8 w-12 h-px bg-cyan mx-auto" />
+            <p className="font-display text-3xl md:text-5xl text-cyan uppercase tracking-wider mt-12">Till I Collapse.</p>
           </motion.div>
         </div>
       </section>
