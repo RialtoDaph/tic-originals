@@ -52,7 +52,7 @@ export default function Account() {
         <div className="border p-10 space-y-6">
           <h2 className="font-heading text-3xl font-light">{c.title}</h2>
           <p className="text-sm text-gray-text">{c.loginRequired}</p>
-          <Button onClick={navigateToLogin} className="w-full bg-cyan text-dark-deep hover:bg-cyan-dark rounded-none text-xs tracking-[0.2em] uppercase py-5">
+          <Button onClick={navigateToLogin} className="w-full bg-cyan text-dark-deep hover:bg-cyan-dark text-xs tracking-[0.2em] uppercase py-5">
             {c.signIn}
           </Button>
         </div>
@@ -64,7 +64,7 @@ export default function Account() {
     <div className="max-w-3xl mx-auto px-4 sm:px-6 py-16">
       <div className="flex items-center justify-between mb-10">
         <h1 className="font-heading text-4xl font-light">{c.title}</h1>
-        <Button variant="outline" onClick={() => logout()} className="rounded-none text-xs tracking-wider uppercase flex items-center gap-2">
+        <Button variant="outline" onClick={() => logout()} className="text-xs tracking-wider uppercase flex items-center gap-2">
           <LogOut className="w-3.5 h-3.5" />
           {c.logout}
         </Button>

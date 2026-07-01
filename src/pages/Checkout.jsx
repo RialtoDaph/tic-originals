@@ -262,7 +262,7 @@ export default function Checkout() {
           </div>
           <Button
             onClick={() => base44.auth.redirectToLogin(window.location.href)}
-            className="w-full bg-cyan text-dark-deep hover:bg-cyan-dark rounded-none text-xs tracking-[0.2em] uppercase py-5">
+            className="w-full bg-cyan text-dark-deep hover:bg-cyan-dark text-xs tracking-[0.2em] uppercase py-5">
             {lang === 'de' ? 'Jetzt anmelden' : 'Sign In'}
           </Button>
           <p className="text-xs text-gray-text">

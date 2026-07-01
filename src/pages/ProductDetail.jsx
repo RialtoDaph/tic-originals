@@ -228,7 +228,7 @@ export default function ProductDetail() {
             <Button
               onClick={handleAddToCart}
               disabled={!selectedColor || !selectedSize || stockForSelection <= 0}
-              className="w-full bg-dark-deep text-white hover:bg-cyan hover:text-dark-deep py-7 text-[11px] tracking-[0.3em] uppercase rounded-none disabled:opacity-40 transition-colors"
+              className="w-full bg-dark-deep text-white hover:bg-cyan hover:text-dark-deep py-7 text-[11px] tracking-[0.3em] uppercase disabled:opacity-40 transition-colors"
             >
               {stockForSelection <= 0 && selectedColor && selectedSize ? t('products.soldOut') : t('products.addToCart')}
             </Button>
@@ -264,7 +264,7 @@ export default function ProductDetail() {
             <Button
               onClick={handleAddToCart}
               disabled={!selectedColor || !selectedSize || stockForSelection <= 0}
-              className="bg-cyan text-dark-deep hover:bg-cyan-dark text-xs tracking-[0.15em] uppercase rounded-none px-6 py-5 shrink-0 disabled:opacity-40"
+              className="bg-cyan text-dark-deep hover:bg-cyan-dark text-xs tracking-[0.15em] uppercase px-6 py-5 shrink-0 disabled:opacity-40"
             >
               {!selectedColor || !selectedSize
                 ? (lang === 'de' ? 'Option wählen' : 'Select Options')

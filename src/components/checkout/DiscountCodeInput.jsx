@@ -64,7 +64,7 @@ export default function DiscountCodeInput({ subtotal, customerEmail, onApply, on
           onClick={handleApply}
           disabled={loading || !input.trim()}
           variant="outline"
-          className="rounded-none text-xs tracking-wider uppercase border-dark hover:bg-muted"
+          className="text-xs tracking-wider uppercase border-dark hover:bg-muted"
         >
           {loading ? '...' : (lang === 'de' ? 'Anwenden' : 'Apply')}
         </Button>

@@ -133,7 +133,7 @@ export default function QuickViewModal({ product, onClose }) {
               <Button
                 onClick={handleAdd}
                 disabled={!selectedColor || !selectedSize || stockForSelection <= 0}
-                className={`w-full py-5 text-xs tracking-[0.2em] uppercase rounded-none transition-colors ${
+                className={`w-full py-5 text-xs tracking-[0.2em] uppercase transition-colors ${
                   added ? 'bg-green-500 hover:bg-green-500 text-white' : 'bg-cyan text-dark-deep hover:bg-cyan-dark'
                 }`}
               >

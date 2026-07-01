@@ -113,7 +113,7 @@ export default function ProductReviews({ productId }) {
                 setShowForm(true);
               }}
               variant="outline"
-              className="rounded-none border-dark text-xs tracking-[0.15em] uppercase px-8 py-5"
+              className="border-dark text-xs tracking-[0.15em] uppercase px-8 py-5"
             >
               {l.write}
             </Button>
@@ -121,7 +121,7 @@ export default function ProductReviews({ productId }) {
             <Button
               onClick={() => base44.auth.redirectToLogin(window.location.href)}
               variant="outline"
-              className="rounded-none border-dark text-xs tracking-[0.15em] uppercase px-8 py-5"
+              className="border-dark text-xs tracking-[0.15em] uppercase px-8 py-5"
             >
               <LogIn className="w-3.5 h-3.5 mr-2" />
               {l.signIn}
@@ -183,7 +183,7 @@ export default function ProductReviews({ productId }) {
               <Button
                 type="submit"
                 disabled={mutation.isPending || form.rating === 0 || !form.author_name}
-                className="bg-cyan text-dark-deep hover:bg-cyan-dark rounded-none text-xs tracking-[0.15em] uppercase px-8"
+                className="bg-cyan text-dark-deep hover:bg-cyan-dark text-xs tracking-[0.15em] uppercase px-8"
               >
                 {mutation.isPending ? '...' : l.submit}
               </Button>
@@ -191,7 +191,7 @@ export default function ProductReviews({ productId }) {
                 type="button"
                 variant="ghost"
                 onClick={() => setShowForm(false)}
-                className="rounded-none text-xs tracking-[0.15em] uppercase"
+                className="text-xs tracking-[0.15em] uppercase"
               >
                 {l.cancel}
               </Button>

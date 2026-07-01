@@ -120,7 +120,7 @@ export default function NewsletterPopup() {
                       <Button
                         type="submit"
                         disabled={loading}
-                        className="w-full bg-cyan text-dark-deep hover:bg-white rounded-none text-[11px] tracking-[0.3em] uppercase py-5 mt-4"
+                        className="w-full bg-cyan text-dark-deep hover:bg-white text-[11px] tracking-[0.3em] uppercase py-5 mt-4"
                       >
                         {loading ? '...' : c.cta}
                       </Button>
@@ -144,7 +144,7 @@ export default function NewsletterPopup() {
                     <p className="text-[10px] tracking-[0.4em] uppercase text-cyan mb-3">— Your code</p>
                     <p className="font-display text-6xl md:text-7xl text-white mb-5 tracking-wider">TIC10</p>
                     <p className="text-sm text-white/70 leading-relaxed max-w-xs mx-auto">{c.thanks}</p>
-                    <Button onClick={dismiss} className="mt-8 bg-cyan text-dark-deep hover:bg-white rounded-none text-[11px] tracking-[0.3em] uppercase px-10 py-5">
+                    <Button onClick={dismiss} className="mt-8 bg-cyan text-dark-deep hover:bg-white text-[11px] tracking-[0.3em] uppercase px-10 py-5">
                       {lang === 'de' ? 'Jetzt shoppen' : 'Shop Now'}
                     </Button>
                   </motion.div>

@@ -137,7 +137,7 @@ export default function HeroSlider() {
 
             {/* CTA */}
             <Link to={slide.link}>
-              <Button className="bg-cyan text-dark-deep hover:bg-cyan-dark px-10 py-6 text-xs tracking-[0.25em] uppercase rounded-none">
+              <Button className="bg-cyan text-dark-deep hover:bg-cyan-dark px-10 py-6 text-xs tracking-[0.25em] uppercase">
                 {lang === 'de' ? slide.cta_de : slide.cta_en}
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
