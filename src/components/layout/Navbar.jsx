@@ -34,16 +34,16 @@ export default function Navbar() {
       <AnnouncementTicker />
       <nav className={`sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b transition-all duration-500 ${scrolled ? 'border-border shadow-sm' : 'border-transparent'}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className={`flex items-center justify-between gap-4 transition-all duration-500 ${scrolled ? 'h-14 md:h-16' : 'h-16 md:h-20'}`}>
+          <div className={`flex items-center justify-between gap-4 transition-all duration-500 ${scrolled ? 'h-16 md:h-16' : 'h-20 md:h-20'}`}>
             <button className="lg:hidden shrink-0" onClick={() => setMobileOpen(!mobileOpen)}>
-              {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              {mobileOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
 
             <Link to="/" className="shrink-0">
               <img
                 src="https://media.base44.com/images/public/69e5695817245a39fd1a3317/5c0b2056b_Untitleddesign.png"
                 alt="Till I Collapse"
-                className={`w-auto transition-all duration-500 ${scrolled ? 'h-12 md:h-20' : 'h-16 md:h-32 lg:h-40'}`}
+                className={`w-auto transition-all duration-500 ${scrolled ? 'h-20 md:h-20' : 'h-28 md:h-32 lg:h-40'}`}
               />
             </Link>
 
