@@ -65,10 +65,15 @@ export default function Home() {
               <div className="w-8 h-px bg-cyan" />
               <p className="text-[10px] tracking-[0.4em] uppercase text-cyan">Manifesto</p>
             </div>
-            <blockquote className="font-heading text-2xl md:text-4xl lg:text-5xl text-white/95 font-light leading-[1.3] italic">
-              "Cause sometimes you just feel tired. Feel weak, and when you feel weak. You feel like you wanna just give up. But you gotta search within you. Try to find that inner strength and just pull that shit out of you. And get that motivation to not give up. And not be a quitter. No matter how bad you wanna just fall flat on your face and COLLAPSE."
-            </blockquote>
-            <p className="font-display text-3xl md:text-5xl text-cyan uppercase tracking-wider mt-12">Till I Collapse.</p>
+            <div className="relative">
+              <span className="absolute -top-8 -left-2 md:-top-16 md:-left-6 font-display text-[8rem] md:text-[14rem] leading-none text-cyan/20 select-none pointer-events-none">"</span>
+              <blockquote className="relative font-heading text-xl md:text-3xl lg:text-4xl text-white/90 font-light leading-[1.5] italic space-y-5 md:space-y-6 max-w-3xl">
+                <p>Cause sometimes you just feel tired. Feel weak, and when you feel weak, you feel like you wanna just give up.</p>
+                <p>But you gotta search within you. Try to find that inner strength and just pull that shit out of you.</p>
+                <p>And get that motivation to not give up. And not be a quitter. No matter how bad you wanna just fall flat on your face and <span className="not-italic font-display text-cyan tracking-wider">COLLAPSE</span>.</p>
+              </blockquote>
+            </div>
+            <p className="font-display text-3xl md:text-5xl text-cyan uppercase tracking-wider mt-12">— Till I Collapse.</p>
           </motion.div>
         </div>
       </section>
