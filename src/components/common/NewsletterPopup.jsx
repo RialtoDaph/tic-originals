@@ -44,8 +44,8 @@ export default function NewsletterPopup() {
       sub: 'Join the TIC community. No spam — just drops, deals & brand stories.',
       placeholder: 'your@email.com',
       cta: 'Claim My 10% Discount',
-      code: 'Use code TIC10 at checkout',
-      thanks: "You're in. Use code TIC10 at checkout for 10% off!",
+      thanks: "You're in! Check your inbox — your 10% discount code is on the way.",
+      thanksTitle: 'Check your inbox',
       later: 'Maybe later',
     },
     de: {
@@ -54,8 +54,8 @@ export default function NewsletterPopup() {
       sub: 'Werde Teil der TIC-Community. Kein Spam — nur Drops, Deals & Brand-Stories.',
       placeholder: 'deine@email.de',
       cta: 'Jetzt 10 % sichern',
-      code: 'Code TIC10 an der Kasse eingeben',
-      thanks: 'Du bist dabei! Code TIC10 an der Kasse für 10 % Rabatt.',
+      thanks: 'Du bist dabei! Schau in dein Postfach — dein 10 %-Code ist unterwegs.',
+      thanksTitle: 'Check dein Postfach',
       later: 'Vielleicht später',
     },
   };
@@ -126,9 +126,7 @@ export default function NewsletterPopup() {
                       </Button>
                     </form>
 
-                    <p className="text-center text-[10px] text-white/40 mt-5 tracking-[0.3em] uppercase">{c.code}</p>
-
-                    <button onClick={dismiss} className="block mx-auto mt-4 text-[10px] text-white/30 hover:text-white/60 transition-colors tracking-[0.3em] uppercase">
+                    <button onClick={dismiss} className="block mx-auto mt-6 text-[10px] text-white/30 hover:text-white/60 transition-colors tracking-[0.3em] uppercase">
                       {c.later}
                     </button>
                   </>
@@ -139,11 +137,10 @@ export default function NewsletterPopup() {
                     className="py-6 text-center"
                   >
                     <div className="w-14 h-14 rounded-full bg-cyan flex items-center justify-center mx-auto mb-6">
-                      <Tag className="w-6 h-6 text-dark-deep" />
+                      <Mail className="w-6 h-6 text-dark-deep" />
                     </div>
-                    <p className="text-[10px] tracking-[0.4em] uppercase text-cyan mb-3">Your code</p>
-                    <p className="font-display text-6xl md:text-7xl text-white mb-5 tracking-wider">TIC10</p>
-                    <p className="text-sm text-white/70 leading-relaxed max-w-xs mx-auto">{c.thanks}</p>
+                    <p className="text-[10px] tracking-[0.4em] uppercase text-cyan mb-3">{c.thanksTitle}</p>
+                    <p className="text-sm text-white/70 leading-relaxed max-w-xs mx-auto mt-2">{c.thanks}</p>
                     <Button onClick={dismiss} className="mt-8 bg-cyan text-dark-deep hover:bg-white text-[11px] tracking-[0.3em] uppercase px-10 py-5">
                       {lang === 'de' ? 'Jetzt shoppen' : 'Shop Now'}
                     </Button>
