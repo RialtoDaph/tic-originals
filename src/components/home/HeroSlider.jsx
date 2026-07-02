@@ -146,9 +146,9 @@ export default function HeroSlider() {
         </AnimatePresence>
 
         {/* Controls */}
-        <div className="absolute bottom-6 sm:bottom-10 left-6 right-6 sm:left-auto sm:right-16 lg:right-24 flex items-center justify-between sm:justify-end gap-4">
+        <div className="absolute bottom-6 sm:bottom-10 left-1/2 -translate-x-1/2 flex items-center justify-center">
           {/* Dots */}
-          <div className="flex gap-2 mr-2">
+          <div className="flex gap-2">
             {slides.map((_, i) => (
               <button
                 key={i}
