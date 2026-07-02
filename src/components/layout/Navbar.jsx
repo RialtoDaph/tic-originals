@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Menu, X, Globe, User, Shield } from 'lucide-react';
+import { Menu, X, Globe, Shield } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/lib/AuthContext';
@@ -35,10 +35,6 @@ export default function Navbar() {
       <nav className={`sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b transition-all duration-500 ${scrolled ? 'border-border shadow-sm' : 'border-transparent'}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className={`flex items-center justify-between gap-4 transition-all duration-500 ${scrolled ? 'h-16 md:h-16' : 'h-20 md:h-20'}`}>
-            <button className="lg:hidden shrink-0" onClick={() => setMobileOpen(!mobileOpen)}>
-              {mobileOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-            </button>
-
             <Link to="/" className="shrink-0">
               <img
                 src="https://media.base44.com/images/public/69e5695817245a39fd1a3317/5c0b2056b_Untitleddesign.png"
@@ -67,16 +63,9 @@ export default function Navbar() {
                   <Shield className="w-4 h-4" />
                 </Link>
               )}
-              {user ? (
-                <Link to="/account" title="My Account" className="text-gray-text hover:text-dark transition-colors">
-                  <User className="w-4 h-4" />
-                </Link>
-              ) : (
-                <button onClick={() => base44.auth.redirectToLogin(window.location.href)} title="Login" className="text-gray-text hover:text-dark transition-colors">
-                  <User className="w-4 h-4" />
-                </button>
-              )}
-
+              <button className="lg:hidden shrink-0 text-gray-text hover:text-dark transition-colors" onClick={() => setMobileOpen(!mobileOpen)}>
+                {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              </button>
             </div>
           </div>
         </div>
