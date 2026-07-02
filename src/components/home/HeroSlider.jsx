@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/context/LanguageContext';
 
@@ -160,19 +160,6 @@ export default function HeroSlider() {
             ))}
           </div>
 
-          {/* Arrows */}
-          <button
-            onClick={prev}
-            className="w-10 h-10 border border-white/20 hover:border-cyan hover:text-cyan text-white/50 flex items-center justify-center transition-colors"
-          >
-            <ChevronLeft className="w-4 h-4" />
-          </button>
-          <button
-            onClick={next}
-            className="w-10 h-10 border border-white/20 hover:border-cyan hover:text-cyan text-white/50 flex items-center justify-center transition-colors"
-          >
-            <ChevronRight className="w-4 h-4" />
-          </button>
         </div>
 
         {/* Progress bar */}
