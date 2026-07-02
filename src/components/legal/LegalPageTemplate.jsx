@@ -225,7 +225,7 @@ export default function LegalPageTemplate({ slug }) {
                       </p>
                       <p>
                         {lang === 'de' ? 'An:' : 'To:'}<br />
-                        TIC ORIGINALS<br />
+                        TILL I COLLAPSE ORIGINALS<br />
                         An der Oberen Au 4, 85072 Eichstätt<br />
                         company@ticoriginals.com
                       </p>
