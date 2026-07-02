@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Menu, X, Globe, Shield } from 'lucide-react';
+import { Menu, X, Globe, Shield, User } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/lib/AuthContext';
@@ -64,6 +64,13 @@ export default function Navbar() {
                   <Shield className="w-4 h-4" strokeWidth={1.5} />
                 </Link>
               )}
+              <Link
+                to={user ? '/account' : '/login'}
+                title={user ? (lang === 'de' ? 'Mein Konto' : 'My Account') : (lang === 'de' ? 'Anmelden' : 'Sign In')}
+                className="text-gray-text hover:text-dark transition-colors duration-300"
+              >
+                <User className="w-4 h-4" strokeWidth={1.5} />
+              </Link>
               <button
                 className="lg:hidden shrink-0 text-gray-text hover:text-dark transition-colors duration-300"
                 onClick={() => setMobileOpen(!mobileOpen)}
