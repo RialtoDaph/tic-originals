@@ -85,6 +85,7 @@ export default function Footer() {
               <Link to="/datenschutz" className="block text-sm text-white/70 hover:text-cyan transition-colors">{t('footer.privacy')}</Link>
               <Link to="/agb" className="block text-sm text-white/70 hover:text-cyan transition-colors">{t('footer.terms')}</Link>
               <Link to="/widerruf" className="block text-sm text-white/70 hover:text-cyan transition-colors">{t('footer.withdrawal')}</Link>
+              <Link to="/returns-policy" className="block text-sm text-white/70 hover:text-cyan transition-colors">{lang === 'de' ? 'Rückgabe' : 'Returns'}</Link>
             </div>
           </div>
 
