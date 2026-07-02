@@ -51,7 +51,7 @@ export default function About() {
 
       {/* MARQUEE */}
       <div className="bg-cyan text-dark-deep py-4 border-y-2 border-dark-deep">
-        <Marquee items={['TILL I COLLAPSE', 'NO LIMITS', 'NO EXCUSES', '1 WORLD', 'BORN IN GERMANY']} />
+        <Marquee items={['TILL I COLLAPSE', 'NO LIMITS', 'NO EXCUSES', '1 WORLD', 'BORN IN GERMANY', 'EST. 2026']} />
       </div>
 
       {/* MANIFESTO: asymmetric split */}
