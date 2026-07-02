@@ -7,7 +7,7 @@ import { createCheckoutSession } from '@/functions/createCheckoutSession';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Check, LogIn, Loader2 } from 'lucide-react';
+import { Check, Loader2 } from 'lucide-react';
 import DiscountCodeInput from '@/components/checkout/DiscountCodeInput.jsx';
 import PaymentMethods from '@/components/common/PaymentMethods';
 import { motion } from 'framer-motion';
@@ -244,35 +244,6 @@ export default function Checkout() {
     );
   }
 
-  // Login gate — only show if auth check done and user not logged in
-  if (authChecked && !user) {
-    return (
-      <div className="max-w-md mx-auto px-4 py-24 text-center">
-        <div className="border p-10 space-y-6">
-          <LogIn className="w-10 h-10 mx-auto text-cyan" />
-          <div>
-            <h2 className="font-heading text-3xl font-light mb-2">
-              {lang === 'de' ? 'Anmelden' : 'Sign In to Continue'}
-            </h2>
-            <p className="text-sm text-gray-text leading-relaxed">
-              {lang === 'de'
-                ? 'Melde dich an, um deine Bestellung abzuschließen.'
-                : 'Please sign in to complete your purchase.'}
-            </p>
-          </div>
-          <Button
-            onClick={() => base44.auth.redirectToLogin(window.location.href)}
-            className="w-full bg-cyan text-dark-deep hover:bg-cyan-dark text-xs tracking-[0.2em] uppercase py-5">
-            {lang === 'de' ? 'Jetzt anmelden' : 'Sign In'}
-          </Button>
-          <p className="text-xs text-gray-text">
-            {lang === 'de' ? 'Noch kein Konto? Jetzt registrieren.' : "Don't have an account? Register now."}
-          </p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="max-w-5xl mx-auto px-5 sm:px-6 py-10 md:py-16">
       <div className="mb-10 md:mb-14">
@@ -326,9 +297,9 @@ export default function Checkout() {
               </div>
               <div>
                 <Label className="text-xs tracking-wider uppercase">{t('checkout.email')}</Label>
-                <Input type="email" value={form.email} disabled className="rounded-none mt-1 bg-muted" />
+                <Input type="email" value={form.email} onChange={e => updateField('email', e.target.value)} className="rounded-none mt-1" />
                 <p className="text-xs text-gray-text mt-1">
-                  {lang === 'de' ? 'Bestellungen werden mit deinem Konto verknüpft.' : 'Orders are linked to your account.'}
+                  {lang === 'de' ? 'Wir senden dir die Bestellbestätigung an diese E-Mail.' : "We'll send your order confirmation to this email."}
                 </p>
               </div>
               <div>

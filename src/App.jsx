@@ -48,8 +48,14 @@ const AuthenticatedApp = () => {
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/unsubscribe" element={<Unsubscribe />} />
 
-      {/* Public routes — no auth required (legal pages, about, contact, faq) */}
+      {/* Public routes — no auth required (shop + info pages) */}
       <Route element={<Layout />}>
+        <Route path="/" element={<Home />} />
+        <Route path="/products" element={<Products />} />
+        <Route path="/products/:id" element={<ProductDetail />} />
+        <Route path="/checkout" element={<Checkout />} />
+        <Route path="/order-confirmation" element={<OrderConfirmation />} />
+        <Route path="/tracking" element={<OrderTracking />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/faq" element={<FAQ />} />
@@ -60,15 +66,9 @@ const AuthenticatedApp = () => {
         <Route path="/returns-policy" element={<Returns />} />
       </Route>
 
-      {/* Gated app routes — auth required */}
+      {/* Gated routes — auth required (account + admin) */}
       <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
         <Route element={<Layout />}>
-          <Route path="/" element={<Home />} />
-          <Route path="/products" element={<Products />} />
-          <Route path="/products/:id" element={<ProductDetail />} />
-          <Route path="/checkout" element={<Checkout />} />
-          <Route path="/order-confirmation" element={<OrderConfirmation />} />
-          <Route path="/tracking" element={<OrderTracking />} />
           <Route path="/admin" element={<Dashboard />} />
           <Route path="/account" element={<Account />} />
         </Route>
