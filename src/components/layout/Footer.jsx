@@ -25,7 +25,7 @@ export default function Footer() {
     <footer className="grain-overlay bg-dark-deep text-white relative overflow-hidden">
       {/* Marquee top */}
       <div className="border-y border-dark-light py-5">
-        <Marquee items={['TILL I COLLAPSE', 'NO LIMITS', 'NO EXCUSES', '1 WORLD', 'BORN IN GERMANY', 'EST. 2026']} />
+        <Marquee items={['TILL I COLLAPSE', 'NO LIMITS', '1 WORLD', 'BORN IN GERMANY', 'EST. 2026']} />
       </div>
 
       {/* Newsletter block */}
