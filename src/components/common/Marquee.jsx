@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function Marquee({ items = ['TILL I COLLAPSE', 'NO LIMITS', 'NO EXCUSES', '1 WORLD', 'EST. 2024'], className = '' }) {
+export default function Marquee({ items = ['TILL I COLLAPSE', 'NO LIMITS', 'NO EXCUSES', '1 WORLD', 'EST. 2026'], className = '' }) {
   const loop = [...items, ...items, ...items, ...items];
   return (
     <div className={`overflow-hidden whitespace-nowrap ${className}`}>
