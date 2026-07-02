@@ -61,7 +61,7 @@ export default function Account() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto px-4 sm:px-6 py-16">
+    <div className="max-w-3xl mx-auto px-4 sm:px-6 pt-8 pb-16">
       <div className="flex items-center justify-between mb-10">
         <h1 className="font-heading text-4xl font-light">{c.title}</h1>
         <Button variant="outline" onClick={() => logout()} className="text-xs tracking-wider uppercase flex items-center gap-2">
