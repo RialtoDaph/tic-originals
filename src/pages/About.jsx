@@ -43,7 +43,7 @@ export default function About() {
               <p className="text-[10px] md:text-xs tracking-[0.3em] uppercase text-white/60 max-w-md">
                 {lang === 'de' ? 'Streetwear für jene, die niemals aufgeben.' : 'Streetwear for those who never give up.'}
               </p>
-              <p className="font-display text-2xl md:text-5xl text-cyan tracking-wider">EST. 2024</p>
+              <p className="font-display text-2xl md:text-5xl text-cyan tracking-wider">EST. 2026</p>
             </div>
           </motion.div>
         </div>

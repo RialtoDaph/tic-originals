@@ -127,7 +127,7 @@ export default function Footer() {
             <p className="text-[10px] tracking-[0.2em] uppercase text-white/40">
               © {new Date().getFullYear()} TIC Originals. {lang === 'de' ? 'Alle Rechte vorbehalten.' : 'All rights reserved.'}
             </p>
-            <p className="text-[10px] tracking-[0.2em] uppercase text-white/40">EST. 2024 · 1 WORLD.</p>
+            <p className="text-[10px] tracking-[0.2em] uppercase text-white/40">EST. 2026 · 1 WORLD.</p>
           </div>
         </div>
       </div>

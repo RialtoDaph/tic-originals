@@ -87,7 +87,7 @@ export default function OrderConfirmation() {
 
       <div className="border-t border-white/10 py-6 text-center">
         <p className="font-display text-lg md:text-xl uppercase tracking-widest text-white/30">
-          TILL I COLLAPSE · EST. 2024
+          TILL I COLLAPSE · EST. 2026
         </p>
       </div>
     </div>
