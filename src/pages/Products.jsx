@@ -8,9 +8,11 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Search, X } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useCurrentCollection } from '@/hooks/useCurrentCollection';
 
 export default function Products() {
   const { t, lang } = useLanguage();
+  const collection = useCurrentCollection();
   const [search, setSearch] = useState('');
   const [colorFilter, setColorFilter] = useState('all');
   const [sizeFilter, setSizeFilter] = useState('all');
@@ -69,7 +71,7 @@ export default function Products() {
               <p className="text-xs tracking-[0.3em] uppercase text-white/60">
                 {isLoading ? '...' : `${filtered.length} ${lang === 'de' ? 'Produkte' : 'Products'}`}
               </p>
-              <p className="font-display text-2xl md:text-4xl text-cyan tracking-wider">COLLECTION 001</p>
+              <p className="font-display text-2xl md:text-4xl text-cyan tracking-wider">COLLECTION {collection}</p>
             </div>
           </motion.div>
         </div>

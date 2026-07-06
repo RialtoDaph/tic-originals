@@ -1,0 +1,40 @@
+{
+  "name": "SiteSetting",
+  "type": "object",
+  "properties": {
+    "key": {
+      "type": "string",
+      "description": "Unique setting key (z.B. 'current_collection')"
+    },
+    "value": {
+      "type": "string",
+      "description": "Wert der Einstellung"
+    },
+    "description": {
+      "type": "string",
+      "description": "Interne Notiz",
+      "maxLength": 1000
+    }
+  },
+  "required": [
+    "key"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {},
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

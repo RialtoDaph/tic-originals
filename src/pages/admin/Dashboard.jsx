@@ -2,13 +2,14 @@ import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { Package, ShoppingCart, AlertTriangle, BarChart2, Lock, Tag } from 'lucide-react';
+import { Package, ShoppingCart, AlertTriangle, BarChart2, Lock, Tag, Settings } from 'lucide-react';
 import AdminOrders from '@/components/admin/AdminOrders';
 import AdminProducts from '@/components/admin/AdminProducts.jsx';
 import AdminInventory from '@/components/admin/AdminInventory';
 import AdminOverview from '@/components/admin/AdminOverview';
 import AdminReports from '@/components/admin/AdminReports';
 import AdminDiscountCodes from '@/components/admin/AdminDiscountCodes';
+import AdminSettings from '@/components/admin/AdminSettings';
 
 export default function Dashboard() {
   const [tab, setTab] = useState('overview');
@@ -96,6 +97,9 @@ export default function Dashboard() {
           <TabsTrigger value="discounts" className="gap-2">
             <Tag className="w-4 h-4" /> Rabattcodes
           </TabsTrigger>
+          <TabsTrigger value="settings" className="gap-2">
+            <Settings className="w-4 h-4" /> Settings
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview">
@@ -115,6 +119,9 @@ export default function Dashboard() {
         </TabsContent>
         <TabsContent value="discounts">
           <AdminDiscountCodes />
+        </TabsContent>
+        <TabsContent value="settings">
+          <AdminSettings />
         </TabsContent>
       </Tabs>
     </div>
