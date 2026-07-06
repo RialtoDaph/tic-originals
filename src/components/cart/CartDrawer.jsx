@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { X, Minus, Plus, Trash2, ShoppingBag, ArrowRight } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { useLanguage } from '@/context/LanguageContext';
@@ -8,6 +8,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 export default function CartDrawer() {
   const { items, removeItem, updateQuantity, subtotal, shippingCost, total, isOpen, setIsOpen } = useCart();
   const { t, lang } = useLanguage();
+  const navigate = useNavigate();
+
+  const handleCheckout = () => {
+    setIsOpen(false);
+    navigate('/checkout');
+  };
 
   const progress = Math.min((subtotal / 80) * 100, 100);
   const remaining = Math.max(0, 80 - subtotal);
@@ -148,14 +154,14 @@ export default function CartDrawer() {
                     </div>
                   </div>
 
-                  <Link
-                    to="/checkout"
-                    onClick={() => setIsOpen(false)}
+                  <button
+                    type="button"
+                    onClick={handleCheckout}
                     className="flex items-center justify-center gap-2 w-full bg-dark-deep text-white py-5 text-[11px] tracking-[0.3em] uppercase hover:bg-cyan hover:text-dark-deep transition-colors group"
                   >
                     {t('cart.checkout')}
                     <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-                  </Link>
+                  </button>
                 </div>
               </>
             )}
