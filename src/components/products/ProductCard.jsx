@@ -6,11 +6,55 @@ import { motion } from 'framer-motion';
 import { Eye } from 'lucide-react';
 import QuickViewModal from './QuickViewModal';
 
-export default function ProductCard({ product }) {
+export default function ProductCard({ product, variant = 'default' }) {
   const { t, lang } = useLanguage();
   const totalStock = product.stock?.reduce((sum, s) => sum + s.quantity, 0) || 0;
   const [showQuickView, setShowQuickView] = useState(false);
 
+  // Card variant — used inside mobile horizontal scroll: white card, rounded, shadow, info inside card
+  if (variant === 'card') {
+    return (
+      <>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="group bg-white rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.06)] overflow-hidden"
+        >
+          <Link to={`/products/${product.id}`} className="block">
+            <div className="aspect-square bg-muted overflow-hidden relative">
+              {product.images?.[0] ? (
+                <img
+                  src={product.images[0]}
+                  alt={product.name}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-dark to-dark-deep">
+                  <span className="font-display text-5xl text-cyan/30 tracking-[0.2em]">TIC</span>
+                </div>
+              )}
+            </div>
+            <div className="p-4">
+              <h3 className="font-heading text-lg font-semibold text-dark-deep leading-tight truncate">
+                {product.name}
+              </h3>
+              <div className="mt-2 flex items-center justify-between gap-3">
+                <div className="flex items-baseline gap-1.5">
+                  <span className="text-xl font-semibold text-dark-deep tabular-nums">
+                    €{product.price?.toFixed(2)}
+                  </span>
+                  <span className="text-xs text-gray-text">{t('products.inclVat')}</span>
+                </div>
+                <StockBadge quantity={totalStock} />
+              </div>
+            </div>
+          </Link>
+        </motion.div>
+      </>
+    );
+  }
+
+  // Default variant — desktop grid (unchanged)
   return (
     <>
       <motion.div

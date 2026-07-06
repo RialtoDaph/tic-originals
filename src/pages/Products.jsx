@@ -165,11 +165,23 @@ export default function Products() {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 md:gap-10">
-            {filtered.map(product => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
+          <>
+            {/* Mobile: horizontal snap scroll */}
+            <div className="md:hidden -mx-5 px-5 flex gap-4 overflow-x-auto snap-x snap-mandatory no-scrollbar pb-4">
+              {filtered.map(product => (
+                <div key={product.id} className="snap-start shrink-0 w-[75%]">
+                  <ProductCard product={product} variant="card" />
+                </div>
+              ))}
+              <div className="shrink-0 w-1" />
+            </div>
+            {/* Desktop: original grid */}
+            <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-10">
+              {filtered.map(product => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
+          </>
         )}
       </div>
     </div>

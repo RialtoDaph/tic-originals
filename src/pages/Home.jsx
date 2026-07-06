@@ -40,7 +40,17 @@ export default function Home() {
               {t('nav.shop')} <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 md:gap-8">
+          {/* Mobile: horizontal snap scroll */}
+          <div className="md:hidden -mx-5 px-5 flex gap-4 overflow-x-auto snap-x snap-mandatory no-scrollbar pb-4">
+            {products.map((product) => (
+              <div key={product.id} className="snap-start shrink-0 w-[75%]">
+                <ProductCard product={product} variant="card" />
+              </div>
+            ))}
+            <div className="shrink-0 w-1" />
+          </div>
+          {/* Desktop: original grid */}
+          <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {products.map((product) =>
           <ProductCard key={product.id} product={product} />
           )}
