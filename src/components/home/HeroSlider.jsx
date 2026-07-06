@@ -8,7 +8,7 @@ import { useLanguage } from '@/context/LanguageContext';
 const slides = [
   {
     id: 1,
-    image: 'https://images.unsplash.com/photo-1523398002811-999ca8dec234?w=1800&q=85&fit=crop',
+    image: 'https://media.base44.com/images/public/69e5695817245a39fd1a3317/422a47639_ww.jpeg',
     tag_en: 'New Collection',
     tag_de: 'Neue Kollektion',
     headline_en: 'TILL I\nCOLLAPSE',
@@ -22,7 +22,7 @@ const slides = [
   },
   {
     id: 2,
-    image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=1800&q=85&fit=crop',
+    image: 'https://media.base44.com/images/public/69e5695817245a39fd1a3317/b059a8d57_alll.jpeg',
     tag_en: 'Limited Drops',
     tag_de: 'Limitierte Drops',
     headline_en: 'WEAR\nYOUR\nSTRENGTH',
@@ -36,7 +36,7 @@ const slides = [
   },
   {
     id: 3,
-    image: 'https://images.unsplash.com/photo-1571945153237-4929e783af4a?w=1800&q=85&fit=crop',
+    image: 'https://media.base44.com/images/public/69e5695817245a39fd1a3317/c54f5ac14_white.jpeg',
     tag_en: 'TIC Originals',
     tag_de: 'TIC Originals',
     headline_en: 'BUILT\nDIFFERENT',
@@ -47,6 +47,20 @@ const slides = [
     cta_de: 'Jetzt erkunden',
     link: '/products',
     accent: 'from-dark-deep/85 via-dark-deep/30 to-transparent',
+  },
+  {
+    id: 4,
+    image: 'https://media.base44.com/images/public/69e5695817245a39fd1a3317/805be744b_WhatsAppImage2026-07-06at152847.jpeg',
+    tag_en: 'I Love My Choppa',
+    tag_de: 'I Love My Choppa',
+    headline_en: 'WORN\nWITH\nPRIDE',
+    headline_de: 'MIT\nSTOLZ\nGETRAGEN',
+    sub_en: 'Statement pieces for those who move to their own rhythm.',
+    sub_de: 'Statement-Pieces für alle, die ihrem eigenen Rhythmus folgen.',
+    cta_en: 'Shop Now',
+    cta_de: 'Jetzt shoppen',
+    link: '/products',
+    accent: 'from-dark-deep/85 via-dark-deep/40 to-transparent',
   },
 ];
 
