@@ -7,7 +7,8 @@ import { createCheckoutSession } from '@/functions/createCheckoutSession';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Check, Loader2 } from 'lucide-react';
+import { Check, Loader2, ShoppingBag } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import DiscountCodeInput from '@/components/checkout/DiscountCodeInput.jsx';
 import PaymentMethods from '@/components/common/PaymentMethods';
 import { motion } from 'framer-motion';
@@ -238,8 +239,16 @@ export default function Checkout() {
 
   if (items.length === 0) {
     return (
-      <div className="max-w-2xl mx-auto px-4 py-24 text-center">
-        <p className="text-gray-text">{t('cart.empty')}</p>
+      <div className="max-w-2xl mx-auto px-4 py-24 text-center flex flex-col items-center">
+        <ShoppingBag className="w-12 h-12 text-gray-text mb-4" />
+        <h1 className="font-display text-4xl uppercase mb-2">{t('checkout.title')}</h1>
+        <p className="text-gray-text mb-6">{t('cart.empty')}</p>
+        <Link
+          to="/products"
+          className="inline-flex items-center gap-2 bg-dark-deep text-white px-8 py-4 text-[11px] tracking-[0.25em] uppercase hover:bg-cyan hover:text-dark-deep transition-colors"
+        >
+          {lang === 'de' ? 'Zum Shop' : 'Go to Shop'}
+        </Link>
       </div>
     );
   }
