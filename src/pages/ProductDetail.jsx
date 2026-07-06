@@ -64,6 +64,22 @@ export default function ProductDetail() {
   }
 
   const allImages = product.images || [];
+  const colors = product.colors || [];
+  // Image ↔ color are synced by index when counts match (1 image per color).
+  const imageColorSynced = colors.length > 1 && allImages.length === colors.length;
+
+  const handleImageChange = (i) => {
+    setActiveImage(i);
+    if (imageColorSynced) setSelectedColor(colors[i]);
+  };
+
+  const handleColorChange = (color) => {
+    setSelectedColor(color);
+    if (imageColorSynced) {
+      const idx = colors.indexOf(color);
+      if (idx >= 0) setActiveImage(idx);
+    }
+  };
 
   const handleAddToCart = () => {
     if (!selectedColor || !selectedSize || stockForSelection <= 0) return;
@@ -107,11 +123,11 @@ export default function ProductDetail() {
             {/* Prev/next arrows for multiple images */}
             {allImages.length > 1 && (
               <>
-                <button onClick={() => setActiveImage(i => (i - 1 + allImages.length) % allImages.length)}
+                <button onClick={() => handleImageChange((activeImage - 1 + allImages.length) % allImages.length)}
                   className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/80 hover:bg-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                   <ChevronLeft className="w-4 h-4" />
                 </button>
-                <button onClick={() => setActiveImage(i => (i + 1) % allImages.length)}
+                <button onClick={() => handleImageChange((activeImage + 1) % allImages.length)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/80 hover:bg-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                   <ChevronRight className="w-4 h-4" />
                 </button>
@@ -123,7 +139,7 @@ export default function ProductDetail() {
           {allImages.length > 1 && (
             <div className="grid grid-cols-5 gap-2">
               {allImages.map((img, i) => (
-                <button key={i} onClick={() => setActiveImage(i)}
+                <button key={i} onClick={() => handleImageChange(i)}
                   className={`aspect-square bg-muted overflow-hidden border-2 transition-colors ${i === activeImage ? 'border-dark' : 'border-transparent'}`}>
                   <img src={img} alt="" className="w-full h-full object-cover" />
                 </button>
@@ -161,7 +177,7 @@ export default function ProductDetail() {
             <div className="flex flex-wrap gap-2">
               {product.colors?.map(color => (
                 <button key={color}
-                  onClick={() => setSelectedColor(color)}
+                  onClick={() => handleColorChange(color)}
                   className={`px-5 py-3 text-[10px] tracking-[0.25em] uppercase transition-all ${
                     selectedColor === color ? 'bg-dark-deep text-white' : 'border border-border hover:border-dark-deep'
                   }`}>
