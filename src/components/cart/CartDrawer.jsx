@@ -11,8 +11,8 @@ export default function CartDrawer() {
   const navigate = useNavigate();
 
   const handleCheckout = () => {
-    setIsOpen(false);
     navigate('/checkout');
+    setIsOpen(false);
   };
 
   const progress = Math.min((subtotal / 80) * 100, 100);
