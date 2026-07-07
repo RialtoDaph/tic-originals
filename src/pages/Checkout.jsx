@@ -40,7 +40,7 @@ export default function Checkout() {
       const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim());
       const plzValid = /^\d{5}$/.test(form.postalCode.trim()); // German PLZ = 5 digits
       return form.firstName.trim() && form.lastName.trim() && emailValid
-        && form.street.trim() && plzValid && form.city.trim();
+        && form.street.trim() && form.houseNumber.trim() && plzValid && form.city.trim();
     }
     return true;
   };
@@ -265,11 +265,11 @@ export default function Checkout() {
               </div>
               <div className="grid grid-cols-3 gap-4">
                 <div className="col-span-2">
-                  <Label className="text-xs tracking-wider uppercase">{t('checkout.street')}</Label>
+                  <Label className="text-xs tracking-wider uppercase">{t('checkout.street')} *</Label>
                   <Input value={form.street} onChange={e => updateField('street', e.target.value)} className="rounded-none mt-1" />
                 </div>
                 <div>
-                  <Label className="text-xs tracking-wider uppercase">{t('checkout.houseNumber')}</Label>
+                  <Label className="text-xs tracking-wider uppercase">{t('checkout.houseNumber')} *</Label>
                   <Input value={form.houseNumber} onChange={e => updateField('houseNumber', e.target.value)} className="rounded-none mt-1" />
                 </div>
               </div>
