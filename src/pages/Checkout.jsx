@@ -36,7 +36,12 @@ export default function Checkout() {
   const updateField = (field, value) => setForm(prev => ({ ...prev, [field]: value }));
 
   const canProceed = () => {
-    if (step === 0) return form.firstName && form.lastName && form.email && form.street && form.postalCode && form.city;
+    if (step === 0) {
+      const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim());
+      const plzValid = /^\d{5}$/.test(form.postalCode.trim()); // German PLZ = 5 digits
+      return form.firstName.trim() && form.lastName.trim() && emailValid
+        && form.street.trim() && plzValid && form.city.trim();
+    }
     return true;
   };
 
