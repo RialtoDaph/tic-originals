@@ -5,8 +5,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Download, Search } from 'lucide-react';
+import { Download, Search, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 
 const STATUSES = ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled', 'returned'];
 
@@ -28,6 +33,11 @@ export default function AdminOrders({ orders }) {
 
   const updateTracking = async (orderId, carrier, trackingNumber) => {
     await base44.entities.Order.update(orderId, { shipping_carrier: carrier, tracking_number: trackingNumber });
+    queryClient.invalidateQueries({ queryKey: ['admin-orders'] });
+  };
+
+  const deleteOrder = async (orderId) => {
+    await base44.entities.Order.delete(orderId);
     queryClient.invalidateQueries({ queryKey: ['admin-orders'] });
   };
 
@@ -78,6 +88,7 @@ export default function AdminOrders({ orders }) {
                 <th className="pb-3 text-xs tracking-wider uppercase text-gray-text">Total</th>
                 <th className="pb-3 text-xs tracking-wider uppercase text-gray-text">Status</th>
                 <th className="pb-3 text-xs tracking-wider uppercase text-gray-text">Tracking</th>
+                <th className="pb-3 text-xs tracking-wider uppercase text-gray-text"></th>
               </tr>
             </thead>
             <tbody>
@@ -109,6 +120,32 @@ export default function AdminOrders({ orders }) {
                         }
                       }}
                     />
+                  </td>
+                  <td className="py-3">
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-text hover:text-red-600">
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Delete order {order.order_number}?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            This permanently removes the order from the database. Stock will not be restored automatically. Only use for abandoned/unpaid pending orders.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={() => deleteOrder(order.id)}
+                            className="bg-red-600 hover:bg-red-700"
+                          >
+                            Delete
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
                   </td>
                 </tr>
               ))}

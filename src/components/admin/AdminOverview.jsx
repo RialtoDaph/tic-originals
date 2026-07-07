@@ -11,7 +11,7 @@ export default function AdminOverview({ orders, products }) {
 
   const stats = [
     { title: 'Total Revenue', value: `€${totalRevenue.toFixed(2)}`, icon: DollarSign, color: 'text-emerald-600' },
-    { title: 'Total Orders', value: orders.length, icon: ShoppingCart, color: 'text-blue-600' },
+    { title: 'Paid Orders', value: paidOrders.length, icon: ShoppingCart, color: 'text-blue-600' },
     { title: 'Pending Orders', value: pendingOrders.length, icon: TrendingUp, color: 'text-amber-600' },
     { title: 'Total Stock', value: totalItems, icon: Package, color: 'text-violet-600' },
   ];
