@@ -37,11 +37,7 @@
     "rating"
   ],
   "rls": {
-    "create": {
-      "user_condition": {
-        "role": "user"
-      }
-    },
+    "create": {},
     "delete": {
       "user_condition": {
         "role": "admin"
