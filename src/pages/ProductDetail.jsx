@@ -199,12 +199,24 @@ export default function ProductDetail() {
             </div>
             <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
               {product.sizes?.map(size => {
-                const stock = product.stock?.find(s => s.color === selectedColor && s.size === size);
-                const qty = stock?.quantity ?? 0;
+                // If a color is picked, check stock for that color+size.
+                // Otherwise sum stock across all colors so sizes stay clickable before a color is chosen.
+                const qty = selectedColor
+                  ? (product.stock?.find(s => s.color === selectedColor && s.size === size)?.quantity ?? 0)
+                  : (product.stock?.filter(s => s.size === size).reduce((sum, s) => sum + (s.quantity || 0), 0) ?? 0);
                 const disabled = qty <= 0;
+                const pickSize = () => {
+                  if (disabled) return;
+                  setSelectedSize(size);
+                  // Auto-pick the first color with stock for this size if none selected yet.
+                  if (!selectedColor) {
+                    const firstColor = product.stock?.find(s => s.size === size && (s.quantity || 0) > 0)?.color;
+                    if (firstColor) handleColorChange(firstColor);
+                  }
+                };
                 return (
                   <button key={size}
-                    onClick={() => !disabled && setSelectedSize(size)}
+                    onClick={pickSize}
                     disabled={disabled}
                     className={`h-14 font-display text-lg tracking-wider uppercase transition-all ${
                       selectedSize === size ? 'bg-dark-deep text-white'
