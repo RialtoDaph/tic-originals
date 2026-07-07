@@ -159,7 +159,16 @@
       }
     },
     "read": {
-      "data.is_active": true
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "data.is_active": true
+        }
+      ]
     },
     "update": {
       "user_condition": {
