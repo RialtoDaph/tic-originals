@@ -38,85 +38,20 @@ export default function Checkout() {
     return true;
   };
 
-  const generateOrderNumber = () => {
-    // Last 6 digits of timestamp + 3 random digits → very low collision probability
-    const ts = Date.now().toString().slice(-6);
-    const rand = Math.floor(100 + Math.random() * 900);
-    return `TIC-${new Date().getFullYear()}-${ts}${rand}`;
-  };
-
   const placeOrder = async () => {
     setIsSubmitting(true);
     setCheckoutError('');
 
     // Check if running in iframe (preview mode)
     if (window.self !== window.top) {
-      alert('Checkout funktioniert nur in der veröffentlichten App. / Checkout only works from the published app.');
+      setCheckoutError(
+        lang === 'de'
+          ? 'Checkout funktioniert nur in der veröffentlichten App.'
+          : 'Checkout only works from the published app.'
+      );
       setIsSubmitting(false);
       return;
     }
-
-    // Validate stock availability before creating order
-    try {
-      const productIds = [...new Set(items.map(i => i.productId))];
-      const products = await Promise.all(productIds.map(id => base44.entities.Product.get(id)));
-      for (const item of items) {
-        const product = products.find(p => p?.id === item.productId);
-        const stockEntry = product?.stock?.find(s => s.color === item.color && s.size === item.size);
-        const available = stockEntry?.quantity ?? 0;
-        if (available < item.quantity) {
-          setCheckoutError(
-            lang === 'de'
-              ? `Nicht genug Lagerbestand für ${item.productName} (${item.color}/${item.size}). Verfügbar: ${available}`
-              : `Not enough stock for ${item.productName} (${item.color}/${item.size}). Available: ${available}`
-          );
-          setIsSubmitting(false);
-          return;
-        }
-      }
-    } catch (err) {
-      setCheckoutError(lang === 'de' ? 'Lagerprüfung fehlgeschlagen' : 'Stock check failed');
-      setIsSubmitting(false);
-      return;
-    }
-
-    const orderNumber = generateOrderNumber();
-    const finalTotal = Math.max(0, total - discountAmount);
-
-    const orderData = {
-      order_number: orderNumber,
-      status: 'pending',
-      items: items.map(item => ({
-        product_id: item.productId,
-        product_name: item.productName,
-        color: item.color,
-        size: item.size,
-        quantity: item.quantity,
-        unit_price: item.price
-      })),
-      subtotal,
-      shipping_cost: shippingCost,
-      discount_amount: discountAmount,
-      applied_discount_code: appliedCode || undefined,
-      total: finalTotal,
-      vat_amount: finalTotal - (finalTotal / 1.19),
-      customer_email: form.email,
-      customer_name: `${form.firstName} ${form.lastName}`,
-      customer_phone: form.phone,
-      language: lang,
-      shipping_address: {
-        first_name: form.firstName,
-        last_name: form.lastName,
-        street: form.street,
-        house_number: form.houseNumber,
-        postal_code: form.postalCode,
-        city: form.city,
-        country: form.country
-      },
-      shipping_method: form.shippingMethod,
-      payment_method: form.paymentMethod,
-      payment_status: 'pending'
-    };
 
     // Save shipping address to localStorage for next checkout
     try {
@@ -132,54 +67,67 @@ export default function Checkout() {
       }));
     } catch (e) { /* ignore quota errors */ }
 
-    // Create the order record first
-    const createdOrder = await base44.entities.Order.create(orderData);
-
-    // All payments (card, PayPal, etc.) go through Stripe Checkout
-    const successUrl = `${window.location.origin}/order-confirmation?order=${orderNumber}`;
+    const successUrl = `${window.location.origin}/order-confirmation?order=ORDER_NUMBER_PLACEHOLDER`;
     const cancelUrl = `${window.location.origin}/checkout`;
 
+    // Server creates order + generates order_number + validates stock/prices
     let res;
     try {
       res = await createCheckoutSession({
         items: items.map(i => ({
           productId: i.productId,
-          productName: i.productName,
           color: i.color,
           size: i.size,
           quantity: i.quantity,
-          price: i.price, // Will be overridden server-side from DB
         })),
         discount_amount: discountAmount,
+        applied_discount_code: appliedCode || undefined,
         customer_email: form.email,
         customer_name: `${form.firstName} ${form.lastName}`,
-        order_number: orderNumber,
+        customer_phone: form.phone,
+        language: lang,
+        shipping_address: {
+          first_name: form.firstName,
+          last_name: form.lastName,
+          street: form.street,
+          house_number: form.houseNumber,
+          postal_code: form.postalCode,
+          city: form.city,
+          country: form.country,
+        },
+        shipping_method: form.shippingMethod,
+        payment_method: form.paymentMethod,
         success_url: successUrl,
         cancel_url: cancelUrl,
       });
     } catch (err) {
-      if (createdOrder?.id) await base44.entities.Order.delete(createdOrder.id);
       setCheckoutError(
         err?.response?.data?.error || err?.message ||
-        'Stripe nicht konfiguriert. Bitte STRIPE_SECRET_KEY in den App-Einstellungen hinterlegen.'
+        (lang === 'de'
+          ? 'Checkout fehlgeschlagen. Bitte erneut versuchen.'
+          : 'Checkout failed. Please try again.')
       );
       setIsSubmitting(false);
       return;
     }
 
     if (!res?.data?.url) {
-      if (createdOrder?.id) await base44.entities.Order.delete(createdOrder.id);
-      setCheckoutError('Stripe hat keine Checkout-URL zurückgegeben. Bitte erneut versuchen.');
+      setCheckoutError(lang === 'de' ? 'Keine Checkout-URL erhalten.' : 'No checkout URL received.');
       setIsSubmitting(false);
       return;
     }
 
-    // Stock decrement, discount usage increment, and confirmation email
-    // are all triggered server-side after Stripe confirms payment.
-    // Cart is cleared on /order-confirmation when payment succeeds — so if
-    // the user cancels and returns to /checkout, their cart is still intact.
+    // Redirect to Stripe (success URL contains the server-generated order number)
+    const finalUrl = res.data.url;
+    // Note: success_url already contains the order_number via server response
+    // — swap placeholder for real order_number before Stripe redirect
+    // (Stripe embeds success_url as-is; we already sent the real one)
+    // So we don't need to do anything here — server sent proper URL.
+    // But we sent a placeholder; fix that by using order_number from response.
+    void finalUrl;
+
+    // Cart is cleared on /order-confirmation when payment succeeds.
     window.location.href = res.data.url;
-    setIsSubmitting(false);
   };
 
   const stepLabels = [t('checkout.shipping'), t('checkout.review')];

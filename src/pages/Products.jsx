@@ -41,7 +41,9 @@ export default function Products() {
     return result;
   }, [products, search, colorFilter, sizeFilter, sortBy]);
 
-  const allColors = [...new Set(products.flatMap(p => p.colors || []))];
+  // Skip pseudo-color values (e.g. "3er-pack", "one-size") — only real colors for filter chips
+  const isRealColor = (c) => c && !/pack|size|one-size/i.test(c);
+  const allColors = [...new Set(products.flatMap(p => (p.colors || []).filter(isRealColor)))];
   const allSizes = [...new Set(products.flatMap(p => p.sizes || []))];
 
   const sortOptions = [
