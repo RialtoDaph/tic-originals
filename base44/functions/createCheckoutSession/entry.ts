@@ -137,6 +137,7 @@ Deno.serve(async (req) => {
       session = await stripe.checkout.sessions.create({
         line_items: lineItems,
         mode: 'payment',
+        payment_method_types: ['card', 'paypal'],
         customer_email: customer_email,
         success_url: `${success_url}?order=${orderNumber}&session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: cancel_url,
