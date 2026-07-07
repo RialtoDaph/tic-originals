@@ -4,6 +4,8 @@ import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/lib/AuthContext';
 import { base44 } from '@/api/base44Client';
 import { createCheckoutSession } from '@/functions/createCheckoutSession';
+// Note: order creation, stock validation, and order_number generation all happen
+// server-side in createCheckoutSession — the client no longer touches those.
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -67,7 +69,9 @@ export default function Checkout() {
       }));
     } catch (e) { /* ignore quota errors */ }
 
-    const successUrl = `${window.location.origin}/order-confirmation?order=ORDER_NUMBER_PLACEHOLDER`;
+    // We send the origin only — server builds the final success_url with the
+    // generated order_number so we don't need a client-side placeholder.
+    const successBase = `${window.location.origin}/order-confirmation`;
     const cancelUrl = `${window.location.origin}/checkout`;
 
     // Server creates order + generates order_number + validates stock/prices
@@ -97,7 +101,7 @@ export default function Checkout() {
         },
         shipping_method: form.shippingMethod,
         payment_method: form.paymentMethod,
-        success_url: successUrl,
+        success_url: successBase,
         cancel_url: cancelUrl,
       });
     } catch (err) {
@@ -116,15 +120,6 @@ export default function Checkout() {
       setIsSubmitting(false);
       return;
     }
-
-    // Redirect to Stripe (success URL contains the server-generated order number)
-    const finalUrl = res.data.url;
-    // Note: success_url already contains the order_number via server response
-    // — swap placeholder for real order_number before Stripe redirect
-    // (Stripe embeds success_url as-is; we already sent the real one)
-    // So we don't need to do anything here — server sent proper URL.
-    // But we sent a placeholder; fix that by using order_number from response.
-    void finalUrl;
 
     // Cart is cleared on /order-confirmation when payment succeeds.
     window.location.href = res.data.url;

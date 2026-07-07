@@ -138,7 +138,7 @@ Deno.serve(async (req) => {
         line_items: lineItems,
         mode: 'payment',
         customer_email: customer_email,
-        success_url: `${success_url}&session_id={CHECKOUT_SESSION_ID}`,
+        success_url: `${success_url}?order=${orderNumber}&session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: cancel_url,
         client_reference_id: orderNumber,
         metadata: {
