@@ -3,8 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Package, ShoppingCart, DollarSign, TrendingUp } from 'lucide-react';
 
 export default function AdminOverview({ orders, products }) {
-  const totalRevenue = orders.reduce((sum, o) => sum + (o.total || 0), 0);
   const paidOrders = orders.filter(o => o.payment_status === 'paid');
+  const totalRevenue = paidOrders.reduce((sum, o) => sum + (o.total || 0), 0);
   const pendingOrders = orders.filter(o => o.status === 'pending' || o.status === 'confirmed');
   const totalItems = products.reduce((sum, p) =>
     sum + (p.stock || []).reduce((s, st) => s + st.quantity, 0), 0);

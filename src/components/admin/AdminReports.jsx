@@ -24,22 +24,23 @@ export default function AdminReports({ orders }) {
     });
   }, [orders, range]);
 
-  const revenue = filtered.reduce((s, o) => s + (o.total || 0), 0);
-  const vatTotal = filtered.reduce((s, o) => s + (o.vat_amount || 0), 0);
-  const avgOrder = filtered.length ? revenue / filtered.length : 0;
-  const paidCount = filtered.filter(o => o.payment_status === 'paid').length;
+  // Revenue is only counted from PAID orders — pending/cancelled don't earn money
+  const paidFiltered = useMemo(() => filtered.filter(o => o.payment_status === 'paid'), [filtered]);
+  const revenue = paidFiltered.reduce((s, o) => s + (o.total || 0), 0);
+  const vatTotal = paidFiltered.reduce((s, o) => s + (o.vat_amount || 0), 0);
+  const avgOrder = paidFiltered.length ? revenue / paidFiltered.length : 0;
 
-  // Revenue by product
+  // Revenue by product — only paid orders
   const productRevenue = useMemo(() => {
     const map = {};
-    filtered.forEach(o => {
+    paidFiltered.forEach(o => {
       (o.items || []).forEach(item => {
         const key = item.product_name || 'Unknown';
         map[key] = (map[key] || 0) + (item.unit_price || 0) * (item.quantity || 1);
       });
     });
     return Object.entries(map).sort((a, b) => b[1] - a[1]);
-  }, [filtered]);
+  }, [paidFiltered]);
 
   // Revenue by status
   const byStatus = useMemo(() => {
@@ -104,8 +105,8 @@ export default function AdminReports({ orders }) {
       {/* KPI Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: 'Gross Revenue', value: `€${revenue.toFixed(2)}`, icon: Euro, color: 'text-emerald-600' },
-          { label: 'Orders', value: filtered.length, icon: ShoppingBag, color: 'text-blue-600' },
+          { label: 'Revenue (paid)', value: `€${revenue.toFixed(2)}`, icon: Euro, color: 'text-emerald-600' },
+          { label: 'Orders (total)', value: filtered.length, icon: ShoppingBag, color: 'text-blue-600' },
           { label: 'Avg. Order Value', value: `€${avgOrder.toFixed(2)}`, icon: TrendingUp, color: 'text-violet-600' },
           { label: 'VAT Collected', value: `€${vatTotal.toFixed(2)}`, icon: Euro, color: 'text-amber-600' },
         ].map((stat, i) => (
