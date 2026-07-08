@@ -8,10 +8,10 @@ import { Zap } from 'lucide-react';
 function TimeBox({ value, label }) {
   return (
     <div className="flex flex-col items-center">
-      <span className="font-display text-2xl md:text-4xl leading-none tabular-nums">
+      <span className="font-display text-lg md:text-4xl leading-none tabular-nums">
         {String(value).padStart(2, '0')}
       </span>
-      <span className="text-[9px] md:text-[10px] tracking-[0.25em] uppercase text-white/70 mt-1">{label}</span>
+      <span className="text-[8px] md:text-[10px] tracking-[0.2em] uppercase text-white/70 mt-0.5 md:mt-1">{label}</span>
     </div>
   );
 }
@@ -54,19 +54,19 @@ export default function FlashSaleBanner() {
       <div className="absolute inset-0 opacity-20 pointer-events-none"
         style={{ backgroundImage: 'repeating-linear-gradient(-45deg, transparent, transparent 20px, rgba(255,255,255,0.1) 20px, rgba(255,255,255,0.1) 40px)' }}
       />
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 md:py-5 flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8 relative z-10">
-        <div className="flex items-center gap-3">
-          <Zap className="w-5 h-5 md:w-6 md:h-6 fill-white" />
-          <div className="text-left">
-            <p className="font-display text-xl md:text-2xl uppercase leading-tight tracking-wider">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-2.5 md:py-5 flex items-center justify-between md:justify-center gap-3 md:gap-8 relative z-10">
+        <div className="flex items-center gap-2 md:gap-3 min-w-0">
+          <Zap className="w-4 h-4 md:w-6 md:h-6 fill-white shrink-0" />
+          <div className="text-left min-w-0">
+            <p className="font-display text-sm md:text-2xl uppercase leading-tight tracking-wider truncate">
               {lang === 'de' ? 'Flash Sale' : 'Flash Sale'} · {badge}
             </p>
-            <p className="text-[10px] md:text-xs tracking-[0.2em] uppercase text-white/85">
+            <p className="text-[8px] md:text-xs tracking-[0.2em] uppercase text-white/85 hidden md:block">
               {lang === 'de' ? 'Endet in' : 'Ends in'}
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-3 md:gap-5">
+        <div className="flex items-center gap-2 md:gap-5 shrink-0">
           {timeLeft.days > 0 && <TimeBox value={timeLeft.days} label={lang === 'de' ? 'Tage' : 'Days'} />}
           <TimeBox value={timeLeft.hours} label={lang === 'de' ? 'Std' : 'Hrs'} />
           <TimeBox value={timeLeft.minutes} label={lang === 'de' ? 'Min' : 'Min'} />
