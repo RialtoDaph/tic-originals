@@ -45,16 +45,16 @@ export default function ProductCard({ product, variant = 'default' }) {
               )}
             </div>
             <div className="p-4">
-              <h3 className="font-heading text-lg font-semibold text-dark-deep leading-tight truncate">
+              <h3 className="font-heading text-base font-semibold text-dark-deep leading-tight line-clamp-1">
                 {product.name}
               </h3>
-              <div className="mt-2 flex items-center justify-between gap-3">
-                <div className="flex items-baseline gap-1.5 min-w-0">
-                  <PriceDisplay price={product.price} flashSale={flashSale} size="md" />
-                </div>
+              <div className="mt-2 min-w-0">
+                <PriceDisplay price={product.price} flashSale={flashSale} size="md" />
+              </div>
+              <div className="mt-2 flex items-center justify-between gap-2">
+                <p className="text-[10px] text-gray-text tracking-[0.15em] uppercase">{t('products.inclVat')}</p>
                 <StockBadge quantity={totalStock} />
               </div>
-              <p className="text-[10px] text-gray-text tracking-[0.15em] uppercase mt-1">{t('products.inclVat')}</p>
             </div>
           </Link>
         </motion.div>
