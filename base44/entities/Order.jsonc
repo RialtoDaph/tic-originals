@@ -137,6 +137,10 @@
         "house_number": {
           "type": "string"
         },
+        "address_line_2": {
+          "type": "string",
+          "description": "Optional: apartment, floor, c/o, delivery note, etc."
+        },
         "postal_code": {
           "type": "string"
         },

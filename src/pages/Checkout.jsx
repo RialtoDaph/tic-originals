@@ -14,6 +14,8 @@ import { Link } from 'react-router-dom';
 import DiscountCodeInput from '@/components/checkout/DiscountCodeInput.jsx';
 import PaymentMethods from '@/components/common/PaymentMethods';
 import { motion } from 'framer-motion';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { COUNTRIES } from '@/lib/countries';
 
 const STEPS = ['shipping', 'review'];
 
@@ -29,7 +31,7 @@ export default function Checkout() {
 
   const [form, setForm] = useState({
     firstName: '', lastName: '', email: '', phone: '',
-    street: '', houseNumber: '', postalCode: '', city: '', country: 'Deutschland',
+    street: '', houseNumber: '', addressLine2: '', postalCode: '', city: '', country: 'Deutschland',
     shippingMethod: 'standard', paymentMethod: 'stripe',
   });
 
@@ -68,6 +70,7 @@ export default function Checkout() {
         phone: form.phone,
         street: form.street,
         houseNumber: form.houseNumber,
+        addressLine2: form.addressLine2,
         postalCode: form.postalCode,
         city: form.city,
         country: form.country,
@@ -100,6 +103,7 @@ export default function Checkout() {
           last_name: form.lastName,
           street: form.street,
           house_number: form.houseNumber,
+          address_line_2: form.addressLine2 || undefined,
           postal_code: form.postalCode,
           city: form.city,
           country: form.country,
@@ -160,6 +164,7 @@ export default function Checkout() {
               phone: orders[0].customer_phone || '',
               street: addr.street || '',
               houseNumber: addr.house_number || '',
+              addressLine2: addr.address_line_2 || '',
               postalCode: addr.postal_code || '',
               city: addr.city || '',
               country: addr.country || 'Deutschland',
@@ -176,6 +181,7 @@ export default function Checkout() {
         phone: prev.phone || saved?.phone || '',
         street: prev.street || saved?.street || '',
         houseNumber: prev.houseNumber || saved?.houseNumber || '',
+        addressLine2: prev.addressLine2 || saved?.addressLine2 || '',
         postalCode: prev.postalCode || saved?.postalCode || '',
         city: prev.city || saved?.city || '',
         country: prev.country || saved?.country || 'Deutschland',
@@ -273,6 +279,17 @@ export default function Checkout() {
                   <Input value={form.houseNumber} onChange={e => updateField('houseNumber', e.target.value)} className="rounded-none mt-1" />
                 </div>
               </div>
+              <div>
+                <Label className="text-xs tracking-wider uppercase">
+                  {t('checkout.addressLine2')} <span className="text-gray-text normal-case tracking-normal">({t('checkout.addressLine2Hint')})</span>
+                </Label>
+                <Input
+                  value={form.addressLine2}
+                  onChange={e => updateField('addressLine2', e.target.value)}
+                  placeholder={lang === 'de' ? 'z.B. Wohnung 5, 2. Stock, c/o Müller' : 'e.g. Apt 5, 2nd floor, c/o Müller'}
+                  className="rounded-none mt-1"
+                />
+              </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label className="text-xs tracking-wider uppercase">{t('checkout.postalCode')}</Label>
@@ -285,7 +302,18 @@ export default function Checkout() {
               </div>
               <div>
                 <Label className="text-xs tracking-wider uppercase">{t('checkout.country')}</Label>
-                <Input value={form.country} disabled className="rounded-none mt-1 bg-muted" />
+                <Select value={form.country} onValueChange={v => updateField('country', v)}>
+                  <SelectTrigger className="rounded-none mt-1">
+                    <SelectValue placeholder={t('checkout.selectCountry')} />
+                  </SelectTrigger>
+                  <SelectContent className="max-h-72">
+                    {COUNTRIES.map(c => (
+                      <SelectItem key={c.code} value={lang === 'de' ? c.de : c.en}>
+                        {lang === 'de' ? c.de : c.en}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
           )}
@@ -297,6 +325,8 @@ export default function Checkout() {
                 <h3 className="text-xs tracking-wider uppercase mb-3 text-gray-text">{t('checkout.shipping')}</h3>
                 <p className="text-sm">{form.firstName} {form.lastName}</p>
                 <p className="text-sm text-gray-text">{form.street} {form.houseNumber}, {form.postalCode} {form.city}</p>
+                {form.addressLine2 && <p className="text-sm text-gray-text">{form.addressLine2}</p>}
+                <p className="text-sm text-gray-text">{form.country}</p>
                 <p className="text-sm text-gray-text">{form.email}</p>
               </div>
               <div className="border p-4 space-y-3">
