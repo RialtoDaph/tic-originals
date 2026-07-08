@@ -12,6 +12,9 @@ import ProductReviews from '@/components/products/ProductReviews.jsx';
 import SocialProofBar from '@/components/products/SocialProofBar';
 import SizeGuideModal from '@/components/products/SizeGuideModal';
 import RecentlyViewed, { trackProductView } from '@/components/products/RecentlyViewed';
+import PriceDisplay from '@/components/products/PriceDisplay';
+import { useFlashSales } from '@/hooks/useFlashSales';
+import { getFlashSaleForProduct } from '@/lib/flashSale';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function ProductDetail() {
@@ -30,8 +33,11 @@ export default function ProductDetail() {
     queryKey: ['products'],
     queryFn: () => getPublicProducts({}).then(res => res.data.products),
   });
+  const { data: flashSales = [] } = useFlashSales();
 
   const product = products.find(p => p.id === productId);
+  const flashSale = getFlashSaleForProduct(product, flashSales);
+  const effectivePrice = flashSale ? flashSale.salePrice : product?.price;
 
   // Track view & sticky CTA
   useEffect(() => {
@@ -83,7 +89,8 @@ export default function ProductDetail() {
 
   const handleAddToCart = () => {
     if (!selectedColor || !selectedSize || stockForSelection <= 0) return;
-    addItem(product, selectedColor, selectedSize, quantity);
+    // Pass flash-sale price so the cart line reflects the discount automatically.
+    addItem(product, selectedColor, selectedSize, quantity, flashSale ? flashSale.salePrice : null);
   };
 
   return (
@@ -155,8 +162,8 @@ export default function ProductDetail() {
             <p className="text-[10px] tracking-[0.4em] uppercase text-cyan">TIC Originals</p>
           </div>
           <h1 className="font-display text-4xl md:text-5xl lg:text-6xl uppercase leading-[0.9] mb-6">{product.name}</h1>
-          <div className="flex items-baseline gap-3 mb-6">
-            <p className="font-display text-3xl md:text-4xl">€{product.price?.toFixed(2)}</p>
+          <div className="flex items-baseline gap-3 mb-6 flex-wrap">
+            <PriceDisplay price={product.price} flashSale={flashSale} size="lg" />
             <span className="text-[10px] tracking-[0.25em] uppercase text-gray-text">{t('products.inclVat')}</span>
           </div>
           <p className="text-gray-text text-sm leading-relaxed mb-8 max-w-md">
@@ -287,7 +294,10 @@ export default function ProductDetail() {
             )}
             <div className="flex-1 min-w-0">
               <p className="font-heading text-sm truncate">{product.name}</p>
-              <p className="text-xs text-gray-text">€{product.price?.toFixed(2)}</p>
+              <p className="text-xs text-gray-text">
+                €{(effectivePrice ?? product.price)?.toFixed(2)}
+                {flashSale && <span className="line-through ml-1.5 opacity-60">€{product.price?.toFixed(2)}</span>}
+              </p>
             </div>
             <Button
               onClick={handleAddToCart}

@@ -1,0 +1,78 @@
+{
+  "name": "Bundle",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Bundle-Name (z.B. 'Starter Pack')"
+    },
+    "product_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Produkte im Bundle. Duplikat f\u00fcr Mengenangabe (z.B. Produkt X 2x \u2192 id zweimal)."
+    },
+    "normal_price": {
+      "type": "number",
+      "description": "Summe der normalen Preise in EUR (nur Anzeige, Strikethrough)"
+    },
+    "bundle_price": {
+      "type": "number",
+      "description": "Regul\u00e4rer Bundle-Preis in EUR"
+    },
+    "bundle_sale_price": {
+      "type": "number",
+      "description": "Optionaler Aktions-Preis (\u00fcbersteuert bundle_price wenn sale_valid_until in der Zukunft)"
+    },
+    "sale_valid_until": {
+      "type": "string",
+      "format": "date",
+      "description": "Datum bis zu dem bundle_sale_price gilt (YYYY-MM-DD)"
+    },
+    "items_summary": {
+      "type": "string",
+      "description": "Kurze Beschreibung (z.B. '2x tee, freie Kombination')"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true,
+      "description": "Bundle im Shop anzeigen?"
+    }
+  },
+  "required": [
+    "name",
+    "product_ids",
+    "normal_price",
+    "bundle_price"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "data.is_active": true
+        }
+      ]
+    }
+  }
+}

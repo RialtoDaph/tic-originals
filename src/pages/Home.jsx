@@ -5,11 +5,11 @@ import { useLanguage } from '@/context/LanguageContext';
 import { getPublicProducts } from '@/functions/getPublicProducts';
 import { useQuery } from '@tanstack/react-query';
 import ProductCard from '@/components/products/ProductCard';
-import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
 import HeroSlider from '@/components/home/HeroSlider';
-import ReviewsCarousel from '@/components/home/ReviewsCarousel';
 import Marquee from '@/components/common/Marquee';
+import FlashSaleBanner from '@/components/home/FlashSaleBanner';
+import BundleSection from '@/components/home/BundleSection';
 import { useCurrentCollection } from '@/hooks/useCurrentCollection';
 
 export default function Home() {
@@ -22,6 +22,9 @@ export default function Home() {
 
   return (
     <div>
+      {/* Flash sale banner — hidden when no active sale */}
+      <FlashSaleBanner />
+
       {/* Hero Slider */}
       <HeroSlider />
 
@@ -59,6 +62,9 @@ export default function Home() {
           </div>
         </section>
       }
+
+      {/* Bundles */}
+      <BundleSection />
 
       {/* Manifesto */}
       <section className="grain-overlay bg-dark-deep py-16 md:py-32 lg:py-40 relative overflow-hidden">

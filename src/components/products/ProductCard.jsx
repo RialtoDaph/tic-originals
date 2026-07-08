@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '@/context/LanguageContext';
 import StockBadge from '@/components/common/StockBadge';
+import PriceDisplay from '@/components/products/PriceDisplay';
+import { useFlashSales } from '@/hooks/useFlashSales';
+import { getFlashSaleForProduct } from '@/lib/flashSale';
 import { motion } from 'framer-motion';
 import { Eye } from 'lucide-react';
 import QuickViewModal from './QuickViewModal';
@@ -10,6 +13,8 @@ export default function ProductCard({ product, variant = 'default' }) {
   const { t, lang } = useLanguage();
   const totalStock = product.stock?.reduce((sum, s) => sum + s.quantity, 0) || 0;
   const [showQuickView, setShowQuickView] = useState(false);
+  const { data: flashSales = [] } = useFlashSales();
+  const flashSale = getFlashSaleForProduct(product, flashSales);
 
   // Card variant — used inside mobile horizontal scroll: white card, rounded, shadow, info inside card
   if (variant === 'card') {
@@ -33,20 +38,23 @@ export default function ProductCard({ product, variant = 'default' }) {
                   <span className="font-display text-5xl text-cyan/30 tracking-[0.2em]">TIC</span>
                 </div>
               )}
+              {flashSale && (
+                <div className="absolute top-3 left-3 bg-red-600 text-white text-[10px] tracking-[0.15em] uppercase px-2 py-0.5 font-medium">
+                  {flashSale.discount_type === 'percentage' ? `-${flashSale.discount_value}%` : `-€${flashSale.discount_value}`}
+                </div>
+              )}
             </div>
             <div className="p-4">
               <h3 className="font-heading text-lg font-semibold text-dark-deep leading-tight truncate">
                 {product.name}
               </h3>
               <div className="mt-2 flex items-center justify-between gap-3">
-                <div className="flex items-baseline gap-1.5">
-                  <span className="text-xl font-semibold text-dark-deep tabular-nums">
-                    €{product.price?.toFixed(2)}
-                  </span>
-                  <span className="text-xs text-gray-text">{t('products.inclVat')}</span>
+                <div className="flex items-baseline gap-1.5 min-w-0">
+                  <PriceDisplay price={product.price} flashSale={flashSale} size="md" />
                 </div>
                 <StockBadge quantity={totalStock} />
               </div>
+              <p className="text-[10px] text-gray-text tracking-[0.15em] uppercase mt-1">{t('products.inclVat')}</p>
             </div>
           </Link>
         </motion.div>
@@ -54,7 +62,7 @@ export default function ProductCard({ product, variant = 'default' }) {
     );
   }
 
-  // Default variant — desktop grid (unchanged)
+  // Default variant — desktop grid
   return (
     <>
       <motion.div
@@ -79,10 +87,14 @@ export default function ProductCard({ product, variant = 'default' }) {
               </div>
             )}
           </Link>
-          <div className="absolute top-3 left-3">
+          <div className="absolute top-3 left-3 flex flex-col gap-2">
             <StockBadge quantity={totalStock} />
+            {flashSale && (
+              <span className="bg-red-600 text-white text-[10px] tracking-[0.15em] uppercase px-2 py-0.5 font-medium">
+                {flashSale.discount_type === 'percentage' ? `-${flashSale.discount_value}%` : `-€${flashSale.discount_value}`}
+              </span>
+            )}
           </div>
-          {/* Quick View Button — minimal, top-right icon only */}
           <button
             onClick={() => setShowQuickView(true)}
             aria-label={lang === 'de' ? 'Schnellansicht' : 'Quick View'}
@@ -93,7 +105,9 @@ export default function ProductCard({ product, variant = 'default' }) {
         <Link to={`/products/${product.id}`} className="block">
           <div className="flex items-baseline justify-between gap-4">
             <h3 className="font-heading text-lg md:text-xl leading-tight tracking-tight truncate">{product.name}</h3>
-            <p className="text-sm tracking-wide shrink-0 tabular-nums">€{product.price?.toFixed(2)}</p>
+            <div className="shrink-0">
+              <PriceDisplay price={product.price} flashSale={flashSale} size="sm" />
+            </div>
           </div>
           <p className="text-[11px] text-gray-text mt-1.5 tracking-[0.15em] uppercase">{t('products.inclVat')}</p>
         </Link>

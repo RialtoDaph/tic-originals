@@ -64,6 +64,13 @@
       "type": "string",
       "format": "date",
       "description": "G\u00fcltig bis (YYYY-MM-DD)"
+    },
+    "applicable_product_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Produkt-IDs, f\u00fcr die dieser Code gilt. Leer = alle Produkte. Flash Sale: bef\u00fcllt = automatischer Preisnachlass wird im Shop angezeigt."
     }
   },
   "required": [

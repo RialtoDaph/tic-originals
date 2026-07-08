@@ -9,12 +9,14 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Plus, Pencil, Trash2, Tag } from 'lucide-react';
 import { format } from 'date-fns';
+import ProductMultiPicker from './ProductMultiPicker';
 
 const EMPTY_FORM = {
   code: '', description: '', discount_type: 'percentage', discount_value: '',
   minimum_order_amount: 0, maximum_discount_amount: '',
   usage_limit: '', usage_limit_per_customer: 1,
-  is_first_order_only: false, valid_from: '', valid_until: '', is_active: true
+  is_first_order_only: false, valid_from: '', valid_until: '', is_active: true,
+  applicable_product_ids: [],
 };
 
 function validate(form) {
@@ -65,6 +67,7 @@ export default function AdminDiscountCodes() {
       usage_limit: c.usage_limit ?? '', usage_limit_per_customer: c.usage_limit_per_customer ?? 1,
       is_first_order_only: c.is_first_order_only ?? false,
       valid_from: c.valid_from ?? '', valid_until: c.valid_until ?? '', is_active: c.is_active ?? true,
+      applicable_product_ids: c.applicable_product_ids ?? [],
     });
     setErrors({});
     setDialogOpen(true);
@@ -83,6 +86,7 @@ export default function AdminDiscountCodes() {
       usage_limit_per_customer: Number(form.usage_limit_per_customer) || 1,
       valid_from: form.valid_from || undefined,
       valid_until: form.valid_until || undefined,
+      applicable_product_ids: form.applicable_product_ids || [],
     };
     saveMutation.mutate(data);
   };
@@ -274,6 +278,12 @@ export default function AdminDiscountCodes() {
                 {errors.valid_until && <p className="text-xs text-red-500 mt-1">{errors.valid_until}</p>}
               </div>
             </div>
+
+            <ProductMultiPicker
+              label="Anwendbar auf Produkte (leer = alle; wenn gesetzt = Flash Sale mit automatischem Strikethrough im Shop)"
+              value={form.applicable_product_ids}
+              onChange={(ids) => setForm(p => ({ ...p, applicable_product_ids: ids }))}
+            />
 
             <div className="flex items-center gap-6">
               <label className="flex items-center gap-2 cursor-pointer text-sm">
