@@ -21,7 +21,7 @@ const STEPS = ['shipping', 'review'];
 
 export default function Checkout() {
   const { t, lang } = useLanguage();
-  const { items, subtotal, shippingCost, total } = useCart();
+  const { items, subtotal } = useCart();
   const { user, authChecked } = useAuth();
   const [step, setStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -416,27 +416,35 @@ export default function Checkout() {
             }}
           />
 
-          <div className="border-t pt-4 space-y-2">
-            <div className="flex justify-between text-sm">
-              <span className="text-gray-text">{t('cart.subtotal')}</span>
-              <span>€{subtotal.toFixed(2)}</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-gray-text">{t('cart.shipping')}</span>
-              <span>{shippingCost === 0 ? t('cart.free') : `€${shippingCost.toFixed(2)}`}</span>
-            </div>
-            {discountAmount > 0 && (
-              <div className="flex justify-between text-sm text-green-700">
-                <span>{lang === 'de' ? 'Rabatt' : 'Discount'} ({appliedCode})</span>
-                <span>−€{discountAmount.toFixed(2)}</span>
+          {(() => {
+            // Free shipping is applied to the post-discount subtotal.
+            const subtotalAfterDiscount = Math.max(0, subtotal - discountAmount);
+            const effectiveShipping = subtotalAfterDiscount >= 80 ? 0 : 4.95;
+            const effectiveTotal = subtotalAfterDiscount + effectiveShipping;
+            return (
+              <div className="border-t pt-4 space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-text">{t('cart.subtotal')}</span>
+                  <span>€{subtotal.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-text">{t('cart.shipping')}</span>
+                  <span>{effectiveShipping === 0 ? t('cart.free') : `€${effectiveShipping.toFixed(2)}`}</span>
+                </div>
+                {discountAmount > 0 && (
+                  <div className="flex justify-between text-sm text-green-700">
+                    <span>{lang === 'de' ? 'Rabatt' : 'Discount'} ({appliedCode})</span>
+                    <span>−€{discountAmount.toFixed(2)}</span>
+                  </div>
+                )}
+                <div className="flex justify-between font-medium pt-2 border-t">
+                  <span>{t('cart.total')}</span>
+                  <span>€{effectiveTotal.toFixed(2)}</span>
+                </div>
+                <p className="text-xs text-gray-text">{t('products.inclVat')} (19%)</p>
               </div>
-            )}
-            <div className="flex justify-between font-medium pt-2 border-t">
-              <span>{t('cart.total')}</span>
-              <span>€{Math.max(0, total - discountAmount).toFixed(2)}</span>
-            </div>
-            <p className="text-xs text-gray-text">{t('products.inclVat')} (19%)</p>
-          </div>
+            );
+          })()}
         </div>
       </div>
     </div>

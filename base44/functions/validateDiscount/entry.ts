@@ -28,26 +28,40 @@ Deno.serve(async (req) => {
       return Response.json({ valid: false, error: 'Code usage limit reached / Code wurde zu oft verwendet' });
     }
 
-    // Scope: if applicable_product_ids is set, the code only discounts those
-    // products. Compute the applicable subtotal from the cart items provided.
+    // Discount codes apply only to full-price, non-bundle items: bundles and
+    // flash-sale items are already discounted, so we don't stack on top.
     const scoped = Array.isArray(record.applicable_product_ids) && record.applicable_product_ids.length > 0;
-    let applicableSubtotal = subtotal;
-    if (scoped) {
-      if (!Array.isArray(items) || items.length === 0) {
-        return Response.json({
-          valid: false,
-          error: 'Code applies to specific products only / Code gilt nur für bestimmte Produkte',
-        });
-      }
-      applicableSubtotal = items
-        .filter((i: any) => record.applicable_product_ids.includes(i.productId))
-        .reduce((sum: number, i: any) => sum + (i.price || 0) * (i.quantity || 0), 0);
-      if (applicableSubtotal <= 0) {
-        return Response.json({
-          valid: false,
-          error: 'No eligible products in cart / Keine passenden Produkte im Warenkorb',
-        });
-      }
+    if (!Array.isArray(items) || items.length === 0) {
+      // No cart context — fall back to whole subtotal (edge case).
+      const applicableSubtotal = subtotal;
+      const amount = computeDiscount(record, applicableSubtotal);
+      return finalize(record, amount, scoped);
+    }
+
+    // Fetch active flash sales so we can flag on-sale items on the server.
+    const today2 = new Date().toISOString().split('T')[0];
+    const activeCodes = await base44.asServiceRole.entities.DiscountCode.filter(
+      { is_active: true }, '-created_date', 100
+    );
+    const flashSales = activeCodes
+      .filter((c: any) => Array.isArray(c.applicable_product_ids) && c.applicable_product_ids.length > 0)
+      .filter((c: any) => !c.valid_from || c.valid_from <= today2)
+      .filter((c: any) => !c.valid_until || c.valid_until >= today2);
+    const isOnSale = (productId: string) =>
+      flashSales.some((fs: any) => fs.applicable_product_ids.includes(productId));
+
+    const applicableSubtotal = items
+      .filter((i: any) => !i.bundleId && !isOnSale(i.productId))
+      .filter((i: any) => !scoped || record.applicable_product_ids.includes(i.productId))
+      .reduce((sum: number, i: any) => sum + (i.price || 0) * (i.quantity || 0), 0);
+
+    if (applicableSubtotal <= 0) {
+      return Response.json({
+        valid: false,
+        error: scoped
+          ? 'No eligible products in cart / Keine passenden Produkte im Warenkorb'
+          : 'Code cannot combine with items on sale / Code kann nicht mit Sale-Artikeln kombiniert werden',
+      });
     }
 
     if (record.minimum_order_amount > 0 && subtotal < record.minimum_order_amount) {
@@ -85,22 +99,30 @@ Deno.serve(async (req) => {
       }
     }
 
-    let discountAmount = 0;
-    if (record.discount_type === 'percentage') {
-      discountAmount = (applicableSubtotal * record.discount_value) / 100;
-      if (record.maximum_discount_amount) discountAmount = Math.min(discountAmount, record.maximum_discount_amount);
-    } else {
-      discountAmount = Math.min(record.discount_value, applicableSubtotal);
-    }
-
-    return Response.json({
-      valid: true,
-      discount_amount: Math.round(discountAmount * 100) / 100,
-      code: record.code,
-      scoped,
-    });
+    const discountAmount = computeDiscount(record, applicableSubtotal);
+    return finalize(record, discountAmount, scoped);
   } catch (error) {
     console.error('validateDiscount error:', error.message);
     return Response.json({ valid: false, error: error.message }, { status: 500 });
   }
 });
+
+function computeDiscount(record: any, applicableSubtotal: number) {
+  let amount = 0;
+  if (record.discount_type === 'percentage') {
+    amount = (applicableSubtotal * record.discount_value) / 100;
+    if (record.maximum_discount_amount) amount = Math.min(amount, record.maximum_discount_amount);
+  } else {
+    amount = Math.min(record.discount_value, applicableSubtotal);
+  }
+  return amount;
+}
+
+function finalize(record: any, discountAmount: number, scoped: boolean) {
+  return Response.json({
+    valid: true,
+    discount_amount: Math.round(discountAmount * 100) / 100,
+    code: record.code,
+    scoped,
+  });
+}

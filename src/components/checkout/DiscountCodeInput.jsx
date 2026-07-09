@@ -19,7 +19,12 @@ export default function DiscountCodeInput({ subtotal, customerEmail, items, onAp
         code,
         subtotal,
         customer_email: customerEmail,
-        items: (items || []).map(i => ({ productId: i.productId, price: i.price, quantity: i.quantity })),
+        items: (items || []).map(i => ({
+          productId: i.productId,
+          price: i.price,
+          quantity: i.quantity,
+          bundleId: i.bundleId || undefined,
+        })),
       });
       const data = res?.data || {};
       if (!data.valid) {

@@ -161,6 +161,7 @@ Deno.serve(async (req) => {
         price: unitPrice,
         bundleId: undefined,
         bundleName: undefined,
+        _onSale: flashPrice != null,
       });
     }
 
@@ -204,11 +205,14 @@ Deno.serve(async (req) => {
       }
     }
 
-    // ---- Shipping, discount, totals ----
+    // ---- Discount + shipping + totals ----
     const SHIPPING_COST = 4.95;
     const FREE_SHIPPING_THRESHOLD = 80;
     const verifiedSubtotal = verifiedItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
-    const verifiedShippingCost = verifiedSubtotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_COST;
+
+    // Discount codes apply only to full-price, non-bundle items: bundles and
+    // flash-sale items are already discounted, so we don't stack on top.
+    const eligibleForDiscount = (i: any) => !i.bundleId && !i._onSale;
 
     // Re-validate discount server-side against the verified cart. Never trust
     // the discount_amount the client sends — recompute it from the code.
@@ -230,14 +234,17 @@ Deno.serve(async (req) => {
       }
 
       const scoped = Array.isArray(dc.applicable_product_ids) && dc.applicable_product_ids.length > 0;
-      const applicableSubtotal = scoped
-        ? verifiedItems
-            .filter((i) => dc.applicable_product_ids.includes(i.productId))
-            .reduce((sum, i) => sum + i.price * i.quantity, 0)
-        : verifiedSubtotal;
+      const applicableItems = verifiedItems
+        .filter(eligibleForDiscount)
+        .filter((i) => !scoped || dc.applicable_product_ids.includes(i.productId));
+      const applicableSubtotal = applicableItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
 
-      if (scoped && applicableSubtotal <= 0) {
-        return Response.json({ error: 'Discount code does not apply to any item in cart' }, { status: 400 });
+      if (applicableSubtotal <= 0) {
+        return Response.json({
+          error: scoped
+            ? 'Discount code does not apply to any item in cart'
+            : 'Discount code does not apply — all items are already on sale',
+        }, { status: 400 });
       }
 
       let amount = 0;
@@ -251,7 +258,11 @@ Deno.serve(async (req) => {
       verifiedCode = dc.code;
     }
 
-    const finalTotal = Math.max(0, verifiedSubtotal + verifiedShippingCost - safeDiscount);
+    // Free-shipping threshold is checked against the post-discount subtotal.
+    const subtotalAfterDiscount = Math.max(0, verifiedSubtotal - safeDiscount);
+    const verifiedShippingCost = subtotalAfterDiscount >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_COST;
+
+    const finalTotal = Math.max(0, subtotalAfterDiscount + verifiedShippingCost);
 
     const orderNumber = generateOrderNumber();
 
