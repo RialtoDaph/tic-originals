@@ -402,6 +402,7 @@ export default function Checkout() {
           <DiscountCodeInput
             subtotal={subtotal}
             customerEmail={form.email}
+            items={items}
             lang={lang}
             appliedCode={appliedCode}
             discountAmount={discountAmount}

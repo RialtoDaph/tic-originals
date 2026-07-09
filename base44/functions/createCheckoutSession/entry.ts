@@ -191,7 +191,48 @@ Deno.serve(async (req) => {
     const FREE_SHIPPING_THRESHOLD = 80;
     const verifiedSubtotal = verifiedItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
     const verifiedShippingCost = verifiedSubtotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_COST;
-    const safeDiscount = Math.min(Math.max(0, discount_amount || 0), verifiedSubtotal);
+
+    // Re-validate discount server-side against the verified cart. Never trust
+    // the discount_amount the client sends — recompute it from the code.
+    let safeDiscount = 0;
+    let verifiedCode: string | undefined = undefined;
+    if (applied_discount_code) {
+      const codes = await base44.asServiceRole.entities.DiscountCode.filter({
+        code: applied_discount_code.toUpperCase().trim(),
+      });
+      const dc = codes[0];
+      const validCode = dc && dc.is_active
+        && (!dc.valid_from || dc.valid_from <= today)
+        && (!dc.valid_until || dc.valid_until >= today)
+        && (dc.usage_limit == null || (dc.used_count || 0) < dc.usage_limit)
+        && (!(dc.minimum_order_amount > 0) || verifiedSubtotal >= dc.minimum_order_amount);
+
+      if (!validCode) {
+        return Response.json({ error: 'Discount code is no longer valid' }, { status: 400 });
+      }
+
+      const scoped = Array.isArray(dc.applicable_product_ids) && dc.applicable_product_ids.length > 0;
+      const applicableSubtotal = scoped
+        ? verifiedItems
+            .filter((i) => dc.applicable_product_ids.includes(i.productId))
+            .reduce((sum, i) => sum + i.price * i.quantity, 0)
+        : verifiedSubtotal;
+
+      if (scoped && applicableSubtotal <= 0) {
+        return Response.json({ error: 'Discount code does not apply to any item in cart' }, { status: 400 });
+      }
+
+      let amount = 0;
+      if (dc.discount_type === 'percentage') {
+        amount = (applicableSubtotal * dc.discount_value) / 100;
+        if (dc.maximum_discount_amount) amount = Math.min(amount, dc.maximum_discount_amount);
+      } else {
+        amount = Math.min(dc.discount_value, applicableSubtotal);
+      }
+      safeDiscount = Math.round(amount * 100) / 100;
+      verifiedCode = dc.code;
+    }
+
     const finalTotal = Math.max(0, verifiedSubtotal + verifiedShippingCost - safeDiscount);
 
     const orderNumber = generateOrderNumber();
@@ -210,7 +251,7 @@ Deno.serve(async (req) => {
       subtotal: verifiedSubtotal,
       shipping_cost: verifiedShippingCost,
       discount_amount: safeDiscount,
-      applied_discount_code: applied_discount_code || undefined,
+      applied_discount_code: verifiedCode,
       total: finalTotal,
       vat_amount: finalTotal - (finalTotal / 1.19),
       customer_email,

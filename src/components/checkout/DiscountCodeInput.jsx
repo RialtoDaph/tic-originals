@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { CheckCircle, XCircle, Tag } from 'lucide-react';
 
-export default function DiscountCodeInput({ subtotal, customerEmail, onApply, onRemove, appliedCode, discountAmount, lang }) {
+export default function DiscountCodeInput({ subtotal, customerEmail, items, onApply, onRemove, appliedCode, discountAmount, lang }) {
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -15,7 +15,12 @@ export default function DiscountCodeInput({ subtotal, customerEmail, onApply, on
     setLoading(true);
     setError('');
     try {
-      const res = await validateDiscount({ code, subtotal, customer_email: customerEmail });
+      const res = await validateDiscount({
+        code,
+        subtotal,
+        customer_email: customerEmail,
+        items: (items || []).map(i => ({ productId: i.productId, price: i.price, quantity: i.quantity })),
+      });
       const data = res?.data || {};
       if (!data.valid) {
         setError(data.error || (lang === 'de' ? 'Code ungültig' : 'Invalid code'));
