@@ -279,6 +279,32 @@ export default function AdminDiscountCodes() {
               </div>
             </div>
 
+            <div className="flex flex-wrap items-center gap-2 -mt-2">
+              <span className="text-xs tracking-wider uppercase text-gray-text mr-1">Schnellauswahl:</span>
+              {[
+                { label: '24 Std.', days: 1 },
+                { label: '3 Tage', days: 3 },
+                { label: '7 Tage', days: 7 },
+                { label: '14 Tage', days: 14 },
+                { label: '30 Tage', days: 30 },
+              ].map(preset => (
+                <button
+                  key={preset.days}
+                  type="button"
+                  onClick={() => {
+                    const today = new Date();
+                    const until = new Date();
+                    until.setDate(today.getDate() + preset.days);
+                    const iso = (d) => d.toISOString().split('T')[0];
+                    setForm(p => ({ ...p, valid_from: iso(today), valid_until: iso(until) }));
+                  }}
+                  className="text-xs tracking-wider uppercase border border-border px-2 py-1 hover:bg-muted transition-colors"
+                >
+                  {preset.label}
+                </button>
+              ))}
+            </div>
+
             <ProductMultiPicker
               label="Anwendbar auf Produkte (leer = alle; wenn gesetzt = Flash Sale mit automatischem Strikethrough im Shop)"
               value={form.applicable_product_ids}
