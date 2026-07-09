@@ -29,7 +29,7 @@ export default function BundleSection() {
       {/* Mobile: horizontal snap scroll — matches Products preview above */}
       <div className="md:hidden -mx-5 px-5 flex gap-4 overflow-x-auto snap-x snap-mandatory no-scrollbar pb-4">
         {bundles.map((b) => (
-          <div key={b.id} className="snap-start shrink-0 w-[75%]">
+          <div key={b.id} className="snap-start shrink-0 w-full">
             <BundleCard bundle={b} />
           </div>
         ))}
