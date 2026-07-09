@@ -69,6 +69,7 @@ export function CartProvider({ children }) {
           price: linePrice,
           image: product.images?.[0] || '',
           bundleTag,
+          bundleId: bundle.id,
           bundleName: bundle.name,
         });
       });

@@ -91,6 +91,7 @@ export default function Checkout() {
           color: i.color,
           size: i.size,
           quantity: i.quantity,
+          bundleId: i.bundleId || undefined,
         })),
         discount_amount: discountAmount,
         applied_discount_code: appliedCode || undefined,
