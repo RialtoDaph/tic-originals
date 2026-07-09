@@ -6,7 +6,7 @@ import React from 'react';
  * Sizing is controlled via the `size` prop so the same component works on cards
  * ('sm', 'md') and the product detail page ('lg').
  */
-export default function PriceDisplay({ price, flashSale, size = 'md', className = '' }) {
+export default function PriceDisplay({ price, flashSale, size = 'md', className = '', showBadge = true }) {
   const sizeClasses = {
     sm: { current: 'text-sm', original: 'text-xs' },
     md: { current: 'text-lg font-semibold', original: 'text-sm' },
@@ -31,9 +31,11 @@ export default function PriceDisplay({ price, flashSale, size = 'md', className 
       <span className={`${sizeClasses.original} text-gray-text line-through tabular-nums`}>
         €{Number(flashSale.originalPrice).toFixed(2)}
       </span>
-      <span className="text-[9px] tracking-[0.15em] uppercase bg-red-600 text-white px-1.5 py-0.5 font-medium">
-        {badge}
-      </span>
+      {showBadge && (
+        <span className="text-[9px] tracking-[0.15em] uppercase bg-red-600 text-white px-1.5 py-0.5 font-medium">
+          {badge}
+        </span>
+      )}
     </span>
   );
 }

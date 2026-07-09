@@ -49,7 +49,7 @@ export default function ProductCard({ product, variant = 'default' }) {
                 {product.name}
               </h3>
               <div className="mt-2 min-w-0">
-                <PriceDisplay price={product.price} flashSale={flashSale} size="md" />
+                <PriceDisplay price={product.price} flashSale={flashSale} size="md" showBadge={false} />
               </div>
               <div className="mt-2 flex items-center justify-between gap-2">
                 <p className="text-[10px] text-gray-text tracking-[0.15em] uppercase">{t('products.inclVat')}</p>
@@ -106,7 +106,7 @@ export default function ProductCard({ product, variant = 'default' }) {
           <div className="flex items-baseline justify-between gap-4">
             <h3 className="font-heading text-lg md:text-xl leading-tight tracking-tight truncate">{product.name}</h3>
             <div className="shrink-0">
-              <PriceDisplay price={product.price} flashSale={flashSale} size="sm" />
+              <PriceDisplay price={product.price} flashSale={flashSale} size="sm" showBadge={false} />
             </div>
           </div>
           <p className="text-[11px] text-gray-text mt-1.5 tracking-[0.15em] uppercase">{t('products.inclVat')}</p>
