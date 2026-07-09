@@ -57,15 +57,14 @@ Deno.serve(async (req) => {
         console.log(`Stock decremented for order ${orderNumber}`);
       }
 
-      // 3. Increment discount code usage if applicable
+      // 3. Increment discount code usage if applicable — atomic $inc so
+      // concurrent orders using the same code can't race on used_count.
       if (order.applied_discount_code) {
-        const codes = await base44.asServiceRole.entities.DiscountCode.filter({ code: order.applied_discount_code });
-        if (codes.length > 0) {
-          await base44.asServiceRole.entities.DiscountCode.update(codes[0].id, {
-            used_count: (codes[0].used_count || 0) + 1,
-          });
-          console.log(`Discount code ${order.applied_discount_code} usage incremented`);
-        }
+        await base44.asServiceRole.entities.DiscountCode.updateMany(
+          { code: order.applied_discount_code },
+          { $inc: { used_count: 1 } }
+        );
+        console.log(`Discount code ${order.applied_discount_code} usage incremented`);
       }
     }
 

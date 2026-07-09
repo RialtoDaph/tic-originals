@@ -60,17 +60,30 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Customer email required' }, { status: 400 });
     }
 
-    // ---- Fetch products, active flash sales, and referenced bundles ----
+    // ---- Fetch products, active flash sales, referenced bundles, and pending reservations ----
     const productIds = [...new Set(items.map((i: any) => i.productId).filter(Boolean))];
     const bundleIds = [...new Set(items.map((i: any) => i.bundleId).filter(Boolean))];
 
-    const [products, activeCodes, bundlesRaw] = await Promise.all([
+    const [products, activeCodes, bundlesRaw, pendingOrders] = await Promise.all([
       Promise.all(productIds.map((id) => base44.asServiceRole.entities.Product.get(id).catch(() => null))),
       base44.asServiceRole.entities.DiscountCode.filter({ is_active: true }, '-created_date', 100),
       bundleIds.length
         ? Promise.all(bundleIds.map((id) => base44.asServiceRole.entities.Bundle.get(id).catch(() => null)))
         : Promise.resolve([]),
+      // Soft stock reservation: any pending order still holds its items until
+      // Stripe pays (webhook decrements real stock) or expires (webhook cancels).
+      base44.asServiceRole.entities.Order.filter({ payment_status: 'pending' }, '-created_date', 500),
     ]);
+
+    // Reserved quantities per product|color|size across all pending orders.
+    const reservedMap: Record<string, number> = {};
+    for (const o of (pendingOrders as any[])) {
+      for (const it of (o.items || [])) {
+        if (!it.product_id) continue;
+        const key = `${it.product_id}|${it.color}|${it.size}`;
+        reservedMap[key] = (reservedMap[key] || 0) + (it.quantity || 0);
+      }
+    }
 
     const productMap: Record<string, any> = Object.fromEntries(
       products.filter(Boolean).map((p: any) => [p.id, p])
@@ -110,12 +123,17 @@ Deno.serve(async (req) => {
       const stockEntry = (product.stock || []).find(
         (s: any) => s.color === item.color && s.size === item.size
       );
-      const available = stockEntry?.quantity ?? 0;
+      const onHand = stockEntry?.quantity ?? 0;
+      const reserved = reservedMap[`${item.productId}|${item.color}|${item.size}`] || 0;
+      const available = Math.max(0, onHand - reserved);
       if (available < item.quantity) {
         return Response.json({
           error: `Not enough stock for ${product.name} (${item.color}/${item.size}). Available: ${available}`,
         }, { status: 400 });
       }
+      // Reserve within this request too, so duplicate lines in one cart are
+      // accounted for against the same on-hand stock.
+      reservedMap[`${item.productId}|${item.color}|${item.size}`] = reserved + item.quantity;
 
       const enriched = { ...item, product };
 
