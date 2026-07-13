@@ -1,0 +1,246 @@
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.38';
+import { jsPDF } from 'npm:jspdf@2.5.1';
+
+// Testing override — while true, ALL invoice emails go to TEST_EMAIL (not the customer).
+const TEST_MODE = true;
+const TEST_EMAIL = 'altodaphino@gmail.com';
+
+// Extract plain-text lines from an Impressum LegalPage. Content may be JSON array of
+// {type, text} blocks, or a plain string — we handle both defensively.
+function parseImpressumLines(page: any): string[] {
+  if (!page) return [];
+  const raw = page.content_de || page.content_en || '';
+  try {
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed)) {
+      const out: string[] = [];
+      for (const block of parsed) {
+        if (typeof block === 'string') out.push(block);
+        else if (block?.text) out.push(String(block.text));
+        else if (block?.content) out.push(String(block.content));
+      }
+      return out.flatMap(s => s.split('\n')).map(s => s.trim()).filter(Boolean);
+    }
+  } catch { /* not JSON — fall through */ }
+  return String(raw).split('\n').map(s => s.trim()).filter(Boolean);
+}
+
+function buildInvoicePDF(order: any, impressumLines: string[]): Uint8Array {
+  const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+  const pageW = 210;
+  const marginL = 20;
+  const marginR = 20;
+  let y = 20;
+
+  // ── Header: TIC brand ────────────────────────────────────────────────
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(24);
+  doc.text('TIC', marginL, y);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8);
+  doc.text('ORIGINALS', marginL, y + 5);
+
+  // Absender (small print, right-aligned block)
+  doc.setFontSize(8);
+  const absenderTop = y - 2;
+  impressumLines.slice(0, 8).forEach((line, i) => {
+    doc.text(line, pageW - marginR, absenderTop + i * 3.5, { align: 'right' });
+  });
+
+  y += 25;
+
+  // ── Invoice title + meta ─────────────────────────────────────────────
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(18);
+  doc.text('RECHNUNG', marginL, y);
+  y += 8;
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9);
+  const invoiceDate = order.created_date
+    ? new Date(order.created_date).toLocaleDateString('de-DE')
+    : new Date().toLocaleDateString('de-DE');
+  doc.text(`Rechnungsnummer: ${order.order_number}`, marginL, y);
+  doc.text(`Datum: ${invoiceDate}`, pageW - marginR, y, { align: 'right' });
+  y += 10;
+
+  // ── Bill-to address ──────────────────────────────────────────────────
+  const addr = order.shipping_address || {};
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(9);
+  doc.text('Rechnungsadresse', marginL, y);
+  y += 5;
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(10);
+  const nameLine = `${addr.first_name || ''} ${addr.last_name || ''}`.trim() || order.customer_name || '';
+  if (nameLine) { doc.text(nameLine, marginL, y); y += 5; }
+  const streetLine = `${addr.street || ''} ${addr.house_number || ''}`.trim();
+  if (streetLine) { doc.text(streetLine, marginL, y); y += 5; }
+  if (addr.address_line_2) { doc.text(addr.address_line_2, marginL, y); y += 5; }
+  const cityLine = `${addr.postal_code || ''} ${addr.city || ''}`.trim();
+  if (cityLine) { doc.text(cityLine, marginL, y); y += 5; }
+  if (addr.country) { doc.text(addr.country, marginL, y); y += 5; }
+  if (order.customer_email) {
+    doc.setFontSize(9);
+    doc.setTextColor(120);
+    doc.text(order.customer_email, marginL, y);
+    doc.setTextColor(0);
+    y += 5;
+  }
+  y += 6;
+
+  // ── Items table ──────────────────────────────────────────────────────
+  const colX = { desc: marginL, qty: 120, price: 145, total: pageW - marginR };
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(9);
+  doc.setFillColor(240);
+  doc.rect(marginL - 2, y - 4, pageW - marginL - marginR + 4, 7, 'F');
+  doc.text('Artikel', colX.desc, y);
+  doc.text('Menge', colX.qty, y, { align: 'right' });
+  doc.text('Einzelpreis', colX.price, y, { align: 'right' });
+  doc.text('Gesamt', colX.total, y, { align: 'right' });
+  y += 6;
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9);
+  for (const item of (order.items || [])) {
+    const desc = `${item.product_name || ''}${item.color || item.size ? ` (${[item.color, item.size].filter(Boolean).join(' / ')})` : ''}`;
+    const lines = doc.splitTextToSize(desc, colX.qty - colX.desc - 4);
+    doc.text(lines, colX.desc, y);
+    doc.text(String(item.quantity || 0), colX.qty, y, { align: 'right' });
+    doc.text(`€${(item.unit_price || 0).toFixed(2)}`, colX.price, y, { align: 'right' });
+    doc.text(`€${((item.unit_price || 0) * (item.quantity || 0)).toFixed(2)}`, colX.total, y, { align: 'right' });
+    y += Math.max(5, lines.length * 4.5) + 2;
+    if (y > 240) { doc.addPage(); y = 20; }
+  }
+
+  y += 2;
+  doc.setDrawColor(200);
+  doc.line(marginL, y, pageW - marginR, y);
+  y += 6;
+
+  // ── Totals ───────────────────────────────────────────────────────────
+  const labelX = 140;
+  doc.setFontSize(9);
+  const row = (label: string, value: string, bold = false) => {
+    doc.setFont('helvetica', bold ? 'bold' : 'normal');
+    doc.text(label, labelX, y, { align: 'right' });
+    doc.text(value, pageW - marginR, y, { align: 'right' });
+    y += 5;
+  };
+  row('Zwischensumme:', `€${(order.subtotal || 0).toFixed(2)}`);
+  if (order.discount_amount > 0) {
+    row(`Rabatt${order.applied_discount_code ? ` (${order.applied_discount_code})` : ''}:`, `−€${order.discount_amount.toFixed(2)}`);
+  }
+  row('Versand:', order.shipping_cost > 0 ? `€${order.shipping_cost.toFixed(2)}` : 'Kostenlos');
+  if (order.vat_amount > 0) {
+    row('davon MwSt. (19%):', `€${order.vat_amount.toFixed(2)}`);
+  }
+  y += 1;
+  doc.setDrawColor(0);
+  doc.line(labelX - 20, y, pageW - marginR, y);
+  y += 4;
+  doc.setFontSize(11);
+  row('GESAMT:', `€${(order.total || 0).toFixed(2)}`, true);
+
+  y += 8;
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8);
+  doc.setTextColor(100);
+  doc.text('Zahlung: bereits per Kreditkarte / PayPal beglichen.', marginL, y);
+  y += 4;
+  doc.text('Alle Preise inkl. gesetzlicher MwSt.', marginL, y);
+  y += 8;
+  doc.text('Vielen Dank für deine Bestellung!', marginL, y);
+
+  // ── Footer with Impressum ────────────────────────────────────────────
+  const footerY = 285;
+  doc.setDrawColor(220);
+  doc.line(marginL, footerY - 4, pageW - marginR, footerY - 4);
+  doc.setFontSize(7);
+  doc.setTextColor(120);
+  const footerLine = impressumLines.slice(0, 6).join(' · ');
+  doc.text(footerLine.substring(0, 160), pageW / 2, footerY, { align: 'center' });
+
+  const arrayBuffer = doc.output('arraybuffer');
+  return new Uint8Array(arrayBuffer);
+}
+
+function base64Encode(bytes: Uint8Array): string {
+  let binary = '';
+  const chunk = 0x8000;
+  for (let i = 0; i < bytes.length; i += chunk) {
+    binary += String.fromCharCode(...bytes.subarray(i, i + chunk));
+  }
+  return btoa(binary);
+}
+
+Deno.serve(async (req) => {
+  try {
+    const base44 = createClientFromRequest(req);
+    const body = await req.json().catch(() => ({}));
+    const { order_id, action } = body; // action: 'download' | 'send'
+
+    if (!order_id) return Response.json({ error: 'order_id is required' }, { status: 400 });
+
+    const order = await base44.asServiceRole.entities.Order.get(order_id);
+    if (!order) return Response.json({ error: 'Order not found' }, { status: 404 });
+
+    // Load Impressum for absender data
+    const impressumResults = await base44.asServiceRole.entities.LegalPage.filter({ slug: 'impressum' });
+    const impressumLines = parseImpressumLines(impressumResults[0]);
+
+    const pdfBytes = buildInvoicePDF(order, impressumLines);
+
+    if (action === 'send') {
+      const recipient = TEST_MODE ? TEST_EMAIL : order.customer_email;
+      if (!recipient) return Response.json({ error: 'No recipient email' }, { status: 400 });
+
+      const isDE = (order.language || 'de') === 'de';
+      const subject = isDE
+        ? `Rechnung ${order.order_number}${TEST_MODE ? ' [TEST]' : ''}`
+        : `Invoice ${order.order_number}${TEST_MODE ? ' [TEST]' : ''}`;
+
+      const html = `
+<!DOCTYPE html><html><body style="font-family:sans-serif;color:#323232;max-width:600px;margin:0 auto;padding:24px;">
+  <h2 style="font-family:Georgia,serif;font-weight:300;">${isDE ? 'Deine Rechnung' : 'Your invoice'}</h2>
+  <p>${isDE ? `Hallo ${order.customer_name || ''},` : `Hi ${order.customer_name || ''},`}</p>
+  <p>${isDE
+    ? `im Anhang findest du deine Rechnung zu Bestellung <strong>${order.order_number}</strong>.`
+    : `Attached you'll find the invoice for order <strong>${order.order_number}</strong>.`}</p>
+  <p style="color:#767676;font-size:13px;">${isDE ? 'Vielen Dank für deinen Einkauf!' : 'Thanks for your purchase!'}</p>
+  <p style="color:#767676;font-size:11px;letter-spacing:2px;text-transform:uppercase;margin-top:32px;">TIC ORIGINALS</p>
+</body></html>`;
+
+      await base44.asServiceRole.integrations.Core.SendEmail({
+        to: recipient,
+        subject,
+        body: html,
+        attachments: [{
+          filename: `Rechnung-${order.order_number}.pdf`,
+          content: base64Encode(pdfBytes),
+          content_type: 'application/pdf',
+        }],
+      });
+
+      return Response.json({
+        success: true,
+        sent_to: recipient,
+        test_mode: TEST_MODE,
+        note: TEST_MODE ? `TEST MODE — sent to ${TEST_EMAIL} instead of customer.` : undefined,
+      });
+    }
+
+    // Default: return the PDF as a download
+    return new Response(pdfBytes, {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/pdf',
+        'Content-Disposition': `attachment; filename="Rechnung-${order.order_number}.pdf"`,
+      },
+    });
+  } catch (error) {
+    console.error('generateInvoicePDF error:', error.message);
+    return Response.json({ error: error.message }, { status: 500 });
+  }
+});

@@ -66,6 +66,17 @@ Deno.serve(async (req) => {
         );
         console.log(`Discount code ${order.applied_discount_code} usage incremented`);
       }
+
+      // 4. Send invoice email (fire-and-forget; do not fail webhook if this errors)
+      try {
+        await base44.asServiceRole.functions.invoke('generateInvoicePDF', {
+          order_id: order.id,
+          action: 'send',
+        });
+        console.log(`Invoice email dispatched for order ${orderNumber}`);
+      } catch (err) {
+        console.error(`Failed to send invoice for ${orderNumber}:`, err.message);
+      }
     }
 
     if (event.type === 'checkout.session.expired') {

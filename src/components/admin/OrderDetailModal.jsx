@@ -6,7 +6,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
-import { Mail, Phone, MapPin, Package, CreditCard, Truck, Check } from 'lucide-react';
+import { Mail, Phone, MapPin, Package, CreditCard, Truck, Check, FileDown, Send } from 'lucide-react';
+import { generateInvoicePDF } from '@/functions/generateInvoicePDF';
 
 const STATUSES = ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled', 'returned'];
 
@@ -17,6 +18,9 @@ export default function OrderDetailModal({ order, open, onOpenChange }) {
   const [tracking, setTracking] = useState(order?.tracking_number || '');
   const [saving, setSaving] = useState(false);
   const [savedFlash, setSavedFlash] = useState(false);
+  const [downloading, setDownloading] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [invoiceMsg, setInvoiceMsg] = useState('');
 
   // Sync form when opening a different order
   useEffect(() => {
@@ -47,6 +51,44 @@ export default function OrderDetailModal({ order, open, onOpenChange }) {
     setSaving(false);
     setSavedFlash(true);
     setTimeout(() => setSavedFlash(false), 1500);
+  };
+
+  const handleDownloadInvoice = async () => {
+    setDownloading(true);
+    setInvoiceMsg('');
+    try {
+      const res = await generateInvoicePDF(
+        { order_id: order.id, action: 'download' },
+        { responseType: 'blob' }
+      );
+      const blob = new Blob([res.data], { type: 'application/pdf' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `Rechnung-${order.order_number}.pdf`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      setInvoiceMsg('Download failed: ' + (err.message || 'unknown error'));
+    }
+    setDownloading(false);
+  };
+
+  const handleSendInvoice = async () => {
+    setSending(true);
+    setInvoiceMsg('');
+    try {
+      const res = await generateInvoicePDF({ order_id: order.id, action: 'send' });
+      const data = res.data || {};
+      if (data.test_mode) {
+        setInvoiceMsg(`✓ Sent to test address (${data.sent_to}) — not to customer.`);
+      } else {
+        setInvoiceMsg(`✓ Invoice sent to ${data.sent_to}`);
+      }
+    } catch (err) {
+      setInvoiceMsg('Send failed: ' + (err.message || 'unknown error'));
+    }
+    setSending(false);
   };
 
   return (
@@ -120,6 +162,29 @@ export default function OrderDetailModal({ order, open, onOpenChange }) {
                 {saving ? 'Saving…' : 'Save changes'}
               </Button>
             </div>
+          </section>
+
+          {/* Rechnung / Invoice */}
+          <section className="border rounded-lg p-4 space-y-3">
+            <div>
+              <h3 className="text-xs tracking-[0.2em] uppercase text-gray-text">Rechnung</h3>
+              <p className="text-xs text-gray-text mt-1">
+                Test mode aktiv — E-Mails gehen an <span className="font-medium text-dark">altodaphino@gmail.com</span>, nicht an den Kunden.
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Button size="sm" variant="outline" onClick={handleDownloadInvoice} disabled={downloading}>
+                <FileDown className="w-4 h-4" /> {downloading ? 'Generating…' : 'Download PDF'}
+              </Button>
+              <Button size="sm" onClick={handleSendInvoice} disabled={sending}>
+                <Send className="w-4 h-4" /> {sending ? 'Sending…' : 'Send invoice'}
+              </Button>
+            </div>
+            {invoiceMsg && (
+              <p className={`text-xs ${invoiceMsg.startsWith('✓') ? 'text-green-700' : 'text-red-600'}`}>
+                {invoiceMsg}
+              </p>
+            )}
           </section>
 
           <section>
