@@ -206,8 +206,16 @@ Deno.serve(async (req) => {
     }
 
     // ---- Discount + shipping + totals ----
-    const SHIPPING_COST = 4.95;
+    // Domestic (Germany) vs. international shipping rates.
+    const SHIPPING_COST_DOMESTIC = 5.19;
+    const SHIPPING_COST_INTERNATIONAL = 14.19;
     const FREE_SHIPPING_THRESHOLD = 80;
+    const isDomestic = (shipping_address?.country || 'Deutschland')
+      .toLowerCase()
+      .trim()
+      .startsWith('deutsch') // matches "Deutschland"
+      || (shipping_address?.country || '').toLowerCase().trim() === 'germany';
+    const SHIPPING_COST = isDomestic ? SHIPPING_COST_DOMESTIC : SHIPPING_COST_INTERNATIONAL;
     const verifiedSubtotal = verifiedItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
 
     // Discount codes apply only to full-price, non-bundle items: bundles and

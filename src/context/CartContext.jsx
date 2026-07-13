@@ -2,7 +2,9 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const CartContext = createContext();
 
-const SHIPPING_COST = 4.95;
+// Default (domestic Germany) shipping rate — Checkout page recomputes based on
+// the selected shipping country. Cart drawer only shows an estimate.
+const SHIPPING_COST = 5.19;
 const FREE_SHIPPING_THRESHOLD = 80;
 
 export function CartProvider({ children }) {

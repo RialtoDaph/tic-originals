@@ -418,8 +418,12 @@ export default function Checkout() {
 
           {(() => {
             // Free shipping is applied to the post-discount subtotal.
+            // Shipping rate depends on destination: DE = €5.19, other = €14.19.
             const subtotalAfterDiscount = Math.max(0, subtotal - discountAmount);
-            const effectiveShipping = subtotalAfterDiscount >= 80 ? 0 : 4.95;
+            const country = (form.country || '').toLowerCase().trim();
+            const isDomestic = country.startsWith('deutsch') || country === 'germany';
+            const shippingRate = isDomestic ? 5.19 : 14.19;
+            const effectiveShipping = subtotalAfterDiscount >= 80 ? 0 : shippingRate;
             const effectiveTotal = subtotalAfterDiscount + effectiveShipping;
             return (
               <div className="border-t pt-4 space-y-2">
