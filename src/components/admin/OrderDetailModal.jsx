@@ -10,10 +10,12 @@ import { Mail, Phone, MapPin, Package, CreditCard, Truck, Check, FileDown, Send 
 import { generateInvoicePDF } from '@/functions/generateInvoicePDF';
 
 const STATUSES = ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled', 'returned'];
+const PAYMENT_STATUSES = ['pending', 'paid', 'failed', 'refunded'];
 
 export default function OrderDetailModal({ order, open, onOpenChange }) {
   const queryClient = useQueryClient();
   const [status, setStatus] = useState(order?.status || 'pending');
+  const [paymentStatus, setPaymentStatus] = useState(order?.payment_status || 'pending');
   const [carrier, setCarrier] = useState(order?.shipping_carrier || 'DHL');
   const [tracking, setTracking] = useState(order?.tracking_number || '');
   const [saving, setSaving] = useState(false);
@@ -26,6 +28,7 @@ export default function OrderDetailModal({ order, open, onOpenChange }) {
   useEffect(() => {
     if (order) {
       setStatus(order.status || 'pending');
+      setPaymentStatus(order.payment_status || 'pending');
       setCarrier(order.shipping_carrier || 'DHL');
       setTracking(order.tracking_number || '');
       setSavedFlash(false);
@@ -37,6 +40,7 @@ export default function OrderDetailModal({ order, open, onOpenChange }) {
 
   const dirty =
     status !== (order.status || 'pending') ||
+    paymentStatus !== (order.payment_status || 'pending') ||
     carrier !== (order.shipping_carrier || 'DHL') ||
     tracking !== (order.tracking_number || '');
 
@@ -44,6 +48,7 @@ export default function OrderDetailModal({ order, open, onOpenChange }) {
     setSaving(true);
     await base44.entities.Order.update(order.id, {
       status,
+      payment_status: paymentStatus,
       shipping_carrier: carrier,
       tracking_number: tracking,
     });
@@ -113,14 +118,25 @@ export default function OrderDetailModal({ order, open, onOpenChange }) {
           <section className="border rounded-lg p-4 bg-muted/30 space-y-3">
             <h3 className="text-xs tracking-[0.2em] uppercase text-gray-text">Manage Order</h3>
 
-            <div>
-              <label className="text-xs text-gray-text block mb-1">Status</label>
-              <Select value={status} onValueChange={setStatus}>
-                <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  {STATUSES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
-                </SelectContent>
-              </Select>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="text-xs text-gray-text block mb-1">Order status</label>
+                <Select value={status} onValueChange={setStatus}>
+                  <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {STATUSES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <label className="text-xs text-gray-text block mb-1">Payment status</label>
+                <Select value={paymentStatus} onValueChange={setPaymentStatus}>
+                  <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {PAYMENT_STATUSES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
