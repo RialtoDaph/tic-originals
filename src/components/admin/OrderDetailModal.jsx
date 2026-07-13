@@ -185,7 +185,7 @@ export default function OrderDetailModal({ order, open, onOpenChange }) {
             <div>
               <h3 className="text-xs tracking-[0.2em] uppercase text-gray-text">Rechnung</h3>
               <p className="text-xs text-gray-text mt-1">
-                Test mode aktiv — E-Mails gehen an <span className="font-medium text-dark">altodaphino@gmail.com</span>, nicht an den Kunden.
+                Rechnungs-E-Mails werden automatisch bei bezahlter Bestellung an den Kunden gesendet. Manueller Versand hier möglich.
               </p>
             </div>
             <div className="flex flex-wrap gap-2">

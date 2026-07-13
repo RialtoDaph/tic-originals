@@ -2,7 +2,7 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.38';
 import { jsPDF } from 'npm:jspdf@2.5.1';
 
 // Testing override — while true, ALL invoice emails go to TEST_EMAIL (not the customer).
-const TEST_MODE = true;
+const TEST_MODE = false;
 const TEST_EMAIL = 'altodaphino@gmail.com';
 
 const LOGO_URL = 'https://media.base44.com/images/public/69e5695817245a39fd1a3317/cce36e628_TIC.png';
