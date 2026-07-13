@@ -32,28 +32,6 @@ export default function AdminOverview({ orders, products }) {
         ))}
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-sm tracking-wider uppercase">Recent Orders</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            {orders.slice(0, 10).map(order => (
-              <div key={order.id} className="flex items-center justify-between py-2 border-b last:border-0">
-                <div>
-                  <p className="text-sm font-medium">{order.order_number}</p>
-                  <p className="text-xs text-gray-text">{order.customer_name}</p>
-                </div>
-                <div className="text-right">
-                  <p className="text-sm">€{order.total?.toFixed(2)}</p>
-                  <span className="text-xs px-2 py-0.5 bg-muted rounded-full">{order.status}</span>
-                </div>
-              </div>
-            ))}
-            {orders.length === 0 && <p className="text-sm text-gray-text">No orders yet</p>}
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 }
