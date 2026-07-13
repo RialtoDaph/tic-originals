@@ -133,19 +133,26 @@ export default function Dashboard() {
         )}
       </div>
 
-      {/* Group navigation (top-level) */}
-      <Tabs value={group} onValueChange={handleGroupChange}>
-        <TabsList className="bg-muted mb-4 flex-wrap h-auto gap-1 overflow-x-auto no-scrollbar w-full sm:w-auto">
-          {GROUPS.map(g => {
-            const Icon = g.icon;
-            return (
-              <TabsTrigger key={g.key} value={g.key} className="gap-2">
-                <Icon className="w-4 h-4" /> {g.label}
-              </TabsTrigger>
-            );
-          })}
-        </TabsList>
-      </Tabs>
+      {/* Group navigation (top-level) — pills */}
+      <div className="flex flex-wrap gap-2 mb-6 overflow-x-auto no-scrollbar">
+        {GROUPS.map(g => {
+          const Icon = g.icon;
+          const active = group === g.key;
+          return (
+            <button
+              key={g.key}
+              onClick={() => handleGroupChange(g.key)}
+              className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs tracking-wider uppercase transition-all border ${
+                active
+                  ? 'bg-dark text-white border-dark shadow-sm'
+                  : 'bg-white text-gray-text border-black/10 hover:border-dark hover:text-dark'
+              }`}
+            >
+              <Icon className="w-3.5 h-3.5" /> {g.label}
+            </button>
+          );
+        })}
+      </div>
 
       {/* Sub-tabs within active group */}
       <Tabs value={tab} onValueChange={setTab}>
