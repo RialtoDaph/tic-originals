@@ -5,47 +5,95 @@ import { jsPDF } from 'npm:jspdf@2.5.1';
 const TEST_MODE = true;
 const TEST_EMAIL = 'altodaphino@gmail.com';
 
-// Extract plain-text lines from an Impressum LegalPage. Content may be JSON array of
-// {type, text} blocks, or a plain string — we handle both defensively.
-function parseImpressumLines(page: any): string[] {
-  if (!page) return [];
+const LOGO_URL = 'https://media.base44.com/images/public/69e5695817245a39fd1a3317/cce36e628_TIC.png';
+
+// Extract structured company info from Impressum LegalPage (JSON blocks with heading + body).
+// Returns { addressLines, contactLines, ustId, steuerNr } for structured rendering.
+function parseImpressum(page: any): { addressLines: string[]; contactLines: string[]; ustId: string; steuerNr: string } {
+  const empty = { addressLines: [], contactLines: [], ustId: '', steuerNr: '' };
+  if (!page) return empty;
   const raw = page.content_de || page.content_en || '';
+  let blocks: any[] = [];
   try {
     const parsed = JSON.parse(raw);
-    if (Array.isArray(parsed)) {
-      const out: string[] = [];
-      for (const block of parsed) {
-        if (typeof block === 'string') out.push(block);
-        else if (block?.text) out.push(String(block.text));
-        else if (block?.content) out.push(String(block.content));
-      }
-      return out.flatMap(s => s.split('\n')).map(s => s.trim()).filter(Boolean);
-    }
-  } catch { /* not JSON — fall through */ }
-  return String(raw).split('\n').map(s => s.trim()).filter(Boolean);
+    if (Array.isArray(parsed)) blocks = parsed;
+  } catch { return empty; }
+
+  const findBlock = (kw: string[]) =>
+    blocks.find(b => kw.some(k => String(b?.heading || '').toLowerCase().includes(k.toLowerCase())));
+
+  const splitBody = (b: any): string[] =>
+    String(b?.body || '').split('\n').map(s => s.trim()).filter(Boolean);
+
+  const addressBlock = findBlock(['§ 5', 'Angaben', 'Information']);
+  const contactBlock = findBlock(['Kontakt', 'Contact']);
+  const ustBlock = findBlock(['Umsatzsteuer', 'VAT']);
+  const steuerBlock = findBlock(['Steuernummer']);
+
+  // Extract just the ID (e.g. "DE462943223") from the USt body — strip long explanatory prefix.
+  const ustBody = String(ustBlock?.body || '');
+  const ustMatch = ustBody.match(/DE\s?\d{7,12}/i);
+  const ustId = ustMatch ? ustMatch[0].replace(/\s/g, '') : '';
+
+  const steuerBody = String(steuerBlock?.body || '');
+  const steuerMatch = steuerBody.match(/[\d/]{6,}/);
+  const steuerNr = steuerMatch ? steuerMatch[0] : '';
+
+  return {
+    addressLines: addressBlock ? splitBody(addressBlock) : [],
+    contactLines: contactBlock ? splitBody(contactBlock) : [],
+    ustId,
+    steuerNr,
+  };
 }
 
-function buildInvoicePDF(order: any, impressumLines: string[]): Uint8Array {
+// Fetch logo as base64 data URL for jsPDF embedding.
+async function fetchLogoDataUrl(): Promise<string | null> {
+  try {
+    const res = await fetch(LOGO_URL);
+    if (!res.ok) return null;
+    const buf = new Uint8Array(await res.arrayBuffer());
+    let binary = '';
+    const chunk = 0x8000;
+    for (let i = 0; i < buf.length; i += chunk) {
+      binary += String.fromCharCode(...buf.subarray(i, i + chunk));
+    }
+    return 'data:image/png;base64,' + btoa(binary);
+  } catch (err) {
+    console.error('Logo fetch failed:', err.message);
+    return null;
+  }
+}
+
+function buildInvoicePDF(order: any, imp: { addressLines: string[]; contactLines: string[]; ustId: string; steuerNr: string }, logoDataUrl: string | null): Uint8Array {
   const doc = new jsPDF({ unit: 'mm', format: 'a4' });
   const pageW = 210;
   const marginL = 20;
   const marginR = 20;
   let y = 20;
 
-  // ── Header: TIC brand ────────────────────────────────────────────────
+  // ── Header: TIC logo + wordmark ──────────────────────────────────────
+  if (logoDataUrl) {
+    doc.addImage(logoDataUrl, 'PNG', marginL, y - 4, 18, 18);
+  }
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(24);
-  doc.text('TIC', marginL, y);
+  doc.setFontSize(14);
+  doc.text('TIC', marginL + 22, y + 4);
   doc.setFont('helvetica', 'normal');
-  doc.setFontSize(8);
-  doc.text('ORIGINALS', marginL, y + 5);
+  doc.setFontSize(7);
+  doc.setTextColor(120);
+  doc.text('ORIGINALS', marginL + 22, y + 8);
+  doc.setTextColor(0);
 
-  // Absender (small print, right-aligned block)
+  // Absender (small print, right-aligned block) — address + contact from Impressum
   doc.setFontSize(8);
+  doc.setTextColor(100);
   const absenderTop = y - 2;
-  impressumLines.slice(0, 8).forEach((line, i) => {
+  const absender = [...imp.addressLines, ...imp.contactLines].slice(0, 8);
+  absender.forEach((line, i) => {
     doc.text(line, pageW - marginR, absenderTop + i * 3.5, { align: 'right' });
   });
+  doc.setTextColor(0);
 
   y += 25;
 
@@ -154,13 +202,24 @@ function buildInvoicePDF(order: any, impressumLines: string[]): Uint8Array {
   doc.text('Vielen Dank für deine Bestellung!', marginL, y);
 
   // ── Footer with Impressum ────────────────────────────────────────────
-  const footerY = 285;
+  const footerY = 280;
   doc.setDrawColor(220);
   doc.line(marginL, footerY - 4, pageW - marginR, footerY - 4);
   doc.setFontSize(7);
   doc.setTextColor(120);
-  const footerLine = impressumLines.slice(0, 6).join(' · ');
-  doc.text(footerLine.substring(0, 160), pageW / 2, footerY, { align: 'center' });
+
+  // Line 1: company + address
+  const line1 = [...imp.addressLines, ...imp.contactLines].join(' · ');
+  doc.text(line1.substring(0, 180), pageW / 2, footerY, { align: 'center' });
+
+  // Line 2: tax IDs
+  const taxParts: string[] = [];
+  if (imp.steuerNr) taxParts.push(`Steuernummer: ${imp.steuerNr}`);
+  if (imp.ustId) taxParts.push(`USt-IdNr: ${imp.ustId}`);
+  if (taxParts.length) {
+    doc.text(taxParts.join(' · '), pageW / 2, footerY + 4, { align: 'center' });
+  }
+  doc.setTextColor(0);
 
   const arrayBuffer = doc.output('arraybuffer');
   return new Uint8Array(arrayBuffer);
@@ -186,11 +245,14 @@ Deno.serve(async (req) => {
     const order = await base44.asServiceRole.entities.Order.get(order_id);
     if (!order) return Response.json({ error: 'Order not found' }, { status: 404 });
 
-    // Load Impressum for absender data
-    const impressumResults = await base44.asServiceRole.entities.LegalPage.filter({ slug: 'impressum' });
-    const impressumLines = parseImpressumLines(impressumResults[0]);
+    // Load Impressum for absender data + fetch logo (parallel)
+    const [impressumResults, logoDataUrl] = await Promise.all([
+      base44.asServiceRole.entities.LegalPage.filter({ slug: 'impressum' }),
+      fetchLogoDataUrl(),
+    ]);
+    const imp = parseImpressum(impressumResults[0]);
 
-    const pdfBytes = buildInvoicePDF(order, impressumLines);
+    const pdfBytes = buildInvoicePDF(order, imp, logoDataUrl);
 
     if (action === 'send') {
       const recipient = TEST_MODE ? TEST_EMAIL : order.customer_email;

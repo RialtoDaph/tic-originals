@@ -96,7 +96,7 @@ export default function Footer() {
                 className="flex items-center gap-2 text-sm text-white/70 hover:text-cyan transition-colors">
                 <Instagram className="w-4 h-4" /> Instagram
               </a>
-              <a href="https://tiktok.com/@ticoriginals" target="_blank" rel="noopener noreferrer"
+              <a href="https://www.tiktok.com/@tillicollapseoriginals" target="_blank" rel="noopener noreferrer"
                 className="flex items-center gap-2 text-sm text-white/70 hover:text-cyan transition-colors">
                 <Music2 className="w-4 h-4" /> TikTok
               </a>
