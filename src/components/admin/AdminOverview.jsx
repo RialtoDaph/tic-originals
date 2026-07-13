@@ -5,14 +5,17 @@ import { Package, ShoppingCart, DollarSign, TrendingUp } from 'lucide-react';
 export default function AdminOverview({ orders, products }) {
   const paidOrders = orders.filter(o => o.payment_status === 'paid');
   const totalRevenue = paidOrders.reduce((sum, o) => sum + (o.total || 0), 0);
-  const pendingOrders = orders.filter(o => o.status === 'pending' || o.status === 'confirmed');
+  const pendingOrders = orders.filter(o =>
+    o.payment_status === 'paid' &&
+    (o.status === 'confirmed' || o.status === 'processing')
+  );
   const totalItems = products.reduce((sum, p) =>
     sum + (p.stock || []).reduce((s, st) => s + st.quantity, 0), 0);
 
   const stats = [
     { title: 'Total Revenue', value: `€${totalRevenue.toFixed(2)}`, icon: DollarSign, color: 'text-emerald-600' },
     { title: 'Paid Orders', value: paidOrders.length, icon: ShoppingCart, color: 'text-blue-600' },
-    { title: 'Pending Orders', value: pendingOrders.length, icon: TrendingUp, color: 'text-amber-600' },
+    { title: 'To Fulfill', value: pendingOrders.length, icon: TrendingUp, color: 'text-amber-600' },
     { title: 'Total Stock', value: totalItems, icon: Package, color: 'text-violet-600' },
   ];
 
