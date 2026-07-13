@@ -201,14 +201,26 @@ Deno.serve(async (req) => {
         ? `Rechnung ${order.order_number}${TEST_MODE ? ' [TEST]' : ''}`
         : `Invoice ${order.order_number}${TEST_MODE ? ' [TEST]' : ''}`;
 
+      // SendEmail doesn't support attachments — upload the PDF and link to it instead.
+      const pdfFile = new File([pdfBytes], `Rechnung-${order.order_number}.pdf`, { type: 'application/pdf' });
+      const uploadRes = await base44.asServiceRole.integrations.Core.UploadFile({ file: pdfFile });
+      const pdfUrl = uploadRes.file_url;
+
       const html = `
 <!DOCTYPE html><html><body style="font-family:sans-serif;color:#323232;max-width:600px;margin:0 auto;padding:24px;">
   <h2 style="font-family:Georgia,serif;font-weight:300;">${isDE ? 'Deine Rechnung' : 'Your invoice'}</h2>
   <p>${isDE ? `Hallo ${order.customer_name || ''},` : `Hi ${order.customer_name || ''},`}</p>
   <p>${isDE
-    ? `im Anhang findest du deine Rechnung zu Bestellung <strong>${order.order_number}</strong>.`
-    : `Attached you'll find the invoice for order <strong>${order.order_number}</strong>.`}</p>
-  <p style="color:#767676;font-size:13px;">${isDE ? 'Vielen Dank für deinen Einkauf!' : 'Thanks for your purchase!'}</p>
+    ? `deine Rechnung zu Bestellung <strong>${order.order_number}</strong> steht bereit.`
+    : `Your invoice for order <strong>${order.order_number}</strong> is ready.`}</p>
+  <p style="margin:24px 0;">
+    <a href="${pdfUrl}" style="display:inline-block;background:#323232;color:#9EF2FF;text-decoration:none;padding:12px 28px;border-radius:999px;font-size:13px;letter-spacing:2px;text-transform:uppercase;">
+      ${isDE ? 'Rechnung herunterladen' : 'Download invoice'}
+    </a>
+  </p>
+  <p style="color:#767676;font-size:12px;">${isDE ? 'Oder öffne diesen Link:' : 'Or open this link:'}<br/>
+    <a href="${pdfUrl}" style="color:#767676;word-break:break-all;">${pdfUrl}</a></p>
+  <p style="color:#767676;font-size:13px;margin-top:24px;">${isDE ? 'Vielen Dank für deinen Einkauf!' : 'Thanks for your purchase!'}</p>
   <p style="color:#767676;font-size:11px;letter-spacing:2px;text-transform:uppercase;margin-top:32px;">TIC ORIGINALS</p>
 </body></html>`;
 
@@ -216,16 +228,12 @@ Deno.serve(async (req) => {
         to: recipient,
         subject,
         body: html,
-        attachments: [{
-          filename: `Rechnung-${order.order_number}.pdf`,
-          content: base64Encode(pdfBytes),
-          content_type: 'application/pdf',
-        }],
       });
 
       return Response.json({
         success: true,
         sent_to: recipient,
+        pdf_url: pdfUrl,
         test_mode: TEST_MODE,
         note: TEST_MODE ? `TEST MODE — sent to ${TEST_EMAIL} instead of customer.` : undefined,
       });
