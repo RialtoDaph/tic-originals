@@ -2,7 +2,10 @@ import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { Package, ShoppingCart, AlertTriangle, BarChart2, Lock, Tag, Settings, Boxes } from 'lucide-react';
+import {
+  Package, ShoppingCart, AlertTriangle, BarChart2, Lock, Tag, Settings, Boxes,
+  TrendingUp, Layers, Megaphone, Cog,
+} from 'lucide-react';
 import AdminOrders from '@/components/admin/AdminOrders';
 import AdminProducts from '@/components/admin/AdminProducts.jsx';
 import AdminInventory from '@/components/admin/AdminInventory';
@@ -12,7 +15,47 @@ import AdminDiscountCodes from '@/components/admin/AdminDiscountCodes';
 import AdminBundles from '@/components/admin/AdminBundles';
 import AdminSettings from '@/components/admin/AdminSettings';
 
+const GROUPS = [
+  {
+    key: 'sales',
+    label: 'Sales & Orders',
+    icon: TrendingUp,
+    items: [
+      { key: 'overview', label: 'Overview', icon: Package },
+      { key: 'orders', label: 'Orders', icon: ShoppingCart },
+      { key: 'reports', label: 'Reports', icon: BarChart2 },
+    ],
+  },
+  {
+    key: 'catalog',
+    label: 'Catalog',
+    icon: Layers,
+    items: [
+      { key: 'products', label: 'Products', icon: Package },
+      { key: 'inventory', label: 'Inventory', icon: AlertTriangle },
+      { key: 'bundles', label: 'Bundles', icon: Boxes },
+    ],
+  },
+  {
+    key: 'marketing',
+    label: 'Marketing',
+    icon: Megaphone,
+    items: [
+      { key: 'discounts', label: 'Rabattcodes', icon: Tag },
+    ],
+  },
+  {
+    key: 'system',
+    label: 'System',
+    icon: Cog,
+    items: [
+      { key: 'settings', label: 'Settings', icon: Settings },
+    ],
+  },
+];
+
 export default function Dashboard() {
+  const [group, setGroup] = useState('sales');
   const [tab, setTab] = useState('overview');
 
   const { data: currentUser, isLoading: loadingUser } = useQuery({
@@ -57,13 +100,31 @@ export default function Dashboard() {
     );
   }
 
+  // Switch group + auto-select first sub-tab of that group
+  const handleGroupChange = (nextGroup) => {
+    setGroup(nextGroup);
+    const g = GROUPS.find(x => x.key === nextGroup);
+    if (g && !g.items.some(i => i.key === tab)) {
+      setTab(g.items[0].key);
+    }
+  };
+
+  // Jump to a sub-tab from anywhere (e.g., low-stock alert)
+  const jumpTo = (subKey) => {
+    const parent = GROUPS.find(g => g.items.some(i => i.key === subKey));
+    if (parent) setGroup(parent.key);
+    setTab(subKey);
+  };
+
+  const activeGroup = GROUPS.find(g => g.key === group) || GROUPS[0];
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="flex items-center justify-between mb-8">
         <h1 className="font-heading text-3xl tracking-[0.05em]">Admin Dashboard</h1>
         {lowStockItems.length > 0 && (
           <button
-            onClick={() => setTab('inventory')}
+            onClick={() => jumpTo('inventory')}
             className="flex items-center gap-2 bg-amber-50 text-amber-700 px-4 py-2 text-xs tracking-wider hover:bg-amber-100 transition-colors"
           >
             <AlertTriangle className="w-4 h-4" />
@@ -72,38 +133,37 @@ export default function Dashboard() {
         )}
       </div>
 
+      {/* Group navigation (top-level) */}
+      <Tabs value={group} onValueChange={handleGroupChange}>
+        <TabsList className="bg-muted mb-4 flex-wrap h-auto gap-1 overflow-x-auto no-scrollbar w-full sm:w-auto">
+          {GROUPS.map(g => {
+            const Icon = g.icon;
+            return (
+              <TabsTrigger key={g.key} value={g.key} className="gap-2">
+                <Icon className="w-4 h-4" /> {g.label}
+              </TabsTrigger>
+            );
+          })}
+        </TabsList>
+      </Tabs>
+
+      {/* Sub-tabs within active group */}
       <Tabs value={tab} onValueChange={setTab}>
-        <TabsList className="bg-muted mb-8 flex-wrap h-auto gap-1">
-          <TabsTrigger value="overview" className="gap-2">
-            <Package className="w-4 h-4" /> Overview
-          </TabsTrigger>
-          <TabsTrigger value="orders" className="gap-2">
-            <ShoppingCart className="w-4 h-4" /> Orders
-          </TabsTrigger>
-          <TabsTrigger value="products" className="gap-2">
-            <Package className="w-4 h-4" /> Products
-          </TabsTrigger>
-          <TabsTrigger value="inventory" className="gap-2">
-            <AlertTriangle className="w-4 h-4" />
-            Inventory
-            {lowStockItems.length > 0 && (
-              <span className="ml-1 bg-amber-400 text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center">
-                {lowStockItems.length}
-              </span>
-            )}
-          </TabsTrigger>
-          <TabsTrigger value="reports" className="gap-2">
-            <BarChart2 className="w-4 h-4" /> Reports
-          </TabsTrigger>
-          <TabsTrigger value="discounts" className="gap-2">
-            <Tag className="w-4 h-4" /> Rabattcodes
-          </TabsTrigger>
-          <TabsTrigger value="bundles" className="gap-2">
-            <Boxes className="w-4 h-4" /> Bundles
-          </TabsTrigger>
-          <TabsTrigger value="settings" className="gap-2">
-            <Settings className="w-4 h-4" /> Settings
-          </TabsTrigger>
+        <TabsList className="bg-transparent border-b w-full justify-start rounded-none mb-8 flex-wrap h-auto gap-1 overflow-x-auto no-scrollbar">
+          {activeGroup.items.map(item => {
+            const Icon = item.icon;
+            const isInventoryAlert = item.key === 'inventory' && lowStockItems.length > 0;
+            return (
+              <TabsTrigger key={item.key} value={item.key} className="gap-2">
+                <Icon className="w-4 h-4" /> {item.label}
+                {isInventoryAlert && (
+                  <span className="ml-1 bg-amber-400 text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center">
+                    {lowStockItems.length}
+                  </span>
+                )}
+              </TabsTrigger>
+            );
+          })}
         </TabsList>
 
         <TabsContent value="overview">
