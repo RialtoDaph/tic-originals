@@ -441,7 +441,7 @@ export default function Checkout() {
                   <span>{t('cart.total')}</span>
                   <span>€{effectiveTotal.toFixed(2)}</span>
                 </div>
-                <p className="text-xs text-gray-text">{t('products.inclVat')} (19%)</p>
+                <p className="text-xs text-gray-text">{t('products.inclVat')}</p>
               </div>
             );
           })()}

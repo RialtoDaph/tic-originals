@@ -282,7 +282,7 @@ Deno.serve(async (req) => {
       discount_amount: safeDiscount,
       applied_discount_code: verifiedCode,
       total: finalTotal,
-      vat_amount: finalTotal - (finalTotal / 1.19),
+      vat_amount: 0, // Kleinunternehmer § 19 UStG — keine USt.
       customer_email,
       customer_name,
       customer_phone,

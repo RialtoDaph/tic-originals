@@ -67,7 +67,17 @@ Deno.serve(async (req) => {
         console.log(`Discount code ${order.applied_discount_code} usage incremented`);
       }
 
-      // 4. Send invoice email (fire-and-forget; do not fail webhook if this errors)
+      // 4. Send order confirmation + invoice emails (fire-and-forget; do not fail webhook if these error)
+      // Refetch order so sendOrderConfirmation gets the updated payment_status='paid'
+      const paidOrder = await base44.asServiceRole.entities.Order.get(order.id);
+      try {
+        await base44.asServiceRole.functions.invoke('sendOrderConfirmation', {
+          data: paidOrder,
+        });
+        console.log(`Order confirmation email dispatched for ${orderNumber}`);
+      } catch (err) {
+        console.error(`Failed to send confirmation for ${orderNumber}:`, err.message);
+      }
       try {
         await base44.asServiceRole.functions.invoke('generateInvoicePDF', {
           order_id: order.id,

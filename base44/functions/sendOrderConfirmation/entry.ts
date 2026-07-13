@@ -81,7 +81,9 @@ Deno.serve(async (req) => {
       ${isDE ? 'Gesamt' : 'Total'}: €${(order.total || 0).toFixed(2)}
     </p>
     <p style="font-size:11px;color:#767676;margin:2px 0;">
-      ${isDE ? 'inkl. 19% MwSt.' : 'incl. 19% VAT'}
+      ${isDE
+        ? 'Gemäß § 19 UStG wird keine Umsatzsteuer berechnet.'
+        : 'No VAT charged (§ 19 UStG — small business).'}
     </p>
   </div>
 

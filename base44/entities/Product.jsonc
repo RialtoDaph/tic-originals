@@ -74,7 +74,7 @@
       "type": "string"
     },
     "price": {
-      "description": "Verkaufspreis in EUR inkl. 19% MwSt.",
+      "description": "Verkaufspreis in EUR (Kleinunternehmer \u00a7 19 UStG \u2014 keine USt.)",
       "placeholder": "25.00",
       "type": "number"
     },
@@ -129,11 +129,6 @@
       },
       "placeholder": "streetwear",
       "type": "array"
-    },
-    "vat_rate": {
-      "default": 19,
-      "description": "MwSt-Satz in %",
-      "type": "number"
     },
     "weight_grams": {
       "description": "Gewicht in Gramm",

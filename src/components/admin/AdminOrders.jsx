@@ -34,14 +34,38 @@ export default function AdminOrders({ orders }) {
     queryClient.invalidateQueries({ queryKey: ['admin-orders'] });
   };
 
-  const updateTracking = async (orderId, carrier, trackingNumber) => {
-    await base44.entities.Order.update(orderId, { shipping_carrier: carrier, tracking_number: trackingNumber });
+  const updateTracking = async (orderId, trackingNumber) => {
+    // Preserve existing carrier — table-level edit only updates the tracking number.
+    await base44.entities.Order.update(orderId, { tracking_number: trackingNumber });
     queryClient.invalidateQueries({ queryKey: ['admin-orders'] });
   };
 
-  const deleteOrder = async (orderId) => {
-    await base44.entities.Order.delete(orderId);
+  const deleteOrder = async (order) => {
+    // Restore stock if the order was paid & stock had been decremented, so
+    // deleting a fulfilled order doesn't silently corrupt inventory counts.
+    if (order.payment_status === 'paid' && order.stock_decremented) {
+      const byProduct = {};
+      for (const item of (order.items || [])) {
+        if (!item.product_id) continue;
+        if (!byProduct[item.product_id]) byProduct[item.product_id] = [];
+        byProduct[item.product_id].push(item);
+      }
+      for (const [productId, items] of Object.entries(byProduct)) {
+        try {
+          const product = await base44.entities.Product.get(productId);
+          if (!product) continue;
+          const newStock = (product.stock || []).map(s => {
+            const matching = items.find(i => i.color === s.color && i.size === s.size);
+            if (matching) return { ...s, quantity: (s.quantity || 0) + matching.quantity };
+            return s;
+          });
+          await base44.entities.Product.update(productId, { stock: newStock });
+        } catch (_e) { /* continue with other products */ }
+      }
+    }
+    await base44.entities.Order.delete(order.id);
     queryClient.invalidateQueries({ queryKey: ['admin-orders'] });
+    queryClient.invalidateQueries({ queryKey: ['admin-products'] });
   };
 
   const exportCSV = () => {
@@ -155,7 +179,7 @@ export default function AdminOrders({ orders }) {
                       className="w-36 h-8 text-xs"
                       onBlur={e => {
                         if (e.target.value !== (order.tracking_number || '')) {
-                          updateTracking(order.id, 'DHL', e.target.value);
+                          updateTracking(order.id, e.target.value);
                         }
                       }}
                     />
@@ -181,13 +205,13 @@ export default function AdminOrders({ orders }) {
                           <AlertDialogHeader>
                             <AlertDialogTitle>Delete order {order.order_number}?</AlertDialogTitle>
                             <AlertDialogDescription>
-                              This permanently removes the order from the database. Stock will not be restored automatically. Only use for abandoned/unpaid pending orders.
+                              This permanently removes the order from the database. If the order was paid, stock will be automatically restored.
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
                             <AlertDialogCancel>Cancel</AlertDialogCancel>
                             <AlertDialogAction
-                              onClick={() => deleteOrder(order.id)}
+                              onClick={() => deleteOrder(order)}
                               className="bg-red-600 hover:bg-red-700"
                             >
                               Delete

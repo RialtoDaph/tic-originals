@@ -27,7 +27,6 @@ export default function AdminReports({ orders }) {
   // Revenue is only counted from PAID orders — pending/cancelled don't earn money
   const paidFiltered = useMemo(() => filtered.filter(o => o.payment_status === 'paid'), [filtered]);
   const revenue = paidFiltered.reduce((s, o) => s + (o.total || 0), 0);
-  const vatTotal = paidFiltered.reduce((s, o) => s + (o.vat_amount || 0), 0);
   const avgOrder = paidFiltered.length ? revenue / paidFiltered.length : 0;
 
   // Revenue by product — only paid orders
@@ -54,7 +53,7 @@ export default function AdminReports({ orders }) {
   const exportCSV = () => {
     const headers = [
       'Order Number', 'Date', 'Customer', 'Email',
-      'Subtotal', 'Shipping', 'VAT', 'Total',
+      'Subtotal', 'Shipping', 'Total',
       'Status', 'Payment Status', 'Shipping Method',
       'Items'
     ];
@@ -65,7 +64,6 @@ export default function AdminReports({ orders }) {
       o.customer_email || '',
       (o.subtotal || 0).toFixed(2),
       (o.shipping_cost || 0).toFixed(2),
-      (o.vat_amount || 0).toFixed(2),
       (o.total || 0).toFixed(2),
       o.status || '',
       o.payment_status || '',
@@ -103,12 +101,11 @@ export default function AdminReports({ orders }) {
       </div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {[
           { label: 'Revenue (paid)', value: `€${revenue.toFixed(2)}`, icon: Euro, color: 'text-emerald-600' },
           { label: 'Orders (total)', value: filtered.length, icon: ShoppingBag, color: 'text-blue-600' },
           { label: 'Avg. Order Value', value: `€${avgOrder.toFixed(2)}`, icon: TrendingUp, color: 'text-violet-600' },
-          { label: 'VAT Collected', value: `€${vatTotal.toFixed(2)}`, icon: Euro, color: 'text-amber-600' },
         ].map((stat, i) => (
           <Card key={i}>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
