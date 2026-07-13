@@ -35,7 +35,7 @@ export default function About() {
               <div className="w-8 h-px bg-cyan" />
               <p className="text-[10px] tracking-[0.4em] uppercase text-cyan">{t('about.story')}</p>
             </div>
-            <h1 className="font-display leading-[0.85] text-white uppercase text-[18vw] md:text-[14vw] lg:text-[220px]">
+            <h1 className="font-display leading-[0.85] text-white uppercase text-[14vw] sm:text-[13vw] md:text-[14vw] lg:text-[220px] break-words">
               TILL I<br />
               <span className="text-outline text-white">COLLAPSE</span>
             </h1>
