@@ -1,11 +1,53 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { base44 } from '@/api/base44Client';
+import { useQueryClient } from '@tanstack/react-query';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
-import { Mail, Phone, MapPin, Package, CreditCard, Truck } from 'lucide-react';
+import { Mail, Phone, MapPin, Package, CreditCard, Truck, Check } from 'lucide-react';
+
+const STATUSES = ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled', 'returned'];
 
 export default function OrderDetailModal({ order, open, onOpenChange }) {
+  const queryClient = useQueryClient();
+  const [status, setStatus] = useState(order?.status || 'pending');
+  const [carrier, setCarrier] = useState(order?.shipping_carrier || 'DHL');
+  const [tracking, setTracking] = useState(order?.tracking_number || '');
+  const [saving, setSaving] = useState(false);
+  const [savedFlash, setSavedFlash] = useState(false);
+
+  // Sync form when opening a different order
+  useEffect(() => {
+    if (order) {
+      setStatus(order.status || 'pending');
+      setCarrier(order.shipping_carrier || 'DHL');
+      setTracking(order.tracking_number || '');
+      setSavedFlash(false);
+    }
+  }, [order?.id]);
+
   if (!order) return null;
   const addr = order.shipping_address || {};
+
+  const dirty =
+    status !== (order.status || 'pending') ||
+    carrier !== (order.shipping_carrier || 'DHL') ||
+    tracking !== (order.tracking_number || '');
+
+  const handleSave = async () => {
+    setSaving(true);
+    await base44.entities.Order.update(order.id, {
+      status,
+      shipping_carrier: carrier,
+      tracking_number: tracking,
+    });
+    await queryClient.invalidateQueries({ queryKey: ['admin-orders'] });
+    setSaving(false);
+    setSavedFlash(true);
+    setTimeout(() => setSavedFlash(false), 1500);
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -24,6 +66,61 @@ export default function OrderDetailModal({ order, open, onOpenChange }) {
               Payment: {order.payment_status}
             </span>
           </div>
+
+          {/* Editable controls */}
+          <section className="border rounded-lg p-4 bg-muted/30 space-y-3">
+            <h3 className="text-xs tracking-[0.2em] uppercase text-gray-text">Manage Order</h3>
+
+            <div>
+              <label className="text-xs text-gray-text block mb-1">Status</label>
+              <Select value={status} onValueChange={setStatus}>
+                <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {STATUSES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div className="sm:col-span-1">
+                <label className="text-xs text-gray-text block mb-1">Carrier</label>
+                <Select value={carrier} onValueChange={setCarrier}>
+                  <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="DHL">DHL</SelectItem>
+                    <SelectItem value="DPD">DPD</SelectItem>
+                    <SelectItem value="Hermes">Hermes</SelectItem>
+                    <SelectItem value="UPS">UPS</SelectItem>
+                    <SelectItem value="GLS">GLS</SelectItem>
+                    <SelectItem value="Deutsche Post">Deutsche Post</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="sm:col-span-2">
+                <label className="text-xs text-gray-text block mb-1">Tracking number</label>
+                <Input
+                  placeholder="Tracking #"
+                  value={tracking}
+                  onChange={e => setTracking(e.target.value)}
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end gap-2 pt-1">
+              {savedFlash && (
+                <span className="text-xs text-green-700 flex items-center gap-1">
+                  <Check className="w-3.5 h-3.5" /> Saved
+                </span>
+              )}
+              <Button
+                size="sm"
+                onClick={handleSave}
+                disabled={!dirty || saving}
+              >
+                {saving ? 'Saving…' : 'Save changes'}
+              </Button>
+            </div>
+          </section>
 
           <section>
             <h3 className="text-xs tracking-[0.2em] uppercase text-gray-text mb-3 flex items-center gap-2">
