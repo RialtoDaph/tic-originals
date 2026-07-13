@@ -19,8 +19,9 @@ const STATUSES = ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 
 export default function AdminOrders({ orders }) {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
-  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [selectedOrderId, setSelectedOrderId] = useState(null);
   const queryClient = useQueryClient();
+  const selectedOrder = selectedOrderId ? orders.find(o => o.id === selectedOrderId) : null;
 
   const filtered = orders.filter(o => {
     const matchSearch = !search || o.order_number?.toLowerCase().includes(search.toLowerCase()) || o.customer_name?.toLowerCase().includes(search.toLowerCase());
@@ -85,7 +86,7 @@ export default function AdminOrders({ orders }) {
           {filtered.map(order => (
             <button
               key={order.id}
-              onClick={() => setSelectedOrder(order)}
+              onClick={() => setSelectedOrderId(order.id)}
               className="w-full text-left border rounded-lg p-4 hover:bg-muted/50 active:bg-muted transition-colors flex items-center justify-between gap-3"
             >
               <div className="flex-1 min-w-0">
@@ -127,7 +128,7 @@ export default function AdminOrders({ orders }) {
                 <tr key={order.id} className="border-b last:border-0">
                   <td className="py-3 font-medium">
                     <button
-                      onClick={() => setSelectedOrder(order)}
+                      onClick={() => setSelectedOrderId(order.id)}
                       className="hover:text-cyan-dark hover:underline text-left"
                     >
                       {order.order_number}
@@ -165,7 +166,7 @@ export default function AdminOrders({ orders }) {
                         variant="ghost"
                         size="icon"
                         className="h-8 w-8 text-gray-text hover:text-dark"
-                        onClick={() => setSelectedOrder(order)}
+                        onClick={() => setSelectedOrderId(order.id)}
                         title="View details"
                       >
                         <Eye className="w-4 h-4" />
@@ -206,7 +207,7 @@ export default function AdminOrders({ orders }) {
       <OrderDetailModal
         order={selectedOrder}
         open={!!selectedOrder}
-        onOpenChange={(v) => !v && setSelectedOrder(null)}
+        onOpenChange={(v) => !v && setSelectedOrderId(null)}
       />
     </Card>
   );
