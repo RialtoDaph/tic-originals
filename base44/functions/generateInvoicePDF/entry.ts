@@ -108,8 +108,14 @@ function buildInvoicePDF(order: any, imp: { addressLines: string[]; contactLines
   const invoiceDate = order.created_date
     ? new Date(order.created_date).toLocaleDateString('de-DE')
     : new Date().toLocaleDateString('de-DE');
+  // Liefer-/Leistungsdatum: Versanddatum falls vorhanden, sonst = Rechnungsdatum (typisch im Onlineshop).
+  const deliveryDate = order.updated_date && order.status === 'shipped'
+    ? new Date(order.updated_date).toLocaleDateString('de-DE')
+    : invoiceDate;
   doc.text(`Rechnungsnummer: ${order.order_number}`, marginL, y);
-  doc.text(`Datum: ${invoiceDate}`, pageW - marginR, y, { align: 'right' });
+  doc.text(`Rechnungsdatum: ${invoiceDate}`, pageW - marginR, y, { align: 'right' });
+  y += 4.5;
+  doc.text(`Leistungsdatum: ${deliveryDate}`, pageW - marginR, y, { align: 'right' });
   y += 10;
 
   // ── Bill-to address ──────────────────────────────────────────────────
@@ -181,9 +187,6 @@ function buildInvoicePDF(order: any, imp: { addressLines: string[]; contactLines
     row(`Rabatt${order.applied_discount_code ? ` (${order.applied_discount_code})` : ''}:`, `−€${order.discount_amount.toFixed(2)}`);
   }
   row('Versand:', order.shipping_cost > 0 ? `€${order.shipping_cost.toFixed(2)}` : 'Kostenlos');
-  if (order.vat_amount > 0) {
-    row('davon MwSt. (19%):', `€${order.vat_amount.toFixed(2)}`);
-  }
   y += 1;
   doc.setDrawColor(0);
   doc.line(labelX - 20, y, pageW - marginR, y);
@@ -193,11 +196,15 @@ function buildInvoicePDF(order: any, imp: { addressLines: string[]; contactLines
 
   y += 8;
   doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9);
+  doc.setTextColor(60);
+  // Kleinunternehmer-Hinweis nach § 19 UStG — Pflichtangabe.
+  const kleinTxt = 'Gemäß § 19 UStG wird keine Umsatzsteuer berechnet.';
+  doc.text(kleinTxt, marginL, y);
+  y += 6;
   doc.setFontSize(8);
   doc.setTextColor(100);
   doc.text('Zahlung: bereits per Kreditkarte / PayPal beglichen.', marginL, y);
-  y += 4;
-  doc.text('Alle Preise inkl. gesetzlicher MwSt.', marginL, y);
   y += 8;
   doc.text('Vielen Dank für deine Bestellung!', marginL, y);
 
