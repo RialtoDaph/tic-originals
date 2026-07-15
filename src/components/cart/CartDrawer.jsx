@@ -6,7 +6,7 @@ import { useLanguage } from '@/context/LanguageContext';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function CartDrawer() {
-  const { items, removeItem, updateQuantity, subtotal, shippingCost, total, isOpen, setIsOpen } = useCart();
+  const { items, removeItem, updateQuantity, subtotal, shippingCost, vatAmount, total, isOpen, setIsOpen } = useCart();
   const { t, lang } = useLanguage();
   const navigate = useNavigate();
 
@@ -147,6 +147,10 @@ export default function CartDrawer() {
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-text">{t('cart.shipping')}</span>
                       <span>{shippingCost === 0 ? t('cart.free') : `€${shippingCost.toFixed(2)}`}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-text">{t('products.vat')}</span>
+                      <span>€{vatAmount.toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between items-baseline pt-3 border-t border-border">
                       <span className="text-[10px] tracking-[0.3em] uppercase">{t('cart.total')}</span>

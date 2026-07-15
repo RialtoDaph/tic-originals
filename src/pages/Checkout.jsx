@@ -424,7 +424,10 @@ export default function Checkout() {
             const isDomestic = country.startsWith('deutsch') || country === 'germany';
             const shippingRate = isDomestic ? 5.19 : 14.19;
             const effectiveShipping = subtotalAfterDiscount >= 80 ? 0 : shippingRate;
-            const effectiveTotal = subtotalAfterDiscount + effectiveShipping;
+            // MwSt 19% added on top of (subtotal - discount + shipping).
+            const preVat = subtotalAfterDiscount + effectiveShipping;
+            const effectiveVat = +(preVat * 0.19).toFixed(2);
+            const effectiveTotal = +(preVat + effectiveVat).toFixed(2);
             return (
               <div className="border-t pt-4 space-y-2">
                 <div className="flex justify-between text-sm">
@@ -441,11 +444,17 @@ export default function Checkout() {
                     <span>−€{discountAmount.toFixed(2)}</span>
                   </div>
                 )}
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-text">{t('products.vat')}</span>
+                  <span>€{effectiveVat.toFixed(2)}</span>
+                </div>
                 <div className="flex justify-between font-medium pt-2 border-t">
                   <span>{t('cart.total')}</span>
                   <span>€{effectiveTotal.toFixed(2)}</span>
                 </div>
-                <p className="text-xs text-gray-text">{t('products.inclVat')}</p>
+                <p className="text-xs text-gray-text">
+                  {lang === 'de' ? 'inkl. 19% MwSt' : 'incl. 19% VAT'}
+                </p>
               </div>
             );
           })()}

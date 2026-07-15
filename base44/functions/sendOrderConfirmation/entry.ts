@@ -75,15 +75,21 @@ Deno.serve(async (req) => {
 
   <div style="text-align:right;margin-bottom:24px;">
     <p style="font-size:13px;color:#767676;margin:4px 0;">
+      ${isDE ? 'Nettosumme' : 'Subtotal (net)'}: €${(order.subtotal || 0).toFixed(2)}
+    </p>
+    <p style="font-size:13px;color:#767676;margin:4px 0;">
       ${isDE ? 'Versand' : 'Shipping'}: ${order.shipping_cost === 0 ? (isDE ? 'Kostenlos' : 'Free') : `€${(order.shipping_cost || 0).toFixed(2)}`}
     </p>
+    <p style="font-size:13px;color:#767676;margin:4px 0;">
+      ${isDE ? 'MwSt 19%' : 'VAT 19%'}: €${(order.vat_amount || 0).toFixed(2)}
+    </p>
     <p style="font-size:16px;font-weight:600;margin:4px 0;">
-      ${isDE ? 'Gesamt' : 'Total'}: €${(order.total || 0).toFixed(2)}
+      ${isDE ? 'Gesamt (brutto)' : 'Total (incl. VAT)'}: €${(order.total || 0).toFixed(2)}
     </p>
     <p style="font-size:11px;color:#767676;margin:2px 0;">
       ${isDE
-        ? 'Gemäß § 19 UStG wird keine Umsatzsteuer berechnet.'
-        : 'No VAT charged (§ 19 UStG — small business).'}
+        ? 'Alle Preise inkl. 19% MwSt.'
+        : 'All prices include 19% VAT.'}
     </p>
   </div>
 

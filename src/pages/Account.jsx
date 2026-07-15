@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
 import { useAuth } from '@/lib/AuthContext';
-import { base44 } from '@/api/base44Client';
+import { getMyOrders } from '@/functions/getMyOrders';
 import { motion } from 'framer-motion';
 import { User, Package, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -26,12 +26,11 @@ export default function Account() {
   useEffect(() => {
     if (!authChecked) return;
     if (!isAuthenticated) { setLoadingOrders(false); return; }
-    base44.entities.Order.filter({ customer_email: user.email }, '-created_date', 50)
-      .then(list => {
-        // Hide pending/unpaid orders (e.g., user abandoned Stripe checkout)
-        const visible = (list || []).filter(o => o.payment_status === 'paid' || o.status !== 'pending');
-        setOrders(visible);
-      })
+    // Orders are created by the service role in the checkout flow, so RLS-scoped
+    // Order.filter from the client can't see them. Fetch via a backend function
+    // that authenticates the user server-side.
+    getMyOrders({})
+      .then(res => setOrders(res?.data?.orders || []))
       .catch(() => setOrders([]))
       .finally(() => setLoadingOrders(false));
   }, [authChecked, isAuthenticated, user]);

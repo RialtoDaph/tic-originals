@@ -35,9 +35,17 @@ export default function About() {
               <div className="w-8 h-px bg-cyan" />
               <p className="text-[10px] tracking-[0.4em] uppercase text-cyan">{t('about.story')}</p>
             </div>
-            <h1 className="font-display leading-[0.85] text-white uppercase text-[14vw] sm:text-[13vw] md:text-[14vw] lg:text-[220px] break-words">
-              TILL I<br />
-              <span className="text-outline text-white">COLLAPSE</span>
+            <h1 className="font-display leading-[0.85] uppercase text-[18vw] sm:text-[16vw] md:text-[14vw] lg:text-[220px]">
+              <span className="block text-white">TILL I</span>
+              <span
+                className="block"
+                style={{
+                  color: 'transparent',
+                  WebkitTextStroke: '1.5px #ffffff',
+                }}
+              >
+                COLLAPSE
+              </span>
             </h1>
             <div className="mt-6 md:mt-10 flex flex-wrap items-end justify-between gap-4">
               <p className="text-[10px] md:text-xs tracking-[0.3em] uppercase text-white/60 max-w-md">

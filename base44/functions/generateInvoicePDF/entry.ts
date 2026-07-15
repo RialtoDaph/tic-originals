@@ -182,25 +182,26 @@ function buildInvoicePDF(order: any, imp: { addressLines: string[]; contactLines
     doc.text(value, pageW - marginR, y, { align: 'right' });
     y += 5;
   };
-  row('Zwischensumme:', `€${(order.subtotal || 0).toFixed(2)}`);
+  row('Nettosumme:', `€${(order.subtotal || 0).toFixed(2)}`);
   if (order.discount_amount > 0) {
     row(`Rabatt${order.applied_discount_code ? ` (${order.applied_discount_code})` : ''}:`, `−€${order.discount_amount.toFixed(2)}`);
   }
-  row('Versand:', order.shipping_cost > 0 ? `€${order.shipping_cost.toFixed(2)}` : 'Kostenlos');
+  row('Versand (netto):', order.shipping_cost > 0 ? `€${order.shipping_cost.toFixed(2)}` : 'Kostenlos');
+  row('MwSt 19%:', `€${(order.vat_amount || 0).toFixed(2)}`);
   y += 1;
   doc.setDrawColor(0);
   doc.line(labelX - 20, y, pageW - marginR, y);
   y += 4;
   doc.setFontSize(11);
-  row('GESAMT:', `€${(order.total || 0).toFixed(2)}`, true);
+  row('GESAMT (brutto):', `€${(order.total || 0).toFixed(2)}`, true);
 
   y += 8;
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(9);
   doc.setTextColor(60);
-  // Kleinunternehmer-Hinweis nach § 19 UStG — Pflichtangabe.
-  const kleinTxt = 'Gemäß § 19 UStG wird keine Umsatzsteuer berechnet.';
-  doc.text(kleinTxt, marginL, y);
+  // Ausweis der Umsatzsteuer nach § 14 UStG (Pflichtangabe bei Regelbesteuerung).
+  const vatTxt = 'Alle Beträge inkl. 19% Umsatzsteuer gemäß § 14 UStG.';
+  doc.text(vatTxt, marginL, y);
   y += 6;
   doc.setFontSize(8);
   doc.setTextColor(100);
