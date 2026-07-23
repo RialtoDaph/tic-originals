@@ -270,12 +270,9 @@ Deno.serve(async (req) => {
     const subtotalAfterDiscount = Math.max(0, verifiedSubtotal - safeDiscount);
     const verifiedShippingCost = subtotalAfterDiscount >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_COST;
 
-    // MwSt 19% — added on top of (subtotal - discount + shipping).
-    // Product/shipping prices are treated as NET; VAT is added at checkout.
-    const VAT_RATE = 0.19;
-    const preVatTotal = subtotalAfterDiscount + verifiedShippingCost;
-    const vatAmount = Math.round(preVatTotal * VAT_RATE * 100) / 100;
-    const finalTotal = Math.max(0, +(preVatTotal + vatAmount).toFixed(2));
+    // Kleinunternehmer § 19 UStG — no VAT charged.
+    const vatAmount = 0;
+    const finalTotal = Math.max(0, +(subtotalAfterDiscount + verifiedShippingCost).toFixed(2));
 
     const orderNumber = generateOrderNumber();
 
@@ -295,7 +292,7 @@ Deno.serve(async (req) => {
       discount_amount: safeDiscount,
       applied_discount_code: verifiedCode,
       total: finalTotal,
-      vat_amount: vatAmount, // 19% MwSt added on top
+      vat_amount: vatAmount, // 0 — Kleinunternehmer § 19 UStG
       customer_email,
       customer_name,
       customer_phone,
@@ -330,18 +327,6 @@ Deno.serve(async (req) => {
           currency: 'eur',
           product_data: { name: 'Versandkosten / Shipping' },
           unit_amount: Math.round(verifiedShippingCost * 100),
-        },
-        quantity: 1,
-      });
-    }
-
-    // MwSt 19% as its own line item so Stripe's total equals our finalTotal.
-    if (vatAmount > 0) {
-      lineItems.push({
-        price_data: {
-          currency: 'eur',
-          product_data: { name: 'MwSt 19% / VAT 19%' },
-          unit_amount: Math.round(vatAmount * 100),
         },
         quantity: 1,
       });

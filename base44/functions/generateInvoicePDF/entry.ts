@@ -7,6 +7,34 @@ const TEST_EMAIL = 'altodaphino@gmail.com';
 
 const LOGO_URL = 'https://media.base44.com/images/public/69e5695817245a39fd1a3317/cce36e628_TIC.png';
 
+// jsPDF's built-in helvetica only supports WinAnsi/Latin-1 and mis-renders
+// most non-ASCII characters as "ï¿½". Normalize every string we draw to a
+// safe ASCII form so the PDF is readable regardless of platform quirks.
+function ascii(input: unknown): string {
+  if (input == null) return '';
+  let s = String(input);
+  // Common punctuation & symbols
+  s = s
+    .replace(/€/g, 'EUR ')
+    .replace(/§/g, 'Paragraph ')
+    .replace(/[–—−]/g, '-')
+    .replace(/[“”„«»]/g, '"')
+    .replace(/[‘’‚]/g, "'")
+    .replace(/…/g, '...')
+    .replace(/•/g, '-')
+    .replace(/·/g, '-')
+    .replace(/×/g, 'x');
+  // German umlauts & sharp s
+  s = s
+    .replace(/ä/g, 'ae').replace(/Ä/g, 'Ae')
+    .replace(/ö/g, 'oe').replace(/Ö/g, 'Oe')
+    .replace(/ü/g, 'ue').replace(/Ü/g, 'Ue')
+    .replace(/ß/g, 'ss');
+  // Strip anything else outside printable ASCII
+  s = s.replace(/[^\x20-\x7E\n\r\t]/g, '');
+  return s;
+}
+
 // Extract structured company info from Impressum LegalPage (JSON blocks with heading + body).
 // Returns { addressLines, contactLines, ustId, steuerNr } for structured rendering.
 function parseImpressum(page: any): { addressLines: string[]; contactLines: string[]; ustId: string; steuerNr: string } {
@@ -72,17 +100,20 @@ function buildInvoicePDF(order: any, imp: { addressLines: string[]; contactLines
   const marginR = 20;
   let y = 20;
 
+  // Local helper to draw ASCII-normalized text.
+  const T = (text: string, x: number, yy: number, opts?: any) => doc.text(ascii(text), x, yy, opts);
+
   // ── Header: TIC logo + wordmark ──────────────────────────────────────
   if (logoDataUrl) {
     doc.addImage(logoDataUrl, 'PNG', marginL, y - 4, 18, 18);
   }
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(14);
-  doc.text('TIC', marginL + 22, y + 4);
+  T('TIC', marginL + 22, y + 4);
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(7);
   doc.setTextColor(120);
-  doc.text('ORIGINALS', marginL + 22, y + 8);
+  T('ORIGINALS', marginL + 22, y + 8);
   doc.setTextColor(0);
 
   // Absender (small print, right-aligned block) — address + contact from Impressum
@@ -91,7 +122,7 @@ function buildInvoicePDF(order: any, imp: { addressLines: string[]; contactLines
   const absenderTop = y - 2;
   const absender = [...imp.addressLines, ...imp.contactLines].slice(0, 8);
   absender.forEach((line, i) => {
-    doc.text(line, pageW - marginR, absenderTop + i * 3.5, { align: 'right' });
+    T(line, pageW - marginR, absenderTop + i * 3.5, { align: 'right' });
   });
   doc.setTextColor(0);
 
@@ -100,7 +131,7 @@ function buildInvoicePDF(order: any, imp: { addressLines: string[]; contactLines
   // ── Invoice title + meta ─────────────────────────────────────────────
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(18);
-  doc.text('RECHNUNG', marginL, y);
+  T('RECHNUNG', marginL, y);
   y += 8;
 
   doc.setFont('helvetica', 'normal');
@@ -112,32 +143,32 @@ function buildInvoicePDF(order: any, imp: { addressLines: string[]; contactLines
   const deliveryDate = order.updated_date && order.status === 'shipped'
     ? new Date(order.updated_date).toLocaleDateString('de-DE')
     : invoiceDate;
-  doc.text(`Rechnungsnummer: ${order.order_number}`, marginL, y);
-  doc.text(`Rechnungsdatum: ${invoiceDate}`, pageW - marginR, y, { align: 'right' });
+  T(`Rechnungsnummer: ${order.order_number}`, marginL, y);
+  T(`Rechnungsdatum: ${invoiceDate}`, pageW - marginR, y, { align: 'right' });
   y += 4.5;
-  doc.text(`Leistungsdatum: ${deliveryDate}`, pageW - marginR, y, { align: 'right' });
+  T(`Leistungsdatum: ${deliveryDate}`, pageW - marginR, y, { align: 'right' });
   y += 10;
 
   // ── Bill-to address ──────────────────────────────────────────────────
   const addr = order.shipping_address || {};
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(9);
-  doc.text('Rechnungsadresse', marginL, y);
+  T('Rechnungsadresse', marginL, y);
   y += 5;
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(10);
   const nameLine = `${addr.first_name || ''} ${addr.last_name || ''}`.trim() || order.customer_name || '';
-  if (nameLine) { doc.text(nameLine, marginL, y); y += 5; }
+  if (nameLine) { T(nameLine, marginL, y); y += 5; }
   const streetLine = `${addr.street || ''} ${addr.house_number || ''}`.trim();
-  if (streetLine) { doc.text(streetLine, marginL, y); y += 5; }
-  if (addr.address_line_2) { doc.text(addr.address_line_2, marginL, y); y += 5; }
+  if (streetLine) { T(streetLine, marginL, y); y += 5; }
+  if (addr.address_line_2) { T(addr.address_line_2, marginL, y); y += 5; }
   const cityLine = `${addr.postal_code || ''} ${addr.city || ''}`.trim();
-  if (cityLine) { doc.text(cityLine, marginL, y); y += 5; }
-  if (addr.country) { doc.text(addr.country, marginL, y); y += 5; }
+  if (cityLine) { T(cityLine, marginL, y); y += 5; }
+  if (addr.country) { T(addr.country, marginL, y); y += 5; }
   if (order.customer_email) {
     doc.setFontSize(9);
     doc.setTextColor(120);
-    doc.text(order.customer_email, marginL, y);
+    T(order.customer_email, marginL, y);
     doc.setTextColor(0);
     y += 5;
   }
@@ -149,21 +180,21 @@ function buildInvoicePDF(order: any, imp: { addressLines: string[]; contactLines
   doc.setFontSize(9);
   doc.setFillColor(240);
   doc.rect(marginL - 2, y - 4, pageW - marginL - marginR + 4, 7, 'F');
-  doc.text('Artikel', colX.desc, y);
-  doc.text('Menge', colX.qty, y, { align: 'right' });
-  doc.text('Einzelpreis', colX.price, y, { align: 'right' });
-  doc.text('Gesamt', colX.total, y, { align: 'right' });
+  T('Artikel', colX.desc, y);
+  T('Menge', colX.qty, y, { align: 'right' });
+  T('Einzelpreis', colX.price, y, { align: 'right' });
+  T('Gesamt', colX.total, y, { align: 'right' });
   y += 6;
 
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(9);
   for (const item of (order.items || [])) {
     const desc = `${item.product_name || ''}${item.color || item.size ? ` (${[item.color, item.size].filter(Boolean).join(' / ')})` : ''}`;
-    const lines = doc.splitTextToSize(desc, colX.qty - colX.desc - 4);
+    const lines = doc.splitTextToSize(ascii(desc), colX.qty - colX.desc - 4);
     doc.text(lines, colX.desc, y);
-    doc.text(String(item.quantity || 0), colX.qty, y, { align: 'right' });
-    doc.text(`€${(item.unit_price || 0).toFixed(2)}`, colX.price, y, { align: 'right' });
-    doc.text(`€${((item.unit_price || 0) * (item.quantity || 0)).toFixed(2)}`, colX.total, y, { align: 'right' });
+    T(String(item.quantity || 0), colX.qty, y, { align: 'right' });
+    T(`EUR ${(item.unit_price || 0).toFixed(2)}`, colX.price, y, { align: 'right' });
+    T(`EUR ${((item.unit_price || 0) * (item.quantity || 0)).toFixed(2)}`, colX.total, y, { align: 'right' });
     y += Math.max(5, lines.length * 4.5) + 2;
     if (y > 240) { doc.addPage(); y = 20; }
   }
@@ -178,36 +209,34 @@ function buildInvoicePDF(order: any, imp: { addressLines: string[]; contactLines
   doc.setFontSize(9);
   const row = (label: string, value: string, bold = false) => {
     doc.setFont('helvetica', bold ? 'bold' : 'normal');
-    doc.text(label, labelX, y, { align: 'right' });
-    doc.text(value, pageW - marginR, y, { align: 'right' });
+    T(label, labelX, y, { align: 'right' });
+    T(value, pageW - marginR, y, { align: 'right' });
     y += 5;
   };
-  row('Nettosumme:', `€${(order.subtotal || 0).toFixed(2)}`);
+  row('Zwischensumme:', `EUR ${(order.subtotal || 0).toFixed(2)}`);
   if (order.discount_amount > 0) {
-    row(`Rabatt${order.applied_discount_code ? ` (${order.applied_discount_code})` : ''}:`, `−€${order.discount_amount.toFixed(2)}`);
+    row(`Rabatt${order.applied_discount_code ? ` (${order.applied_discount_code})` : ''}:`, `- EUR ${order.discount_amount.toFixed(2)}`);
   }
-  row('Versand (netto):', order.shipping_cost > 0 ? `€${order.shipping_cost.toFixed(2)}` : 'Kostenlos');
-  row('MwSt 19%:', `€${(order.vat_amount || 0).toFixed(2)}`);
+  row('Versand:', order.shipping_cost > 0 ? `EUR ${order.shipping_cost.toFixed(2)}` : 'Kostenlos');
   y += 1;
   doc.setDrawColor(0);
   doc.line(labelX - 20, y, pageW - marginR, y);
   y += 4;
   doc.setFontSize(11);
-  row('GESAMT (brutto):', `€${(order.total || 0).toFixed(2)}`, true);
+  row('GESAMT:', `EUR ${(order.total || 0).toFixed(2)}`, true);
 
   y += 8;
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(9);
   doc.setTextColor(60);
-  // Ausweis der Umsatzsteuer nach § 14 UStG (Pflichtangabe bei Regelbesteuerung).
-  const vatTxt = 'Alle Beträge inkl. 19% Umsatzsteuer gemäß § 14 UStG.';
-  doc.text(vatTxt, marginL, y);
+  // Kleinunternehmer-Hinweis nach § 19 UStG.
+  T('Gemaess Paragraph 19 UStG wird keine Umsatzsteuer berechnet.', marginL, y);
   y += 6;
   doc.setFontSize(8);
   doc.setTextColor(100);
-  doc.text('Zahlung: bereits per Kreditkarte / PayPal beglichen.', marginL, y);
+  T('Zahlung: bereits per Kreditkarte / PayPal beglichen.', marginL, y);
   y += 8;
-  doc.text('Vielen Dank für deine Bestellung!', marginL, y);
+  T('Vielen Dank fuer deine Bestellung!', marginL, y);
 
   // ── Footer with Impressum ────────────────────────────────────────────
   const footerY = 280;
@@ -217,15 +246,15 @@ function buildInvoicePDF(order: any, imp: { addressLines: string[]; contactLines
   doc.setTextColor(120);
 
   // Line 1: company + address
-  const line1 = [...imp.addressLines, ...imp.contactLines].join(' · ');
-  doc.text(line1.substring(0, 180), pageW / 2, footerY, { align: 'center' });
+  const line1 = [...imp.addressLines, ...imp.contactLines].join(' - ');
+  T(line1.substring(0, 220), pageW / 2, footerY, { align: 'center' });
 
   // Line 2: tax IDs
   const taxParts: string[] = [];
   if (imp.steuerNr) taxParts.push(`Steuernummer: ${imp.steuerNr}`);
   if (imp.ustId) taxParts.push(`USt-IdNr: ${imp.ustId}`);
   if (taxParts.length) {
-    doc.text(taxParts.join(' · '), pageW / 2, footerY + 4, { align: 'center' });
+    T(taxParts.join(' - '), pageW / 2, footerY + 4, { align: 'center' });
   }
   doc.setTextColor(0);
 

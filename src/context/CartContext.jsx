@@ -96,9 +96,9 @@ export function CartProvider({ children }) {
 
   const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const shippingCost = subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_COST;
-  // MwSt 19% — added on top of net (subtotal + shipping). Prices are stored net.
-  const vatAmount = +((subtotal + shippingCost) * 0.19).toFixed(2);
-  const total = +(subtotal + shippingCost + vatAmount).toFixed(2);
+  // Kleinunternehmer § 19 UStG — no VAT charged.
+  const vatAmount = 0;
+  const total = +(subtotal + shippingCost).toFixed(2);
   const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
 
   return (

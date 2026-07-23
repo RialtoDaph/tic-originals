@@ -148,10 +148,6 @@ export default function CartDrawer() {
                       <span className="text-gray-text">{t('cart.shipping')}</span>
                       <span>{shippingCost === 0 ? t('cart.free') : `€${shippingCost.toFixed(2)}`}</span>
                     </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-text">{t('products.vat')}</span>
-                      <span>€{vatAmount.toFixed(2)}</span>
-                    </div>
                     <div className="flex justify-between items-baseline pt-3 border-t border-border">
                       <span className="text-[10px] tracking-[0.3em] uppercase">{t('cart.total')}</span>
                       <span className="font-display text-3xl">€{total.toFixed(2)}</span>
