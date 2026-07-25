@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '@/context/LanguageContext';
 import StockBadge from '@/components/common/StockBadge';
@@ -15,6 +15,28 @@ export default function ProductCard({ product, variant = 'default' }) {
   const [showQuickView, setShowQuickView] = useState(false);
   const { data: flashSales = [] } = useFlashSales();
   const flashSale = getFlashSaleForProduct(product, flashSales);
+
+  const images = product.images || [];
+  const description = lang === 'de'
+    ? (product.description_de || product.description)
+    : (product.description_en || product.description);
+
+  const [imgIndex, setImgIndex] = useState(0);
+  const [isHovered, setIsHovered] = useState(false);
+  const intervalRef = useRef(null);
+
+  // Auto-cycle images on hover when 3+ images exist
+  useEffect(() => {
+    if (images.length <= 2) return;
+    if (isHovered) {
+      intervalRef.current = setInterval(() => {
+        setImgIndex(prev => (prev + 1) % images.length);
+      }, 1800);
+    } else {
+      setImgIndex(0);
+    }
+    return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
+  }, [isHovered, images.length]);
 
   // Card variant — used inside mobile horizontal scroll: white card, rounded, shadow, info inside card
   if (variant === 'card') {
@@ -69,25 +91,23 @@ export default function ProductCard({ product, variant = 'default' }) {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="group"
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
       >
         <div className="aspect-[3/4] bg-muted overflow-hidden mb-4 md:mb-5 relative">
           <Link to={`/products/${product.id}`} className="block w-full h-full">
-            {product.images?.[0] ? (
-              <>
-                <img src={product.images[0]} alt={product.name}
-                  className={`w-full h-full object-cover absolute inset-0 transition-all duration-[900ms] ease-out ${product.images?.[1] ? 'group-hover:opacity-0' : 'group-hover:scale-[1.04]'}`} />
-                {product.images?.[1] && (
-                  <img src={product.images[1]} alt={product.name}
-                    className="w-full h-full object-cover absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-[900ms] ease-out" />
-                )}
-              </>
+            {images[0] ? (
+              images.map((img, i) => (
+                <img key={i} src={img} alt={product.name}
+                  className={`w-full h-full object-cover absolute inset-0 transition-opacity duration-[900ms] ease-out ${i === imgIndex ? 'opacity-100' : 'opacity-0'}`} />
+              ))
             ) : (
               <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-dark to-dark-deep">
                 <span className="font-display text-6xl text-cyan/30 tracking-[0.2em]">TIC</span>
               </div>
             )}
           </Link>
-          <div className="absolute top-3 left-3 flex flex-col gap-2">
+          <div className="absolute top-3 left-3 flex flex-col gap-2 z-10">
             <StockBadge quantity={totalStock} />
             {flashSale && (
               <span className="bg-red-600 text-white text-[10px] tracking-[0.15em] uppercase px-2 py-0.5 font-medium">
@@ -98,9 +118,30 @@ export default function ProductCard({ product, variant = 'default' }) {
           <button
             onClick={() => setShowQuickView(true)}
             aria-label={lang === 'de' ? 'Schnellansicht' : 'Quick View'}
-            className="hidden md:flex absolute top-3 right-3 w-9 h-9 items-center justify-center bg-white/90 hover:bg-cyan text-dark backdrop-blur-sm rounded-full opacity-0 group-hover:opacity-100 transition-all duration-500">
+            className="hidden md:flex absolute top-3 right-3 w-9 h-9 items-center justify-center bg-white/90 hover:bg-cyan text-dark backdrop-blur-sm rounded-full opacity-0 group-hover:opacity-100 transition-all duration-500 z-10">
             <Eye className="w-4 h-4" />
           </button>
+
+          {/* Carousel dots — only when 3+ images */}
+          {images.length > 2 && (
+            <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 z-10">
+              {images.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={(e) => { e.preventDefault(); setImgIndex(i); }}
+                  aria-label={`Image ${i + 1}`}
+                  className={`h-1 rounded-full transition-all duration-300 ${i === imgIndex ? 'w-6 bg-cyan' : 'w-1.5 bg-white/60 hover:bg-white'}`}
+                />
+              ))}
+            </div>
+          )}
+
+          {/* Expand-on-hover description */}
+          {description && (
+            <div className={`absolute inset-x-0 bottom-0 bg-gradient-to-t from-dark-deep via-dark-deep/90 to-transparent px-4 pt-10 pb-4 transition-all duration-500 ${isHovered ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'}`}>
+              <p className="text-white/90 text-xs leading-relaxed line-clamp-2">{description}</p>
+            </div>
+          )}
         </div>
         <Link to={`/products/${product.id}`} className="block">
           <div className="flex items-baseline justify-between gap-4">
