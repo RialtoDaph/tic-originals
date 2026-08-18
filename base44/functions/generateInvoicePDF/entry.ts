@@ -103,17 +103,14 @@ function buildInvoicePDF(order: any, imp: { addressLines: string[]; contactLines
   // Local helper to draw ASCII-normalized text.
   const T = (text: string, x: number, yy: number, opts?: any) => doc.text(ascii(text), x, yy, opts);
 
-  // ── Header: TIC logo + wordmark ──────────────────────────────────────
-  if (logoDataUrl) {
-    doc.addImage(logoDataUrl, 'PNG', marginL, y - 4, 18, 18);
-  }
+  // ── Header: TIC wordmark (text-based — avoids jsPDF PNG decode issues) ─
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(14);
-  T('TIC', marginL + 22, y + 4);
+  doc.setFontSize(20);
+  T('TIC', marginL, y + 5);
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(7);
   doc.setTextColor(120);
-  T('ORIGINALS', marginL + 22, y + 8);
+  T('ORIGINALS', marginL + 16, y + 9);
   doc.setTextColor(0);
 
   // Absender (small print, right-aligned block) — address + contact from Impressum
