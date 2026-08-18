@@ -76,15 +76,153 @@ function parseImpressum(page: any): { addressLines: string[]; contactLines: stri
 }
 
 // Fetch logo as base64 data URL for jsPDF embedding.
+// The source PNG is RGBA (color type 6), which jsPDF's PNG decoder cannot
+// render correctly (it produces garbled pink/purple output). We flatten it
+// onto a white background and re-encode as an 8-bit RGB PNG (color type 2),
+// which jsPDF handles reliably. Uses only Deno built-ins (no native deps).
+const CRC_TABLE = (() => {
+  const t = new Uint32Array(256);
+  for (let n = 0; n < 256; n++) {
+    let c = n;
+    for (let k = 0; k < 8; k++) c = c & 1 ? (0xedb88320 ^ (c >>> 1)) : (c >>> 1);
+    t[n] = c;
+  }
+  return t;
+})();
+function crc32(data: Uint8Array): number {
+  let c = 0xffffffff;
+  for (const b of data) c = CRC_TABLE[(c ^ b) & 0xff] ^ (c >>> 8);
+  return (c ^ 0xffffffff) >>> 0;
+}
+function paeth(a: number, b: number, c: number): number {
+  const p = a + b - c;
+  const pa = Math.abs(p - a), pb = Math.abs(p - b), pc = Math.abs(p - c);
+  if (pa <= pb && pa <= pc) return a;
+  if (pb <= pc) return b;
+  return c;
+}
+function pngChunk(type: string, data: Uint8Array): Uint8Array {
+  const out = new Uint8Array(12 + data.length);
+  const view = new DataView(out.buffer);
+  view.setUint32(0, data.length);
+  for (let i = 0; i < 4; i++) out[4 + i] = type.charCodeAt(i);
+  out.set(data, 8);
+  view.setUint32(8 + data.length, crc32(out.subarray(4, 8 + data.length)));
+  return out;
+}
+// Flatten an 8-bit RGBA PNG to an 8-bit RGB PNG composited on white.
+async function flattenRgbaPng(bytes: Uint8Array): Promise<Uint8Array | null> {
+  try {
+    const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+    if (bytes.length < 8 || bytes[0] !== 137 || bytes[1] !== 80 || bytes[2] !== 78 || bytes[3] !== 71) return null;
+    let pos = 8;
+    let width = 0, height = 0, bitDepth = 0, colorType = 0;
+    const idatChunks: Uint8Array[] = [];
+    while (pos + 8 <= bytes.length) {
+      const len = view.getUint32(pos);
+      const type = String.fromCharCode(bytes[pos + 4], bytes[pos + 5], bytes[pos + 6], bytes[pos + 7]);
+      const dataStart = pos + 8;
+      if (type === 'IHDR') {
+        width = view.getUint32(dataStart);
+        height = view.getUint32(dataStart + 4);
+        bitDepth = bytes[dataStart + 8];
+        colorType = bytes[dataStart + 9];
+      } else if (type === 'IDAT') {
+        idatChunks.push(bytes.slice(dataStart, dataStart + len));
+      } else if (type === 'IEND') {
+        break;
+      }
+      pos = dataStart + len + 4; // data + CRC
+    }
+    // Only the RGBA case is broken in jsPDF; pass through anything else unchanged.
+    if (colorType !== 6 || bitDepth !== 8) return bytes;
+    if (width === 0 || height === 0) return null;
+
+    // Inflate concatenated IDAT (zlib/deflate).
+    const total = idatChunks.reduce((s, c) => s + c.length, 0);
+    const compressed = new Uint8Array(total);
+    let off = 0;
+    for (const c of idatChunks) { compressed.set(c, off); off += c.length; }
+    const inflated = new Uint8Array(await new Response(
+      new Blob([compressed]).stream().pipeThrough(new DecompressionStream('deflate'))
+    ).arrayBuffer());
+
+    // Unfilter scanlines (1 filter byte + width*4 bytes per row).
+    const bpp = 4;
+    const stride = width * bpp;
+    const raw = new Uint8Array(height * stride);
+    let inPos = 0;
+    for (let y = 0; y < height; y++) {
+      const filter = inflated[inPos++];
+      for (let x = 0; x < stride; x++) {
+        const byte = inflated[inPos + x];
+        const left = x >= bpp ? raw[y * stride + x - bpp] : 0;
+        const up = y > 0 ? raw[(y - 1) * stride + x] : 0;
+        const upLeft = (y > 0 && x >= bpp) ? raw[(y - 1) * stride + x - bpp] : 0;
+        let val: number;
+        switch (filter) {
+          case 1: val = (byte + left) & 0xff; break;
+          case 2: val = (byte + up) & 0xff; break;
+          case 3: val = (byte + ((left + up) >> 1)) & 0xff; break;
+          case 4: val = (byte + paeth(left, up, upLeft)) & 0xff; break;
+          default: val = byte;
+        }
+        raw[y * stride + x] = val;
+      }
+      inPos += stride;
+    }
+
+    // Composite onto white → RGB.
+    const strideRgb = width * 3;
+    const rawRgb = new Uint8Array(height * (strideRgb + 1));
+    for (let y = 0; y < height; y++) {
+      rawRgb[y * (strideRgb + 1)] = 0; // filter None
+      const rowStart = y * (strideRgb + 1) + 1;
+      for (let x = 0; x < width; x++) {
+        const r = raw[y * stride + x * 4];
+        const g = raw[y * stride + x * 4 + 1];
+        const b = raw[y * stride + x * 4 + 2];
+        const a = raw[y * stride + x * 4 + 3];
+        rawRgb[rowStart + x * 3] = Math.round((r * a + 255 * (255 - a)) / 255);
+        rawRgb[rowStart + x * 3 + 1] = Math.round((g * a + 255 * (255 - a)) / 255);
+        rawRgb[rowStart + x * 3 + 2] = Math.round((b * a + 255 * (255 - a)) / 255);
+      }
+    }
+
+    // Deflate raw RGB → zlib.
+    const deflated = new Uint8Array(await new Response(
+      new Blob([rawRgb]).stream().pipeThrough(new CompressionStream('deflate'))
+    ).arrayBuffer());
+
+    // Assemble PNG: signature + IHDR(RGB) + IDAT + IEND.
+    const sig = new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10]);
+    const ihdr = new Uint8Array(13);
+    const ihdrView = new DataView(ihdr.buffer);
+    ihdrView.setUint32(0, width);
+    ihdrView.setUint32(4, height);
+    ihdr[8] = 8; ihdr[9] = 2; ihdr[10] = 0; ihdr[11] = 0; ihdr[12] = 0;
+    const parts = [sig, pngChunk('IHDR', ihdr), pngChunk('IDAT', deflated), pngChunk('IEND', new Uint8Array(0))];
+    const outLen = parts.reduce((s, p) => s + p.length, 0);
+    const out = new Uint8Array(outLen);
+    let p = 0;
+    for (const part of parts) { out.set(part, p); p += part.length; }
+    return out;
+  } catch (err) {
+    console.error('flattenRgbaPng failed:', err.message);
+    return null;
+  }
+}
 async function fetchLogoDataUrl(): Promise<string | null> {
   try {
     const res = await fetch(LOGO_URL);
     if (!res.ok) return null;
     const buf = new Uint8Array(await res.arrayBuffer());
+    const flat = await flattenRgbaPng(buf);
+    if (!flat) return null;
     let binary = '';
     const chunk = 0x8000;
-    for (let i = 0; i < buf.length; i += chunk) {
-      binary += String.fromCharCode(...buf.subarray(i, i + chunk));
+    for (let i = 0; i < flat.length; i += chunk) {
+      binary += String.fromCharCode(...flat.subarray(i, i + chunk));
     }
     return 'data:image/png;base64,' + btoa(binary);
   } catch (err) {
@@ -103,14 +241,17 @@ function buildInvoicePDF(order: any, imp: { addressLines: string[]; contactLines
   // Local helper to draw ASCII-normalized text.
   const T = (text: string, x: number, yy: number, opts?: any) => doc.text(ascii(text), x, yy, opts);
 
-  // ── Header: TIC wordmark (text-based — avoids jsPDF PNG decode issues) ─
+  // ── Header: TIC logo + wordmark ──────────────────────────────────────
+  if (logoDataUrl) {
+    doc.addImage(logoDataUrl, 'PNG', marginL, y - 4, 18, 18);
+  }
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(20);
-  T('TIC', marginL, y + 5);
+  doc.setFontSize(14);
+  T('TIC', marginL + 22, y + 4);
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(7);
   doc.setTextColor(120);
-  T('ORIGINALS', marginL + 16, y + 9);
+  T('ORIGINALS', marginL + 22, y + 8);
   doc.setTextColor(0);
 
   // Absender (small print, right-aligned block) — address + contact from Impressum
