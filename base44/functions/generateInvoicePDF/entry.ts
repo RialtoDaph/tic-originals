@@ -231,24 +231,71 @@ async function fetchLogoDataUrl(): Promise<string | null> {
   }
 }
 
-function buildInvoicePDF(order: any, imp: { addressLines: string[]; contactLines: string[]; ustId: string; steuerNr: string }, logoDataUrl: string | null): Uint8Array {
+// ── Unicode font loading ─────────────────────────────────────────────
+// jsPDF's built-in helvetica only supports WinAnsi/Latin-1 and mis-renders
+// non-ASCII characters as "ï¿½". We embed Roboto TTF (full Unicode cmap) so
+// that ß, ä, ö, ü, €, § etc. render natively. Falls back to helvetica + ascii()
+// transliteration if the font fetch fails.
+const _fontCache: Record<string, string> = {};
+async function fetchTtfBase64(url: string): Promise<string | null> {
+  if (_fontCache[url]) return _fontCache[url];
+  try {
+    const res = await fetch(url);
+    if (!res.ok) return null;
+    const buf = new Uint8Array(await res.arrayBuffer());
+    let binary = '';
+    const chunk = 0x8000;
+    for (let i = 0; i < buf.length; i += chunk) {
+      binary += String.fromCharCode(...buf.subarray(i, i + chunk));
+    }
+    const b64 = btoa(binary);
+    _fontCache[url] = b64;
+    return b64;
+  } catch {
+    return null;
+  }
+}
+async function loadUnicodeFonts(): Promise<{ regular: string; bold: string } | null> {
+  const [regular, bold] = await Promise.all([
+    fetchTtfBase64('https://cdn.jsdelivr.net/npm/@expo-google-fonts/roboto/400Regular/Roboto_400Regular.ttf'),
+    fetchTtfBase64('https://cdn.jsdelivr.net/npm/@expo-google-fonts/roboto/700Bold/Roboto_700Bold.ttf'),
+  ]);
+  if (regular && bold) return { regular, bold };
+  return null;
+}
+
+function buildInvoicePDF(order: any, imp: { addressLines: string[]; contactLines: string[]; ustId: string; steuerNr: string }, logoDataUrl: string | null, fonts: { regular: string; bold: string } | null): Uint8Array {
   const doc = new jsPDF({ unit: 'mm', format: 'a4' });
   const pageW = 210;
   const marginL = 20;
   const marginR = 20;
   let y = 20;
 
-  // Local helper to draw ASCII-normalized text.
-  const T = (text: string, x: number, yy: number, opts?: any) => doc.text(ascii(text), x, yy, opts);
+  // Use Unicode font (Roboto) when available for proper German character rendering.
+  // Fall back to helvetica + ASCII transliteration if font embedding fails.
+  const useUnicode = !!fonts;
+  const fontName = useUnicode ? 'Roboto' : 'helvetica';
+  if (useUnicode) {
+    doc.addFileToVFS('Roboto-Regular.ttf', fonts!.regular);
+    doc.addFileToVFS('Roboto-Bold.ttf', fonts!.bold);
+    doc.addFont('Roboto-Regular.ttf', 'Roboto', 'normal');
+    doc.addFont('Roboto-Bold.ttf', 'Roboto', 'bold');
+  }
+
+  // Text helper: raw Unicode text when font is embedded, ASCII-transliterated fallback otherwise.
+  const T = (text: string, x: number, yy: number, opts?: any) =>
+    doc.text(useUnicode ? String(text ?? '') : ascii(text), x, yy, opts);
+  // Euro formatting: native € with Unicode font, "EUR" with ASCII fallback.
+  const eur = (amount: number) => useUnicode ? `€ ${amount.toFixed(2)}` : `EUR ${amount.toFixed(2)}`;
 
   // ── Header: TIC logo + wordmark ──────────────────────────────────────
   if (logoDataUrl) {
     doc.addImage(logoDataUrl, 'PNG', marginL, y - 4, 18, 18);
   }
-  doc.setFont('helvetica', 'bold');
+  doc.setFont(fontName, 'bold');
   doc.setFontSize(14);
   T('TIC', marginL + 22, y + 4);
-  doc.setFont('helvetica', 'normal');
+  doc.setFont(fontName, 'normal');
   doc.setFontSize(7);
   doc.setTextColor(120);
   T('ORIGINALS', marginL + 22, y + 8);
@@ -267,12 +314,12 @@ function buildInvoicePDF(order: any, imp: { addressLines: string[]; contactLines
   y += 25;
 
   // ── Invoice title + meta ─────────────────────────────────────────────
-  doc.setFont('helvetica', 'bold');
+  doc.setFont(fontName, 'bold');
   doc.setFontSize(18);
   T('RECHNUNG', marginL, y);
   y += 8;
 
-  doc.setFont('helvetica', 'normal');
+  doc.setFont(fontName, 'normal');
   doc.setFontSize(9);
   const invoiceDate = order.created_date
     ? new Date(order.created_date).toLocaleDateString('de-DE')
@@ -289,11 +336,11 @@ function buildInvoicePDF(order: any, imp: { addressLines: string[]; contactLines
 
   // ── Bill-to address ──────────────────────────────────────────────────
   const addr = order.shipping_address || {};
-  doc.setFont('helvetica', 'bold');
+  doc.setFont(fontName, 'bold');
   doc.setFontSize(9);
   T('Rechnungsadresse', marginL, y);
   y += 5;
-  doc.setFont('helvetica', 'normal');
+  doc.setFont(fontName, 'normal');
   doc.setFontSize(10);
   const nameLine = `${addr.first_name || ''} ${addr.last_name || ''}`.trim() || order.customer_name || '';
   if (nameLine) { T(nameLine, marginL, y); y += 5; }
@@ -314,7 +361,7 @@ function buildInvoicePDF(order: any, imp: { addressLines: string[]; contactLines
 
   // ── Items table ──────────────────────────────────────────────────────
   const colX = { desc: marginL, qty: 120, price: 145, total: pageW - marginR };
-  doc.setFont('helvetica', 'bold');
+  doc.setFont(fontName, 'bold');
   doc.setFontSize(9);
   doc.setFillColor(240);
   doc.rect(marginL - 2, y - 4, pageW - marginL - marginR + 4, 7, 'F');
@@ -324,15 +371,15 @@ function buildInvoicePDF(order: any, imp: { addressLines: string[]; contactLines
   T('Gesamt', colX.total, y, { align: 'right' });
   y += 6;
 
-  doc.setFont('helvetica', 'normal');
+  doc.setFont(fontName, 'normal');
   doc.setFontSize(9);
   for (const item of (order.items || [])) {
     const desc = `${item.product_name || ''}${item.color || item.size ? ` (${[item.color, item.size].filter(Boolean).join(' / ')})` : ''}`;
-    const lines = doc.splitTextToSize(ascii(desc), colX.qty - colX.desc - 4);
+    const lines = doc.splitTextToSize(useUnicode ? desc : ascii(desc), colX.qty - colX.desc - 4);
     doc.text(lines, colX.desc, y);
     T(String(item.quantity || 0), colX.qty, y, { align: 'right' });
-    T(`EUR ${(item.unit_price || 0).toFixed(2)}`, colX.price, y, { align: 'right' });
-    T(`EUR ${((item.unit_price || 0) * (item.quantity || 0)).toFixed(2)}`, colX.total, y, { align: 'right' });
+    T(eur(item.unit_price || 0), colX.price, y, { align: 'right' });
+    T(eur((item.unit_price || 0) * (item.quantity || 0)), colX.total, y, { align: 'right' });
     y += Math.max(5, lines.length * 4.5) + 2;
     if (y > 240) { doc.addPage(); y = 20; }
   }
@@ -346,35 +393,35 @@ function buildInvoicePDF(order: any, imp: { addressLines: string[]; contactLines
   const labelX = 140;
   doc.setFontSize(9);
   const row = (label: string, value: string, bold = false) => {
-    doc.setFont('helvetica', bold ? 'bold' : 'normal');
+    doc.setFont(fontName, bold ? 'bold' : 'normal');
     T(label, labelX, y, { align: 'right' });
     T(value, pageW - marginR, y, { align: 'right' });
     y += 5;
   };
-  row('Zwischensumme:', `EUR ${(order.subtotal || 0).toFixed(2)}`);
+  row('Zwischensumme:', eur(order.subtotal || 0));
   if (order.discount_amount > 0) {
-    row(`Rabatt${order.applied_discount_code ? ` (${order.applied_discount_code})` : ''}:`, `- EUR ${order.discount_amount.toFixed(2)}`);
+    row(`Rabatt${order.applied_discount_code ? ` (${order.applied_discount_code})` : ''}:`, useUnicode ? `-€ ${order.discount_amount.toFixed(2)}` : `- EUR ${order.discount_amount.toFixed(2)}`);
   }
-  row('Versand:', order.shipping_cost > 0 ? `EUR ${order.shipping_cost.toFixed(2)}` : 'Kostenlos');
+  row('Versand:', order.shipping_cost > 0 ? eur(order.shipping_cost) : 'Kostenlos');
   y += 1;
   doc.setDrawColor(0);
   doc.line(labelX - 20, y, pageW - marginR, y);
   y += 4;
   doc.setFontSize(11);
-  row('GESAMT:', `EUR ${(order.total || 0).toFixed(2)}`, true);
+  row('GESAMT:', eur(order.total || 0), true);
 
   y += 8;
-  doc.setFont('helvetica', 'normal');
+  doc.setFont(fontName, 'normal');
   doc.setFontSize(9);
   doc.setTextColor(60);
   // Kleinunternehmer-Hinweis nach § 19 UStG.
-  T('Gemaess Paragraph 19 UStG wird keine Umsatzsteuer berechnet.', marginL, y);
+  T('Gemäß § 19 UStG wird keine Umsatzsteuer berechnet.', marginL, y);
   y += 6;
   doc.setFontSize(8);
   doc.setTextColor(100);
   T('Zahlung: bereits per Kreditkarte / PayPal beglichen.', marginL, y);
   y += 8;
-  T('Vielen Dank fuer deine Bestellung!', marginL, y);
+  T('Vielen Dank für deine Bestellung!', marginL, y);
 
   // ── Footer with Impressum ────────────────────────────────────────────
   const footerY = 280;
@@ -420,14 +467,15 @@ Deno.serve(async (req) => {
     const order = await base44.asServiceRole.entities.Order.get(order_id);
     if (!order) return Response.json({ error: 'Order not found' }, { status: 404 });
 
-    // Load Impressum for absender data + fetch logo (parallel)
-    const [impressumResults, logoDataUrl] = await Promise.all([
+    // Load Impressum + logo + Unicode fonts (all in parallel)
+    const [impressumResults, logoDataUrl, fonts] = await Promise.all([
       base44.asServiceRole.entities.LegalPage.filter({ slug: 'impressum' }),
       fetchLogoDataUrl(),
+      loadUnicodeFonts(),
     ]);
     const imp = parseImpressum(impressumResults[0]);
 
-    const pdfBytes = buildInvoicePDF(order, imp, logoDataUrl);
+    const pdfBytes = buildInvoicePDF(order, imp, logoDataUrl, fonts);
 
     if (action === 'send') {
       const recipient = TEST_MODE ? TEST_EMAIL : order.customer_email;
